@@ -1,0 +1,6 @@
+# Ignora la carpeta de dependencias
+node_modules/
+# Ignora la carpeta de compilación
+dist/
+# Ignora el archivo de configuración de entorno 
+.env
