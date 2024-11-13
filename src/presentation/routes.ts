@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { HelloWorldRoutes } from "./helloworld/helloworld-routes";
+import { KitchenRoutes } from "./kitchen/kitchen-routes";
 
 export class AppRoutes {
     static get routes(): Router {
 
         const router = Router();
 
-        router.use('/api/HelloWorld', HelloWorldRoutes.routes);
+        router.use('/api/kitchen', KitchenRoutes.routes); //Ruta de las cocinas
 
         return router;
     }
