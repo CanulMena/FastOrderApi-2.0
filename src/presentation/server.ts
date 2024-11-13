@@ -17,7 +17,8 @@ export class AppServer {
     }
 
     async start(){
-
+        
+        this.app.use(express.json()); //* raw json
         this.app.use( this.routes );
 
         this.app.listen( this.port, () => {
