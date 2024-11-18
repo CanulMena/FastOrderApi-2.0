@@ -4,7 +4,6 @@ export class CreateKitchenDto {
     public readonly name: string, //?Readonly significa que no se puede modificar después de la creación
     public readonly address: string,
     public readonly phone: string,
-    public readonly creationDate?: Date | null,
   ){}
 
   static create( props: {[key: string]: any} ): [ string?, CreateKitchenDto? ] {
