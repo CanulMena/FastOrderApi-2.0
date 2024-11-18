@@ -4,3 +4,5 @@ node_modules/
 dist/
 # Ignora el archivo de configuración de entorno 
 .env
+# Ignora la carpeta de dependencias de postgres - Docker
+postgres/
