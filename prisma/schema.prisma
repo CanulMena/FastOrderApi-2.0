@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Cocina {
+  id        Int                     @id @default(autoincrement()) @db.Integer
+  nombre    String                  @db.VarChar(100)
+  direccion String                  @db.Text   
+  telefono  String                  @db.VarChar(15)
+  usuarios  Usuario[] // Relación uno a muchos con Usuario
+  complementos Complemento[] // Relación uno a muchos con Complemento
+  platillos Platillo[] // Relación uno a muchos con Platillo
+  pagosPendientes PagosPendientes[] // Relación uno a muchos con PagosPendientes
+  clientes Cliente[] // Relación uno
+  pedidos Pedido[] // Relación uno a muchos con Pedido
+}
+
+model Usuario {
+  id          Int     @id @default(autoincrement()) @db.Integer
+  cocinaId    Int     @db.Integer
+  email       String  @unique @db.VarChar(150)
+  contrasena  String  @db.VarChar(255)
+  rol         Rol     @default(ADMIN)
+  cocina      Cocina  @relation(fields: [cocinaId], references: [id]) //El de muchos hace la ralación con el uno
+}
+
+model Platillo {
+  id            Int           @id @default(autoincrement())
+  nombre        String        @db.VarChar(100)
+  precioMedia   Float         @db.Real
+  precioEntera  Float         @db.Real
+  rutaImagen    String?       @db.Text 
+  cocinaId      Int           @db.Integer
+  cocina        Cocina        @relation(fields: [cocinaId], references: [id]) //El de muchos hace la ralación con el uno
+  complementos  PlatilloComplemento[] // Relación con la tabla intermedia
+  detalles      DetallePedido[] // Relación uno a muchos con DetallePedido
+}
+
+model Complemento {
+  id            Int           @id @default(autoincrement())
+  nombre        String        @db.VarChar(100)
+  descripcion   String?       @db.Text
+  rutaImagen    String?       @db.Text
+  cocinaId      Int           @db.Integer
+  cocina        Cocina        @relation(fields: [cocinaId], references: [id]) //El de muchos hace la ralación con el uno
+  platillos     PlatilloComplemento[] // Relación con la tabla intermedia
+
+  @@unique([nombre, cocinaId]) // Restricción de unicidad
+}
+
+model PlatilloComplemento {
+  platilloId   Int         @db.Integer
+  complementoId Int        @db.Integer
+  platillo     Platillo    @relation(fields: [platilloId], references: [id])
+  complemento  Complemento @relation(fields: [complementoId], references: [id])
+
+  @@id([platilloId, complementoId]) // Clave primaria compuesta
+}
+
+model Cliente {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @db.VarChar(100)
+  telefono String?    @db.VarChar(15)
+  direccion String?   @db.Text
+  cocinaId Int        @db.Integer
+  cocina   Cocina     @relation(fields: [cocinaId], references: [id]) // Relación con Cocina
+  pedidos  Pedido[] // Relación uno a muchos con Pedido
+}
+
+model Pedido {
+  id           Int            @id @default(autoincrement())
+  fecha        DateTime       @db.Timestamp
+  estado       EstadoPedido   @default(PENDIENTE)
+  tipoEntrega  TipoEntrega    @default(PRESENCIAL)
+  tipoPago     TipoPago       @default(EFECTIVO)
+  clienteId    Int            @db.Integer
+  cocinaId     Int            @db.Integer
+  cocina       Cocina         @relation(fields: [cocinaId], references: [id]) // Relación con Cocina
+  cliente      Cliente        @relation(fields: [clienteId], references: [id]) // Relación con Cliente
+  pagosPendientes PagosPendientes? // Relación uno a muchos con PagosPendientes
+  detalles     DetallePedido[] // Relación uno a muchos con DetallePedido
+}
+
+model PagosPendientes {
+  id           Int        @id @default(autoincrement()) @db.Integer
+  cantidad     Float      @db.Real
+  montoPendiente Float    @db.Real
+  estadoPago   EstadoPago @default(PENDIENTE)
+  pedidoId     Int        @unique @db.Integer
+  cocinaId     Int        @db.Integer
+  cocina       Cocina     @relation(fields: [cocinaId], references: [id]) // Relación con Cocina
+  pedido       Pedido     @relation(fields: [pedidoId], references: [id]) // Relación con Pedido
+}
+
+model DetallePedido {
+  id             Int           @id @default(autoincrement())
+  cantidadEntera Int           @db.Integer
+  cantidadMedia  Int           @db.Integer
+  subtotal       Float         @db.Real
+  pedidoId       Int           @db.Integer
+  platilloId     Int           @db.Integer
+  pedido         Pedido        @relation(fields: [pedidoId], references: [id]) // Relación con Pedido
+  platillo       Platillo      @relation(fields: [platilloId], references: [id]) // Relación con Platillo
+}
+
+enum EstadoPago {
+  PENDIENTE
+  PAGADO
+}
+
+enum Rol {
+  ADMIN
+  DELIVERY
+  OPERATOR 
+}
+
+enum EstadoPedido {
+  PENDIENTE
+  ENTREGADO
+  CANCELADO
+}
+
+enum TipoEntrega {
+  ENVIO
+  PRESENCIAL
+}
+
+enum TipoPago {
+  EFECTIVO
+  TARJETA
+  FIADO
+}
