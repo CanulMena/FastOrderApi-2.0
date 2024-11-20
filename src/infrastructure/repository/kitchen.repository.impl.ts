@@ -21,7 +21,7 @@ export class KitchenRepositoryImpl implements KitchenRepository {
   deleteKitchen( kitchenId: number ) : Promise<Kitchen>{
     return this.datasource.deleteKitchen(kitchenId);
   }
-  updateKitchen( kitchenId: number, kitchen: CreateKitchenDto ) : Promise<Kitchen>{
-    return this.datasource.updateKitchen(kitchenId, kitchen);
+  updateKitchen( kitchen: CreateKitchenDto ) : Promise<Kitchen>{
+    return this.datasource.updateKitchen(kitchen);
   }
 }
