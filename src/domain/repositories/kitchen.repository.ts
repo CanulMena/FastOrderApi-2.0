@@ -6,5 +6,5 @@ export abstract class KitchenRepository {
   abstract getKitchens() : Promise<Kitchen[]>;
   abstract getKitchenById( kitchenId: number ) : Promise<Kitchen>;
   abstract deleteKitchen( kitchenId: number ) : Promise<Kitchen>;
-  abstract updateKitchen( kitchenId: number, kitchen: CreateKitchenDto ) : Promise<Kitchen>;
+  abstract updateKitchen( kitchen: CreateKitchenDto ) : Promise<Kitchen>;
 }
