@@ -9,7 +9,7 @@ export class User {
     public kitchenId: number // Relación con la cocina a la que pertenece
   ) {}
 
-  static fromJSON(object: {[key: string] : any}): User {
+  static fromJson(object: {[key: string] : any}): User {
     const { 
       userId, 
       email, 
