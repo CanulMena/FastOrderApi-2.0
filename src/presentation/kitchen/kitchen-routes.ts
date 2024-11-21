@@ -1,11 +1,16 @@
 import { Router } from "express";
 import { KitchenController } from "./kitchen-controller";
+import { KitchenDatasourceImpl } from "../../infrastructure/datasource/index";
+import { KitchenRepositoryImpl } from "../../infrastructure/repository/index";
 
 export class KitchenRoutes {
     //? AL NO SER STATIC TENGO QUE CREAR UNA INSTACIA DE LA CLASE
     static get routes(): Router { //verbos http de la ruta de las cocinas
         const router = Router();
-        const kitchenController = new KitchenController();
+
+        const kitchenDatasourceImpl = new KitchenDatasourceImpl();
+        const kichenRepositoryImpl = new KitchenRepositoryImpl( kitchenDatasourceImpl );
+        const kitchenController = new KitchenController(  kichenRepositoryImpl );
 
         router.get('/', kitchenController.getKitchens);
 
@@ -14,6 +19,8 @@ export class KitchenRoutes {
         router.post('/', kitchenController.postKitchen);
 
         router.delete('/:id', kitchenController.deleteKitchen);
+
+        router.put('/:id', kitchenController.updateKitchen);
 
         return router;
     }

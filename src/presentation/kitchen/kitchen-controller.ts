@@ -1,76 +1,70 @@
 import { Request, Response } from 'express';
-import { Kitchen } from '../../domain/entities/index';
 import { CreateKitchenDto } from '../../domain/dtos/index';
-
-const kitchenList: Kitchen[] = [
-    new Kitchen(1, 'Cocina 1', 'Dirección 1','123456789'),
-    new Kitchen(2, 'Cocina 2', 'Dirección 2','123456789'),
-    new Kitchen(3, 'Cocina 3', 'Dirección 3','123456789'),
-    new Kitchen(4, 'Cocina 4', 'Dirección 4','123456789'),
-    new Kitchen(5, 'Cocina 5', 'Dirección 5','123456789'),
-    new Kitchen(6, 'Cocina 6', 'Dirección 6','123456789'),
-    new Kitchen(7, 'Cocina 7', 'Dirección 7','123456789'),
-    new Kitchen(8, 'Cocina 8', 'Dirección 8','123456789'),
-    new Kitchen(9, 'Cocina 9', 'Dirección 9','123456789'),
-    new Kitchen(10, 'Cocina 10', 'Dirección 10', '123456789'),
-];
+import { KitchenRepositoryImpl } from '../../infrastructure/repository/index';
+import { UpdateKitchenDto } from '../../domain/dtos/update-kitchen.dto';
 
 export class KitchenController {
 
-    constructor() {}  //TODO: inyectar repositorios al tener la capa de infraestructura
+    constructor(
+        public kitchenRepositoryImpl: KitchenRepositoryImpl
+    ){}
 
     public getKitchens = (req: Request, res: Response) => { //GET /api/kitchen
-        res.status(200).json(kitchenList);
-        return;
+        this.kitchenRepositoryImpl.getKitchens()
+        .then( kitchens => res.status(200).json(kitchens) ) // 200 OK
+        .catch( error => res.status(500).json({error}) ); // 500 internal
     }
 
     public getKitchenById = (req: Request, res: Response) => { //GET /api/kitchen/:id
         const kitchenId = +req.params.id;  //?El signo + convierte el string a number
-
+        //* Siempre cuando exista un Dto, ahí es donde irán las validaciones
         if( isNaN(kitchenId) ){
-            res.status(400).json({error: 'ID argument is not a number' });
+            res.status(400).json({error: 'ID argument is not a number' }); //? 400 Bad Request
         }
 
-        const kitchen = kitchenList.find(kitchen => kitchen.kitchenId === kitchenId);
-        if (kitchen) {
-            res.status(200).json(kitchen);
-            return;
-        } else {
-            res.status(404).json({error: 'Kitchen not found' });
-            return;
-        }
+        this.kitchenRepositoryImpl.getKitchenById(kitchenId)        
+        .then( kitchen => res.status(200).json(kitchen) ) //? 200 OK
+        .catch( error => res.status(404).json({ "error": error.message}) ); //? 404 Not Found
     }
 
     public postKitchen = (req: Request, res: Response) => { //POST /api/kitchen
 
-        const [error, kitchen] = CreateKitchenDto.create(req.body);
+        const [error, kitchenDto] = CreateKitchenDto.create(req.body);
 
         if (error) {
-            res.status(400).json({error});
+            res.status(400).json({error}); // 400 Bad Request
             return;
         }
 
-        //TODO: Agregar el kitchen al datasource para que se cree en la base de datos
+        this.kitchenRepositoryImpl.createKitchen(kitchenDto!)
+        .then( kitchen => res.status(201).json(kitchen) ) // 201 Created
+        .catch( error => res.status(404).json({ error: error.message }) ); // 404 Not Found
     }
 
     public deleteKitchen = (req: Request, res: Response) => { //DELETE /api/kitchen/:id
         const kitchenId = +req.params.id;
-
+        //* Siempre cuando exista un Dto, ahí es donde irán las validaciones
         if( isNaN(kitchenId) ){ //? isNaN() determina si un valor es numero o no
             res.status(400).json({error: 'ID argument is not a number' });
         }
 
-        const kitchen = kitchenList.find(kitchen => kitchen.kitchenId === kitchenId);
+        this.kitchenRepositoryImpl.deleteKitchen(kitchenId)
+        .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
+        .catch( error => res.status(404).json({ "error": error.message}) ); // 404 Not Found
+    }
 
-        if (!kitchen) {
-            res.status(404).json({error: 'Kitchen not found' });
+    public updateKitchen = (req: Request, res: Response) => { //PUT /api/kitchen/:id
+        const id = +req.params.id;
+        const [error, updateKitchenDto] = UpdateKitchenDto.create({...req.body, id});
+
+        if (error) {
+            res.status(400).json({error}); // 400 Bad Request
             return;
-        } else {
-            const index = kitchenList.indexOf(kitchen);
-            kitchenList.splice(index, 1); //? splice( apartir de que numero se eliminará, cuantos eliminará apartir del numero asigando ) elimina un elemento del array
-            res.status(200).json(kitchen);
         }
-        
+
+        this.kitchenRepositoryImpl.updateKitchen(updateKitchenDto!)
+        .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
+        .catch( error => res.status(404).json({ "error": error.message}) ); // 404
     }
 
 }
