@@ -1,3 +1,4 @@
+
 export class User {
   constructor(
     public userId: number, //Identificador unico del usuario
@@ -14,25 +15,19 @@ export class User {
       email, 
       passwordHash, 
       rol, 
-      // creationDate, // Se espera que sea un string con formato de fecha
       kitchenId } = object;
 
-    let newCreationDate;
+      if(!userId) throw new Error('userId is required');
+      if(!email) throw new Error('email is required');
+      if(!passwordHash) throw new Error('passwordHash is required');
+      if(!rol) throw new Error('rol is required');
+      if(!kitchenId) throw new Error('kitchenId is required');
 
-
-
-    if (rol) {
-      if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY') { // Se espera que el rol sea uno de los tres valores  
-        throw ('rol is not a valid value');
+      if (rol) {
+        if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY') { // Se espera que el rol sea uno de los tres valores  
+          throw new Error('rol is not a valid value');
+        }
       }
-    }
-
-    // if (creationDate) {
-    //   newCreationDate = new Date(creationDate);
-    //   if (isNaN(newCreationDate.getTime())) {
-    //     throw ('creationDate is not a valid date');
-    //   }
-    // }
 
     return new User(
       userId,
@@ -44,3 +39,11 @@ export class User {
     );
   }
 }
+
+    // let newCreationDate;
+    // if (creationDate) {
+    //   newCreationDate = new Date(creationDate);
+    //   if (isNaN(newCreationDate.getTime())) {
+    //     throw ('creationDate is not a valid date');
+    //   }
+    // }
