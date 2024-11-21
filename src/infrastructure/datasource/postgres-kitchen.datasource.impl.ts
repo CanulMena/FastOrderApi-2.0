@@ -4,7 +4,7 @@ import { CreateKitchenDto } from '../../domain/dtos/index';
 import { Kitchen } from '../../domain/entities/index';
 import { UpdateKitchenDto } from '../../domain/dtos/update-kitchen.dto';
 
-export class KitchenDatasourceImpl implements KitchenDatasource {
+export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
 
   private readonly prisma = new PrismaClient().cocina;
 

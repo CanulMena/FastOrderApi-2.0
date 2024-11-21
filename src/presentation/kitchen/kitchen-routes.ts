@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { KitchenController } from "./kitchen-controller";
-import { KitchenDatasourceImpl } from "../../infrastructure/datasource/index";
+import { PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl } from "../../infrastructure/repository/index";
 
 export class KitchenRoutes {
@@ -8,7 +8,7 @@ export class KitchenRoutes {
     static get routes(): Router { //verbos http de la ruta de las cocinas
         const router = Router();
 
-        const kitchenDatasourceImpl = new KitchenDatasourceImpl();
+        const kitchenDatasourceImpl = new PostgresKitchenDatasourceImpl();
         const kichenRepositoryImpl = new KitchenRepositoryImpl( kitchenDatasourceImpl );
         const kitchenController = new KitchenController(  kichenRepositoryImpl );
 
