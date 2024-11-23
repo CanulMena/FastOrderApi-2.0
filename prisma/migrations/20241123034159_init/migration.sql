@@ -79,7 +79,7 @@ CREATE TABLE "Cliente" (
 -- CreateTable
 CREATE TABLE "Pedido" (
     "id" SERIAL NOT NULL,
-    "fecha" TIMESTAMP NOT NULL,
+    "fecha" TIMESTAMP(6) NOT NULL,
     "estado" "EstadoPedido" NOT NULL DEFAULT 'PENDIENTE',
     "tipoEntrega" "TipoEntrega" NOT NULL DEFAULT 'PRESENCIAL',
     "tipoPago" "TipoPago" NOT NULL DEFAULT 'EFECTIVO',
@@ -132,19 +132,19 @@ ALTER TABLE "Platillo" ADD CONSTRAINT "Platillo_cocinaId_fkey" FOREIGN KEY ("coc
 ALTER TABLE "Complemento" ADD CONSTRAINT "Complemento_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PlatilloComplemento" ADD CONSTRAINT "PlatilloComplemento_platilloId_fkey" FOREIGN KEY ("platilloId") REFERENCES "Platillo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PlatilloComplemento" ADD CONSTRAINT "PlatilloComplemento_complementoId_fkey" FOREIGN KEY ("complementoId") REFERENCES "Complemento"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PlatilloComplemento" ADD CONSTRAINT "PlatilloComplemento_complementoId_fkey" FOREIGN KEY ("complementoId") REFERENCES "Complemento"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PlatilloComplemento" ADD CONSTRAINT "PlatilloComplemento_platilloId_fkey" FOREIGN KEY ("platilloId") REFERENCES "Platillo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Cliente" ADD CONSTRAINT "Cliente_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PagosPendientes" ADD CONSTRAINT "PagosPendientes_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
