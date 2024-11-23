@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("POSTGRES_URL")
-  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 model Cocina {
@@ -118,6 +117,7 @@ enum Rol {
   ADMIN
   DELIVERY
   OPERATOR
+  SUPER_ADMIN
 }
 
 enum EstadoPedido {
