@@ -4,38 +4,38 @@ export class User {
     public userId: number, //Identificador unico del usuario
     public email: string, // Guardar el correo con el que se registrará el usuario
     public passwordHash: string, // Guardar el hash en vez de la contraseña
-    public rol: 'ADMIN' | 'OPERATOR' | 'DELIVERY', //Roles que puede tener el usuario
+    public rol: 'ADMIN' | 'OPERATOR' | 'DELIVERY' | 'SUPER_ADMIN', //Roles que puede tener el usuario
     // public creationDate: Date, //Fecha de creación
-    public kitchenId: number // Relación con la cocina a la que pertenece
+    public kitchenId?: number // Relación con la cocina a la que pertenece
   ) {}
 
-  static fromJson(object: {[key: string] : any}): User {
-    const { 
-      userId, 
+  static fromJson(object: {[key: string] : any}): User { //*Factory method para crear un usuario - de la clase creacional
+    const {  //encanpsulan la logica de validacion, ya que esta relacionado con las reglas de negocio de la cración del usuario
+      id,
       email, 
-      passwordHash, 
-      rol, 
-      kitchenId } = object;
+      contrasena,
+      rol,
+      cocinaId } = object;
 
-      if(!userId) throw new Error('userId is required');
+      if(!id) throw new Error('id is required');
       if(!email) throw new Error('email is required');
-      if(!passwordHash) throw new Error('passwordHash is required');
+      if(!contrasena) throw new Error('passwordHash is required');
       if(!rol) throw new Error('rol is required');
-      if(!kitchenId) throw new Error('kitchenId is required');
+      
+      //quiero validar que si kitchen id existe sea un numero
+      if(cocinaId && typeof cocinaId !== 'number') throw new Error('cocinaId is not a number');
 
-      if (rol) {
-        if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY') { // Se espera que el rol sea uno de los tres valores  
-          throw new Error('rol is not a valid value');
-        }
+      if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY' && rol !== 'SUPER_ADMIN') { // Se espera que el rol sea uno de los cuatro valores  
+        throw new Error('rol is not a valid value');
       }
 
     return new User(
-      userId,
+      id,
       email,
-      passwordHash,
+      contrasena,
       rol,
       // creationDate,
-      kitchenId
+      cocinaId
     );
   }
 }
