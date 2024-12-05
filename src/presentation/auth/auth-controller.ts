@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repositories';
 import { CreateUser } from '../../domain/use-case/user/create-user';
 
-export class UserController {
+export class AuthController {
   constructor(
     public userRepositoryImpl: UserRepository
   ){}
- 
-  public postUser = async (req: Request, res: Response) => {
+
+  public registerUser = async (req: Request, res: Response) => {
     const { email, passwordHash, rol, kitchenId } = req.body;
 
     if(!email) {
@@ -39,6 +39,14 @@ export class UserController {
     .exucute({ email, passwordHash, rol, kitchenId })
     .then( user => res.status(201).json(user) )
     .catch( error => res.status(404).json({ error: error.message }) ); // 404 Not Found
+  }
+
+  public loginUser = async (req: Request, res: Response) => {
+    res.status(200).json({ message: 'loginUser' });
+  }
+
+  public validateEmail = async (req: Request, res: Response) => {
+    res.status(200).json({ message: 'validateEmail' });
   }
 
 } 
