@@ -1,4 +1,4 @@
-import { CreateKitchenDto } from '../dtos';
+import { CreateKitchenDto } from '../dtos/kitchen/index';
 import { Kitchen } from '../entities/index';
 
 export abstract class KitchenDatasource {
