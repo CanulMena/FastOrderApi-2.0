@@ -6,3 +6,5 @@ dist/
 .env
 # Ignora la carpeta de dependencias de postgres - Docker
 postgres/
+#Ignora la carpeta de dependencias de prisma
+prisma/
