@@ -23,7 +23,9 @@ model Cocina {
 model Usuario {
   id         Int     @id @default(autoincrement())
   cocinaId   Int?
+  nombre     String  @db.VarChar(100) @default("Nombre por defecto")
   email      String  @unique @db.VarChar(150)
+  emailValid Boolean @default(false)
   contrasena String  @db.VarChar(255)
   rol        Rol     @default(ADMIN)
   cocina     Cocina? @relation(fields: [cocinaId], references: [id])
