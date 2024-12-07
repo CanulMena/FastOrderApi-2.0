@@ -27,7 +27,7 @@ export class AuthController {
       return
     }
     new CreateUser( this.userRepositoryImpl )
-    .exucute(registerUserDto)
+    .exucute(registerUserDto!)
     .then( user => {
       const { passwordHash, ...userEntity } = user;
       res.status(201).json({ 
