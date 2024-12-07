@@ -26,7 +26,7 @@ export class User {
       if(!email) throw CustomError.badRequest('Missing email');
       if(emailValid === undefined) throw CustomError.badRequest('Missing emailValid');
       if(!contrasena) throw CustomError.badRequest('Missing password');
-      if(!cocinaId) throw CustomError.badRequest('Missing kitchenId');
+      // if(!cocinaId) throw CustomError.badRequest('Missing kitchenId');
       if(!rol) throw CustomError.badRequest('Missing rol');
       if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY' && rol !== 'SUPER_ADMIN') {
         throw CustomError.badRequest('Invalid rol');
