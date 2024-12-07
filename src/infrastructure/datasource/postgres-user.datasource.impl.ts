@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { UserDatasource } from "../../domain/datasource/index";
 import { User } from "../../domain/entities/index";
-import { Kitchen } from '../../domain/entities/kitchen.entity';
 
 export class PosgresUserDataSourceImpl implements UserDatasource {
 
@@ -11,8 +10,9 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
 
     const userCreated = await this.prisma.create({ //Esta creando un usuario con la cocina que se le asigno. 
       data: {
-        email: user.email,
-        contrasena: user.passwordHash,
+        nombre: user.name,
+        email: user.email, //Me tira error si el email existe
+        contrasena: user.password,
         rol: user.rol,
         cocinaId: user.kitchenId || null,
       }
