@@ -6,9 +6,9 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
 
   private readonly prisma = new PrismaClient().usuario;
 
-  async createUser(user: any): Promise<User> { // Poder crear un usuario con una o sin una cocina
+  async createUser(user: any): Promise<User> {
 
-    const userCreated = await this.prisma.create({ //Esta creando un usuario con la cocina que se le asigno. 
+    const userCreated = await this.prisma.create({ 
       data: {
         nombre: user.name,
         email: user.email, //Me tira error si el email existe
