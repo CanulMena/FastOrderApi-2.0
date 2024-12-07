@@ -1,8 +1,12 @@
+import { bcryptAdapter } from "../../../configuration/plugins";
+import { RegisterUserDto } from "../../dtos/auth/index";
 import { User } from "../../entities";
 import { UserRepository } from "../../repositories";
 
+//
+
 interface CreateUserUseCase {
-  exucute(data: any): Promise<User>
+  exucute(registerUserDto: RegisterUserDto): Promise<User>
 }
 
 export class CreateUser implements CreateUserUseCase {
@@ -11,8 +15,10 @@ export class CreateUser implements CreateUserUseCase {
     private readonly userRepository: UserRepository
   ) {}
 
-  exucute(data: any): Promise<User> {
-    const { name, email, password, rol, kitchenId } = data;
-    return this.userRepository.createUser({name, email, password, rol, kitchenId});
+  exucute(registerUserDto: RegisterUserDto): Promise<User> {
+    const hashedPassword = bcryptAdapter.hash(registerUserDto.password);
+    const newUserDto = { ...registerUserDto, password: hashedPassword };
+    console.log(newUserDto);
+    return this.userRepository.createUser(newUserDto);
   }
 }
