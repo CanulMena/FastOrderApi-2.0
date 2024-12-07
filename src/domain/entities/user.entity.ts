@@ -1,49 +1,46 @@
+import { CustomError } from "../errors/index";
 
 export class User {
   constructor(
     public userId: number, //Identificador unico del usuario
+    public name: string, // Nombre del usuario
     public email: string, // Guardar el correo con el que se registrará el usuario
+    public emailVerified: boolean, // Verificar si el correo del usuario ha sido verificado
     public passwordHash: string, // Guardar el hash en vez de la contraseña
     public rol: 'ADMIN' | 'OPERATOR' | 'DELIVERY' | 'SUPER_ADMIN', //Roles que puede tener el usuario
-    // public creationDate: Date, //Fecha de creación
     public kitchenId?: number // Relación con la cocina a la que pertenece
   ) {}
 
-  static fromJson(object: {[key: string] : any}): User { //*Factory method para crear un usuario - de la clase creacional
-    const {  //encanpsulan la logica de validacion, ya que esta relacionado con las reglas de negocio de la cración del usuario
+  static fromJson(object: {[key: string] : any}): User {
+    const {
       id,
-      email, 
+      nombre,
+      email,
+      emailValid,
       contrasena,
       rol,
       cocinaId } = object;
 
-      if(!id) throw new Error('id is required');
-      if(!email) throw new Error('email is required');
-      if(!contrasena) throw new Error('passwordHash is required');
-      if(!rol) throw new Error('rol is required');
-      
-      //quiero validar que si kitchen id existe sea un numero
-      if(cocinaId && typeof cocinaId !== 'number') throw new Error('cocinaId is not a number');
-
-      if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY' && rol !== 'SUPER_ADMIN') { // Se espera que el rol sea uno de los cuatro valores  
-        throw new Error('rol is not a valid value');
+      if(!id) throw CustomError.badRequest('Missing id');
+      if(nombre) throw CustomError.badRequest('Missing nombre');
+      if(!email) throw CustomError.badRequest('Missing email');
+      if(emailValid === undefined) throw CustomError.badRequest('Missing emailValid');
+      if(!contrasena) throw CustomError.badRequest('Missing password');
+      if(!cocinaId) throw CustomError.badRequest('Missing kitchenId');
+      if(!rol) throw CustomError.badRequest('Missing rol');
+      if (rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY' && rol !== 'SUPER_ADMIN') {
+        throw CustomError.badRequest('Invalid rol');
       }
 
     return new User(
       id,
+      nombre,
       email,
+      emailValid,
       contrasena,
       rol,
-      // creationDate,
       cocinaId
     );
+    
   }
 }
-
-    // let newCreationDate;
-    // if (creationDate) {
-    //   newCreationDate = new Date(creationDate);
-    //   if (isNaN(newCreationDate.getTime())) {
-    //     throw ('creationDate is not a valid date');
-    //   }
-    // }
