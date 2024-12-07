@@ -12,7 +12,7 @@ export class CreateUser implements CreateUserUseCase {
   ) {}
 
   exucute(data: any): Promise<User> {
-    const { email, passwordHash, rol, kitchenId } = data;
-    return this.userRepository.createUser({email, passwordHash, rol, kitchenId});
+    const { name, email, password, rol, kitchenId } = data;
+    return this.userRepository.createUser({name, email, password, rol, kitchenId});
   }
 }
