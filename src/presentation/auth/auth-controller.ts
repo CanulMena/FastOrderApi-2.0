@@ -4,6 +4,8 @@ import { CreateUser } from '../../domain/use-case/user/create-user';
 import { RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
 
+//* En el controlador, no necesitas preocuparte por la lógica de encriptado. Solo orquestas los flujos y llamas al caso de uso
+
 export class AuthController {
   constructor(
     public userRepositoryImpl: UserRepository
