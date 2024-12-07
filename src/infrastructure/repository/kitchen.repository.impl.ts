@@ -1,5 +1,5 @@
 import { KitchenDatasource } from '../../domain/datasource';
-import { CreateKitchenDto } from '../../domain/dtos/index';
+import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { Kitchen } from '../../domain/entities/index'; 
 import { KitchenRepository } from '../../domain/repositories';
 

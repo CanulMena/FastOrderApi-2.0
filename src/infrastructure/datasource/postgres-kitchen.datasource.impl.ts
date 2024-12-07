@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { KitchenDatasource } from '../../domain/datasource/index';
-import { CreateKitchenDto } from '../../domain/dtos/index';
+import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { Kitchen } from '../../domain/entities/index';
-import { UpdateKitchenDto } from '../../domain/dtos/update-kitchen.dto';
+import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
 
 export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
 

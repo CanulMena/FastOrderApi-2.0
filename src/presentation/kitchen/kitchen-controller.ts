@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { CreateKitchenDto } from '../../domain/dtos/index';
+import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { KitchenRepositoryImpl } from '../../infrastructure/repository/index';
-import { UpdateKitchenDto } from '../../domain/dtos/update-kitchen.dto';
+import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
 
 export class KitchenController {
 
