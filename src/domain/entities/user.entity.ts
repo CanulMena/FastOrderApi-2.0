@@ -22,7 +22,7 @@ export class User {
       cocinaId } = object;
 
       if(!id) throw CustomError.badRequest('Missing id');
-      if(nombre) throw CustomError.badRequest('Missing nombre');
+      if(!nombre) throw CustomError.badRequest('Missing nombre');
       if(!email) throw CustomError.badRequest('Missing email');
       if(emailValid === undefined) throw CustomError.badRequest('Missing emailValid');
       if(!contrasena) throw CustomError.badRequest('Missing password');
