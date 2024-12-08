@@ -1,6 +1,5 @@
 import { bcryptAdapter } from "../../../configuration/plugins";
 import { RegisterUserDto } from "../../dtos/auth/index";
-import { User } from "../../entities";
 import { UserRepository } from "../../repositories";
 
 //Dentro de los casos de uso, se debe manejar la lógica de negocio de la aplicación
