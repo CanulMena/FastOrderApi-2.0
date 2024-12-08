@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repositories';
 import { CreateUser } from '../../domain/use-case/user/create-user';
-import { RegisterUserDto } from '../../domain/dtos/auth';
+import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
+import { LoginUser } from '../../domain/use-case/user/login-user';
+
+//* En el controlador, no necesitas preocuparte por la lógica de encriptado. Solo orquestas los flujos y llamas al caso de uso
 
 export class AuthController {
   constructor(
@@ -18,26 +21,29 @@ export class AuthController {
   }
 
   public registerUser = async (req: Request, res: Response) => {
-    const { name, email, password, rol, kitchenId } = req.body;
-    const [ error, registerUserDto ] = RegisterUserDto.create({ name, email, password, rol, kitchenId });
+    const [ error, registerUserDto ] = RegisterUserDto.create(req.body);
     if( error ) {
       res.status(400).json({ error: error });
       return
     }
     new CreateUser( this.userRepositoryImpl )
-    .exucute(registerUserDto)
-    .then( user => {
-      const { passwordHash, ...userEntity } = user;
-      res.status(201).json({ 
-        user: userEntity,
-        token: 'token'
-      });
-    })
+    .exucute(registerUserDto!)
+    .then( user => res.status(200).json(user))
     .catch( error => this.handleError(error, res));
   }
 
   public loginUser = async (req: Request, res: Response) => {
-    res.status(200).json({ message: 'loginUser' });
+    const [ error, loginUserDto ] = LoginUserDto.create(req.body);
+    if( error ) {
+      res.status(400).json({ error: error }); //400 Bad Request
+      return
+    }
+    new LoginUser( this.userRepositoryImpl )
+    .execute(loginUserDto!)
+    .then( response => {
+      res.status(200).json(response);
+    })
+    .catch( error => this.handleError(error, res));
   }
 
   public validateEmail = async (req: Request, res: Response) => {
