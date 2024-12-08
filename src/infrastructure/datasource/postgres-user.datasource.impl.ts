@@ -10,10 +10,18 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
 
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
 
+    const existeEmail = await this.prisma.findUnique({
+      where: {
+        email: registerUserDto.email
+      }
+    })
+
+    if (existeEmail) throw CustomError.badRequest('Email already exists');
+
     const userCreated = await this.prisma.create({ 
       data: {
         nombre: registerUserDto.name,
-        email: registerUserDto.email, //Me tira error si el email existe
+        email: registerUserDto.email,
         contrasena: registerUserDto.password,
         rol: registerUserDto.rol,
         cocinaId: registerUserDto.kitchenId || null,
@@ -34,7 +42,6 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
     if (!userFound) throw CustomError.notFound('User not found');
 
     return User.fromJson(userFound!);
-
   }
 
   getUsers(): Promise<User[]> {
