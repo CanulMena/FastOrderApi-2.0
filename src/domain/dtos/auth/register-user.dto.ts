@@ -19,7 +19,7 @@ export class RegisterUserDto {
     if ( !password ) return ['Missing Password'];
     if ( password.length < 6 ) return ['Password must be at least 6 characters long'];
     if ( rol !== 'ADMIN' && rol !== 'OPERATOR' && rol !== 'DELIVERY' && rol !== 'SUPER_ADMIN' ) return ['Invalid Rol'];
-    if ( !kitchenId ) return ['Missing Kitchen Id']; 
+    // if ( !kitchenId ) return ['Missing Kitchen Id'];
 
     return [undefined, new RegisterUserDto( name, email, password, rol, kitchenId )];
   }
