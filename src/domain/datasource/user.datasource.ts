@@ -1,11 +1,12 @@
-//TODO: Implement CreateUserDto and UpdateUserDto
+import { LoginUserDto, RegisterUserDto } from '../dtos/auth';
 import { User } from '../entities/index';
 
 
 export abstract class UserDatasource {
-  abstract createUser( user : any ) : Promise<User>; //todo: Implement CreateUserDto
-  abstract getUsers() : Promise<User[]>;
-  abstract getUserById( user: number ) : Promise<User>;
-  abstract deletUser( user: number ) : Promise<User>;
-  abstract updateUser( user: any ) : Promise<User>; //todo: Implement UpdateUserDto
+  abstract createUser(registerUserDto: RegisterUserDto): Promise<User>;
+  abstract getUserByEmail(email: string): Promise<User>;
+  abstract getUsers(): Promise<User[]>;
+  abstract getUserById(user: number): Promise<User>;
+  abstract deletUser(user: number): Promise<User>;
+  abstract updateUser(updateUserDto: any): Promise<User>;
 }
