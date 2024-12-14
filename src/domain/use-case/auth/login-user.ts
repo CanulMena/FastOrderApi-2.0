@@ -1,4 +1,4 @@
-import { bcryptAdapter, jsonwebtokenAdapter } from "../../../configuration/plugins";
+import { bcryptAdapter, jwtAdapter } from "../../../configuration/plugins";
 import { LoginUserDto, RegisterUserDto } from "../../dtos/auth";
 import { User } from "../../entities";
 import { CustomError } from "../../errors";
@@ -27,7 +27,7 @@ export class LoginUser implements LoginUserUseCase {
       "rol": userFound.rol,
       "cocinaId": userFound.kitchenId
     });
-    const token = await jsonwebtokenAdapter.generateToken({ id: userEntity.userId }, 'secret');
+    const token = await jwtAdapter.generateToken({ id: userEntity.userId }, 'secret');
     if( !token ) throw CustomError.internalServer('Error generating token');
     return {
       user: userEntity,
