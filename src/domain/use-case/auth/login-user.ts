@@ -1,5 +1,5 @@
 import { bcryptAdapter, jwtAdapter } from "../../../configuration/plugins";
-import { LoginUserDto, RegisterUserDto } from "../../dtos/auth";
+import { LoginUserDto } from "../../dtos/auth";
 import { User } from "../../entities";
 import { CustomError } from "../../errors";
 import { UserRepository } from "../../repositories";
