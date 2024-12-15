@@ -4,7 +4,7 @@ import { AuthController } from "./auth-controller";
 import { EmailService } from "../email/email-service";
 import { PosgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
 import { UserRepositoryImpl } from '../../infrastructure/repository/index';
-import { SendEmailValidationLink, ValidateEmail } from '../../domain/use-case/auth/index';
+import { SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
 
 export class AuthRoutes {
 

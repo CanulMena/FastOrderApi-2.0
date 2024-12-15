@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repositories';
 import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
-import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-case/auth/index';
+import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
 
 //* En el controlador, no necesitas preocuparte por la lógica de encriptado. Solo orquestas los flujos y llamas al caso de uso
 
