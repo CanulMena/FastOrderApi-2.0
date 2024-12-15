@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repositories';
-import { CreateUser } from '../../domain/use-case/user/create-user';
 import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
-import { LoginUser } from '../../domain/use-case/user/login-user';
+import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-case/auth/index';
 
 //* En el controlador, no necesitas preocuparte por la lógica de encriptado. Solo orquestas los flujos y llamas al caso de uso
 
 export class AuthController {
   constructor(
-    public userRepositoryImpl: UserRepository
+    public userRepositoryImpl: UserRepository,
+    public sendEmailValidationLink: SendEmailValidationLink,
+    public validateUserEmail: ValidateEmail
   ){}
 
   private handleError(error: unknown, res: Response) {
@@ -26,7 +27,10 @@ export class AuthController {
       res.status(400).json({ error: error });
       return
     }
-    new CreateUser( this.userRepositoryImpl )
+    new CreateUser( 
+      this.userRepositoryImpl,
+      this.sendEmailValidationLink
+    )
     .exucute(registerUserDto!)
     .then( user => res.status(200).json(user))
     .catch( error => this.handleError(error, res));
@@ -47,7 +51,12 @@ export class AuthController {
   }
 
   public validateEmail = async (req: Request, res: Response) => {
-    res.status(200).json({ message: 'validateEmail' });
+    const { token } = req.params;
+    this.validateUserEmail.execute(token)
+    .then( response => {
+      res.status(200).json(response);
+    })
+    .catch( error => this.handleError(error, res));
   }
 
 } 
