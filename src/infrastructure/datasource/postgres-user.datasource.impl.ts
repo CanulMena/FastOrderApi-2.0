@@ -44,6 +44,18 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
     return User.fromJson(userFound!);
   }
 
+  async updateEmailValidation(email: string, isValidated: boolean): Promise<User> {
+
+    await this.getUserByEmail(email)
+
+    const user = await this.prisma.update({
+      where: { email },
+      data: { emailValid: isValidated },
+    });
+
+    return User.fromJson(user);
+  }
+
   getUsers(): Promise<User[]> {
     throw new Error("Method not implemented.");
   }

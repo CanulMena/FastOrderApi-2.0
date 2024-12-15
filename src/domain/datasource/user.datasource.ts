@@ -5,6 +5,7 @@ import { User } from '../entities/index';
 export abstract class UserDatasource {
   abstract createUser(registerUserDto: RegisterUserDto): Promise<User>;
   abstract getUserByEmail(email: string): Promise<User>;
+  abstract updateEmailValidation(email: string, isValidated: boolean): Promise<User>;
   abstract getUsers(): Promise<User[]>;
   abstract getUserById(user: number): Promise<User>;
   abstract deletUser(user: number): Promise<User>;
