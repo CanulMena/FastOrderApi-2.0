@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { UserDatasource } from "../../domain/datasource/index";
 import { User } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
-import { LoginUserDto, RegisterUserDto } from "../../domain/dtos/auth/index";
+import { RegisterUserDto } from "../../domain/dtos/auth/index";
 
 export class PosgresUserDataSourceImpl implements UserDatasource {
 
