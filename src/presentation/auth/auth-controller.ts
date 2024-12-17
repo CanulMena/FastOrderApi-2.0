@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../../domain/repositories';
+import { UserRepository, KitchenRepository } from '../../domain/repositories';
 import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
 import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
 
-//* En el controlador, no necesitas preocuparte por la lógica de encriptado. Solo orquestas los flujos y llamas al caso de uso
-
 export class AuthController {
   constructor(
+    public kitchenRepository: KitchenRepository,
     public userRepositoryImpl: UserRepository,
     public sendEmailValidationLink: SendEmailValidationLink,
     public validateUserEmail: ValidateEmail
@@ -22,12 +21,14 @@ export class AuthController {
   }
 
   public registerUser = async (req: Request, res: Response) => {
+    
     const [ error, registerUserDto ] = RegisterUserDto.create(req.body);
     if( error ) {
       res.status(400).json({ error: error });
       return
     }
-    new CreateUser( 
+    new CreateUser(
+      this.kitchenRepository,
       this.userRepositoryImpl,
       this.sendEmailValidationLink
     )
@@ -44,18 +45,15 @@ export class AuthController {
     }
     new LoginUser( this.userRepositoryImpl )
     .execute(loginUserDto!)
-    .then( response => {
-      res.status(200).json(response);
-    })
+    .then( response => res.status(200).json(response))
     .catch( error => this.handleError(error, res));
   }
 
   public validateEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
-    this.validateUserEmail.execute(token)
-    .then( response => {
-      res.status(200).json(response);
-    })
+    this.validateUserEmail
+    .execute(token)
+    .then( response => res.status(200).json(response))
     .catch( error => this.handleError(error, res));
   }
 
