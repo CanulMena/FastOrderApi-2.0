@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { UserDatasource } from "../../domain/datasource/index";
 import { User } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
-import { LoginUserDto, RegisterUserDto } from "../../domain/dtos/auth/index";
+import { RegisterUserDto } from "../../domain/dtos/auth/index";
 
 export class PosgresUserDataSourceImpl implements UserDatasource {
 
@@ -42,6 +42,18 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
     if (!userFound) throw CustomError.notFound('User not found');
 
     return User.fromJson(userFound!);
+  }
+
+  async updateEmailValidation(email: string, isValidated: boolean): Promise<User> {
+
+    await this.getUserByEmail(email)
+
+    const user = await this.prisma.update({
+      where: { email },
+      data: { emailValid: isValidated },
+    });
+
+    return User.fromJson(user);
   }
 
   getUsers(): Promise<User[]> {

@@ -9,6 +9,10 @@ export class UserRepositoryImpl implements UserRepository {
     private readonly userDatasource: UserDatasource
   ) {}
 
+  updateEmailValidation(email: string, isValidated: boolean): Promise<User> {
+    return this.userDatasource.updateEmailValidation(email, isValidated);
+  }
+
   getUserByEmail(email: string): Promise<User> {
     return this.userDatasource.getUserByEmail(email);
   }

@@ -3,6 +3,7 @@ import { KitchenDatasource } from '../../domain/datasource/index';
 import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { Kitchen } from '../../domain/entities/index';
 import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
+import { CustomError } from '../../domain/errors';
 
 export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
 
@@ -32,7 +33,7 @@ export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
     });
 
     if( !kitchen ){
-      throw new Error(`Kitchen with id ${kitchenId} not found`);
+      throw CustomError.notFound('Kitchen ID does not exist');
     }
     
     return Kitchen.fromJson(kitchen);
