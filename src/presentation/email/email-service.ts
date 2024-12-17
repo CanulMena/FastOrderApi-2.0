@@ -19,7 +19,8 @@ export class EmailService {
     constructor(
         mailerService: string,
         mailerEmail: string,
-        mailerSecretKey: string
+        mailerSecretKey: string,
+        private readonly postToProvider: boolean
     ){
 
         this.tranporter = nodemailer.createTransport({
@@ -37,13 +38,14 @@ export class EmailService {
 
         try {
 
+            if(!this.postToProvider) return true;
+
             const setInformation = await this.tranporter.sendMail({ //utilizamos nuestro transportador para enviar el correo
                 to: to,
                 subject: subject,
                 html: htmlBody,  
                 attachments: attachments
-            }); 
-            // console.log(`Email sent to ${setInformation}`);
+            });             
             return true;
 
         } catch (error) {
