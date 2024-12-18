@@ -1,2 +1,3 @@
-export { UserRepository } from './user.repository';
-export { KitchenRepository } from "../repositories/kitchen.repository";
+export * from './user.repository';
+export * from "./kitchen.repository";
+export * from "./customer.repository";
