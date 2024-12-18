@@ -8,7 +8,7 @@ export class RegisterUserDto {
     public readonly email: string,
     public readonly password: string,
     public readonly rol: UserRole,
-    public readonly kitchenId: number | null,
+    public readonly kitchenId?: number,
   ){}
 
   //Valores falsy de js: undefined, null, 0, NaN, "", o false
