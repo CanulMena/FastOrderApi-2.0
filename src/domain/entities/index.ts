@@ -1,4 +1,4 @@
-export * from "./client.entity";
+export * from "./customer.entity";
 export * from "./dish.entity";
 export * from "./kitchen.entity";
 export * from "./user.entity";
