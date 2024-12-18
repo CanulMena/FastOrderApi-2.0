@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
-import { KitchenRepositoryImpl } from '../../infrastructure/repository/index';
 import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
+import { KitchenRepository } from '../../domain/repositories';
 
 export class KitchenController {
 
     constructor(
-        public kitchenRepositoryImpl: KitchenRepositoryImpl
+        public kitchenRepository: KitchenRepository
     ){}
 
     public getKitchens = (req: Request, res: Response) => { //GET /api/kitchen
-        this.kitchenRepositoryImpl.getKitchens()
+        this.kitchenRepository.getKitchens()
         .then( kitchens => res.status(200).json(kitchens) ) // 200 OK
         .catch( error => res.status(500).json({error}) ); // 500 internal
     }
@@ -22,7 +22,7 @@ export class KitchenController {
             res.status(400).json({error: 'ID argument is not a number' }); //? 400 Bad Request
         }
 
-        this.kitchenRepositoryImpl.getKitchenById(kitchenId)        
+        this.kitchenRepository.getKitchenById(kitchenId)        
         .then( kitchen => res.status(200).json(kitchen) ) //? 200 OK
         .catch( error => res.status(404).json({ "error": error.message}) ); //? 404 Not Found
     }
@@ -36,7 +36,7 @@ export class KitchenController {
             return;
         }
 
-        this.kitchenRepositoryImpl.createKitchen(kitchenDto!)
+        this.kitchenRepository.createKitchen(kitchenDto!)
         .then( kitchen => res.status(201).json(kitchen) ) // 201 Created
         .catch( error => res.status(404).json({ error: error.message }) ); // 404 Not Found
     }
@@ -48,7 +48,7 @@ export class KitchenController {
             res.status(400).json({error: 'ID argument is not a number' });
         }
 
-        this.kitchenRepositoryImpl.deleteKitchen(kitchenId)
+        this.kitchenRepository.deleteKitchen(kitchenId)
         .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
         .catch( error => res.status(404).json({ "error": error.message}) ); // 404 Not Found
     }
@@ -62,7 +62,7 @@ export class KitchenController {
             return;
         }
 
-        this.kitchenRepositoryImpl.updateKitchen(updateKitchenDto!)
+        this.kitchenRepository.updateKitchen(updateKitchenDto!)
         .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
         .catch( error => res.status(404).json({ "error": error.message}) ); // 404
     }
