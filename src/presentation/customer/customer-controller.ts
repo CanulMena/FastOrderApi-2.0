@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CustomerRepository } from '../../domain/repositories';
+import { CustomerRepository, KitchenRepository } from '../../domain/repositories';
 import { RegisterCustomerDto } from '../../domain/dtos/customer';
 import { CreateCustomer } from '../../domain/use-cases/customer/create-customer';
 import { CustomError } from '../../domain/errors';
@@ -7,6 +7,7 @@ import { CustomError } from '../../domain/errors';
 export class CustomerController{
 
   constructor(
+    private readonly kitchenRepository: KitchenRepository,
     private readonly customerRepository: CustomerRepository
   ){}
 
@@ -25,7 +26,10 @@ export class CustomerController{
       res.status(400).json({ error: error });
       return;
     }
-    new CreateCustomer(this.customerRepository)
+    new CreateCustomer(
+      this.kitchenRepository,
+      this.customerRepository
+    )
     .execute(registerCustomerDto!)
     .then((customer) => res.status(201).json(customer))
     .catch((err) => this.handleError(err, res));

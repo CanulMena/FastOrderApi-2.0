@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { CustomerController } from "./customer-controller";
-import { PostgresCustomerDatasourceImpl } from '../../infrastructure/datasource';
-import { CustomerRepositoryImpl } from "../../infrastructure/repository";
+import { PostgresCustomerDatasourceImpl, PostgresKitchenDatasourceImpl } from '../../infrastructure/datasource';
+import { CustomerRepositoryImpl, KitchenRepositoryImpl } from "../../infrastructure/repository";
 
 export class CustomerRoutes {
 
@@ -10,7 +10,14 @@ export class CustomerRoutes {
     const router = Router();
     const customerDatasourceImpl = new PostgresCustomerDatasourceImpl();
     const customerRepositoryImpl = new CustomerRepositoryImpl(customerDatasourceImpl);
-    const routesController = new CustomerController(customerRepositoryImpl);
+
+    const kitchenDatasourceImpl = new PostgresKitchenDatasourceImpl();
+    const kitchenRepositoryImpl = new KitchenRepositoryImpl(kitchenDatasourceImpl);
+
+    const routesController = new CustomerController(
+      kitchenRepositoryImpl,
+      customerRepositoryImpl
+    );
 
     router.post('/register', routesController.postCustomer);
     
