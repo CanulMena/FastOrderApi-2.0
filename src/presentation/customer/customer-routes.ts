@@ -3,6 +3,7 @@ import { CustomerController } from "./customer-controller";
 import { PostgresCustomerDatasourceImpl, PostgresKitchenDatasourceImpl, PosgresUserDataSourceImpl } from '../../infrastructure/datasource';
 import { CustomerRepositoryImpl, KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { rolesConfig } from "../../configuration";
 
 export class CustomerRoutes {
 
@@ -24,8 +25,15 @@ export class CustomerRoutes {
     );
 
     const authMiddleware = new AuthMiddleware(userRepository);
+
+    const roles = rolesConfig;
     
-    router.post('/register', authMiddleware.validateJWT, routesController.postCustomer); //esta ruta tiene un request, response y next escuchando?
+    router.post(
+      '/register', 
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      routesController.postCustomer
+    );
     
     return router;
   }
