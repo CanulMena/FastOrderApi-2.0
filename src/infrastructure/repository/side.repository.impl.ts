@@ -1,4 +1,5 @@
 import { SideDatasource } from "../../domain/datasource/side.datasource";
+import { UpdateSideDto } from "../../domain/dtos/side";
 import { CreateSideDto } from "../../domain/dtos/side/create-side.dto";
 import { Side } from "../../domain/entities";
 import { SideRepository } from "../../domain/repositories/side.repository";
@@ -26,8 +27,8 @@ export class SideRepositoryImpl implements SideRepository {
         return this.datasource.deleteSide(sideId);
     }
     
-    // updateSide( side: CreateSideDto ) : Promise<Side>{
-    //     return this.datasource.updateSide(side);
-    // }
+    updateSide(side: UpdateSideDto): Promise<Side> {
+        return this.datasource.updateSide(side);
+    }
     
 }

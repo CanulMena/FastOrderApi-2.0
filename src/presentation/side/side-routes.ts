@@ -21,6 +21,9 @@ export class SideRoutes {
 
         router.delete('/:id', sideController.deleteSide);
 
+        router.put('/:id', sideController.updateSide);
+
+
         return router;
 
     }

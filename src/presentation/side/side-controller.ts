@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { SideRepository } from "../../domain/repositories/side.repository";
 import { CreateSideDto } from '../../domain/dtos/side/create-side.dto';
+import { UpdateSideDto } from '../../domain/dtos/side/update-side.dto';
 
 export class SideController {
 
@@ -48,6 +49,21 @@ export class SideController {
         }
 
         this.sideRepository.deleteSide(sideId)
+        .then( side => res.status(200).json(side))
+        .catch( error => res.status(404).json({error: error.message}));
+    }
+
+    public updateSide = ( req: Request, res: Response ) => {
+        const id = +req.params.id;
+        const kitchenId = req.body.kitchenId ? + req.body.kitchenId : undefined;
+        const [error, updateSideDto] = UpdateSideDto.create({...req.body, id});
+
+        if ( error ) {
+            res.status(400).json({error});
+            return;
+        }
+
+        this.sideRepository.updateSide(updateSideDto!)
         .then( side => res.status(200).json(side))
         .catch( error => res.status(404).json({error: error.message}));
     }

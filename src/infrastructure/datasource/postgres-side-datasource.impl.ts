@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { SideDatasource } from "../../domain/datasource/side.datasource";
-import { CreateSideDto } from "../../domain/dtos/side/create-side.dto";
-import { Side } from "../../domain/entities";
+import { SideDatasource } from "../../domain/datasource/index";
+import { CreateSideDto } from "../../domain/dtos/side/index";
+import { Side } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
+import { UpdateSideDto } from "../../domain/dtos/side/update-side.dto";
 
 export class PosgresSideDatasourceImpl implements SideDatasource {
 
@@ -49,7 +50,18 @@ export class PosgresSideDatasourceImpl implements SideDatasource {
         return Side.fromJson(side);
     }
 
-    // async updateSide( UpdateSide: Upd): Promise<Side> {
-    //     await this.getSideById(Updt)
-    // }
+    async updateSide( UpdateSideDto: UpdateSideDto ): Promise<Side> {
+        await this.getSideById(UpdateSideDto.id)
+        const side = await this.prisma.update({
+            where: {
+                id: UpdateSideDto.id
+            },
+            data: {
+                nombre: UpdateSideDto.name,
+                rutaImagen: UpdateSideDto.imageUrl,
+                descripcion: UpdateSideDto.description
+            }
+        })
+        return Side.fromJson(side);
+    }
 }
