@@ -59,9 +59,19 @@ export class PosgresUserDataSourceImpl implements UserDatasource {
   getUsers(): Promise<User[]> {
     throw new Error("Method not implemented.");
   }
-  getUserById(user: number): Promise<User> {
-    throw new Error("Method not implemented.");
+  async getUserById(user: number): Promise<User> {
+
+    const userFound = await this.prisma.findUnique({
+      where: {
+        id: user
+      }
+    });
+
+    if (!userFound) throw CustomError.notFound('User not found');
+
+    return User.fromJson(userFound!);
   }
+  
   deletUser(user: number): Promise<User> {
     throw new Error("Method not implemented.");
   }

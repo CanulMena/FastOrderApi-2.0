@@ -27,7 +27,7 @@ export class LoginUser implements LoginUserUseCase {
       "rol": userFound.rol,
       "cocinaId": userFound.kitchenId
     });
-    const token = await jwtAdapter.generateToken({ id: userEntity.userId }, 'secret');
+    const token = await jwtAdapter.generateToken({ id: userEntity.userId });
     if( !token ) throw CustomError.internalServer('Error generating token');
     return {
       user: userEntity,

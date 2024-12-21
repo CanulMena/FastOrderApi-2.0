@@ -21,16 +21,16 @@ export class UserRepositoryImpl implements UserRepository {
     return this.userDatasource.createUser(user);
   }
   getUsers(): Promise<User[]> {
-    return this.getUsers();
+    return this.userDatasource.getUsers();
   }
   getUserById(userId: number): Promise<User> {
-    return this.getUserById(userId);
+    return this.userDatasource.getUserById(userId);
   }
   deleteUser(userId: number): Promise<User> {
-    return this.deleteUser(userId);
+    return this.userDatasource.deletUser(userId);
   }
   updateUser(user: any): Promise<User> {
-    return this.updateUser(user);
+    return this.userDatasource.updateUser(user);
   }
   
 }

@@ -14,11 +14,11 @@ export const jwtAdapter = {
     });
   },
 
-  validateToken: (token: string) => {
-    return new Promise( (resolve) => {
+  validateToken<T>(token: string): Promise<T | null> {
+    return new Promise((resolve) => {
       jwt.verify(token, JWT_SEED, (err, decoded) => {
         if(err) return resolve(null);
-        return resolve(decoded);
+        resolve(decoded as T);
       });
     });
   }
