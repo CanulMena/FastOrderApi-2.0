@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { PosgresSideDatasourceImpl } from "../../infrastructure/datasource/postgres-side-datasource.impl";
-import { SideRepositoryImpl } from "../../infrastructure/repository/side.repository.impl";
+import { PosgresSideDatasourceImpl } from "../../infrastructure/datasource/index";
+import { SideRepositoryImpl } from "../../infrastructure/repository/index";
 import { SideController } from "./side-controller";
 
 
