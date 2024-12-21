@@ -1,6 +1,5 @@
 import { SideDatasource } from "../../domain/datasource/side.datasource";
-import { UpdateSideDto } from "../../domain/dtos/side";
-import { CreateSideDto } from "../../domain/dtos/side/create-side.dto";
+import { UpdateSideDto, CreateSideDto } from "../../domain/dtos/side/index";
 import { Side } from "../../domain/entities";
 import { SideRepository } from "../../domain/repositories/side.repository";
 
