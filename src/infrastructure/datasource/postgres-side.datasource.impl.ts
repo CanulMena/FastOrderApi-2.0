@@ -3,7 +3,7 @@ import { SideDatasource } from "../../domain/datasource/index";
 import { CreateSideDto } from "../../domain/dtos/side/index";
 import { Side } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
-import { UpdateSideDto } from "../../domain/dtos/side/update-side.dto";
+import { UpdateSideDto } from "../../domain/dtos/side/index";
 
 export class PosgresSideDatasourceImpl implements SideDatasource {
 
