@@ -38,7 +38,7 @@ export class EmailService {
 
         try {
 
-            if(!this.postToProvider) return true;
+            // if(!this.postToProvider) return true;
 
             const setInformation = await this.tranporter.sendMail({ //utilizamos nuestro transportador para enviar el correo
                 to: to,
