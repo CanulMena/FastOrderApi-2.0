@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { SideRepository } from "../../domain/repositories/side.repository";
+import { SideRepository } from "../../domain/repositories/index";
 import { CreateSideDto, UpdateSideDto } from '../../domain/dtos/side/index';
 
 export class SideController {
