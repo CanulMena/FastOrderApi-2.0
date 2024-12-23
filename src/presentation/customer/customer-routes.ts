@@ -32,6 +32,7 @@ export class CustomerRoutes {
       '/register', 
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
+      authMiddleware.validateKitchenAccess,
       routesController.postCustomer
     );
     
