@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { envs } from "../../configuration";
+import { envs, rolesConfig } from "../../configuration";
 import { AuthController } from "./auth-controller";
 import { EmailService } from "../email/email-service";
 import { PosgresUserDataSourceImpl, PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl, UserRepositoryImpl } from '../../infrastructure/repository/index';
 import { SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 export class AuthRoutes {
 
@@ -38,12 +39,24 @@ export class AuthRoutes {
       validateUserEmail
     );
 
-    router.post('/register', authController.registerUser);
-    router.post('/login', authController.loginUser);
-    router.get('/validate-email/:token', authController.validateEmail);
+    const authMiddleware = new AuthMiddleware( userRepositoryImpl );
+
+    router.post(
+      '/register',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.Admin),
+      authMiddleware.validateKitchenAccess,
+      authController.registerUser
+    );
+
+    router.post('/login',authController.loginUser); // cualquier usuario puede loguearse
+
+    router.get('/validate-email/:token', authController.validateEmail);//no es necesario implementar ningun tipo de middleware
+
     //existe parametros de consulta  /ruta?id=1
     //existen parametros de ruta /:id
     //existen segmentos de ruta /ruta/segmento
+
     return router;
   }
 }
