@@ -16,7 +16,7 @@ export class KitchenController {
     }
 
     public getKitchenById = (req: Request, res: Response) => { //GET /api/kitchen/:id
-        const kitchenId = +req.params.id;  //?El signo + convierte el string a number
+        const kitchenId = +req.params.kitchenId;  //?El signo + convierte el string a number
         //* Siempre cuando exista un Dto, ahí es donde irán las validaciones
         if( isNaN(kitchenId) ){
             res.status(400).json({error: 'ID argument is not a number' }); //? 400 Bad Request
@@ -42,7 +42,7 @@ export class KitchenController {
     }
 
     public deleteKitchen = (req: Request, res: Response) => { //DELETE /api/kitchen/:id
-        const kitchenId = +req.params.id;
+        const kitchenId = +req.params.kitchenId;
         //* Siempre cuando exista un Dto, ahí es donde irán las validaciones
         if( isNaN(kitchenId) ){ //? isNaN() determina si un valor es numero o no
             res.status(400).json({error: 'ID argument is not a number' });
@@ -54,8 +54,8 @@ export class KitchenController {
     }
 
     public updateKitchen = (req: Request, res: Response) => { //PUT /api/kitchen/:id
-        const id = +req.params.id;
-        const [error, updateKitchenDto] = UpdateKitchenDto.create({...req.body, id});
+        const kitchenId = +req.params.kitchenId;
+        const [error, updateKitchenDto] = UpdateKitchenDto.create({...req.body, kitchenId});
 
         if (error) {
             res.status(400).json({error}); // 400 Bad Request

@@ -15,7 +15,7 @@ export class SideController {
     }
 
     public getSideById = (req: Request, res: Response) => {
-        const sideId = +req.params.id;
+        const sideId = +req.params.kitchenId;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
@@ -41,7 +41,7 @@ export class SideController {
     }
 
     public deleteSide = (req: Request, res: Response) => {
-        const sideId = +req.params.id;
+        const sideId = +req.params.kitchenId;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
@@ -53,9 +53,8 @@ export class SideController {
     }
 
     public updateSide = ( req: Request, res: Response ) => {
-        const id = +req.params.id;
-        const kitchenId = req.body.kitchenId ? + req.body.kitchenId : undefined;
-        const [error, updateSideDto] = UpdateSideDto.create({...req.body, id});
+        const kitchenId = +req.params.kitchenId;
+        const [error, updateSideDto] = UpdateSideDto.create({...req.body, kitchenId});
 
         if ( error ) {
             res.status(400).json({error});
