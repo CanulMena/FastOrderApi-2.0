@@ -10,15 +10,15 @@ export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
   private readonly prisma = new PrismaClient().cocina;
 
   async createKitchen( createKitchenDto : CreateKitchenDto ) : Promise<Kitchen> {
-    const kitchenObj = await this.prisma.create({
+    const kitchenCreated = await this.prisma.create({
       data: {
         nombre: createKitchenDto.name,
         direccion: createKitchenDto.address,
         telefono: createKitchenDto.phone
       }
     });
-    const kitchen = Kitchen.fromJson(kitchenObj);
-    return kitchen;
+    
+    return Kitchen.fromJson(kitchenCreated);;
   }
 
   async getKitchens() : Promise<Kitchen[]>{
@@ -50,10 +50,10 @@ export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
   }
 
   async updateKitchen( UpdateKitchenDto: UpdateKitchenDto ) : Promise<Kitchen>{
-    await this.getKitchenById(UpdateKitchenDto.id)
+    await this.getKitchenById(UpdateKitchenDto.KitchenId)
     const kitchen = await this.prisma.update({
       where: {
-        id: UpdateKitchenDto.id
+        id: UpdateKitchenDto.KitchenId
       },
       data: {
         nombre: UpdateKitchenDto.name,

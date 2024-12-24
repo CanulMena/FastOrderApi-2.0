@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { KitchenController } from "./kitchen-controller";
-import { PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
-import { KitchenRepositoryImpl } from "../../infrastructure/repository/index";
+import { PostgresKitchenDatasourceImpl, PosgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
+import { KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
+import { AuthMiddleware } from "../middlewares/auth.middleware"
+import { rolesConfig } from "../../configuration";
 
 export class KitchenRoutes {
     //? AL NO SER STATIC TENGO QUE CREAR UNA INSTACIA DE LA CLASE
@@ -12,15 +14,48 @@ export class KitchenRoutes {
         const kichenRepositoryImpl = new KitchenRepositoryImpl( kitchenDatasourceImpl );
         const kitchenController = new KitchenController(  kichenRepositoryImpl );
 
-        router.get('/', kitchenController.getKitchens);
+        const userDataSourceImpl = new PosgresUserDataSourceImpl();
+        const userRepository = new UserRepositoryImpl(userDataSourceImpl);
 
-        router.get('/:id', kitchenController.getKitchenById);
+        const authMiddleware = new AuthMiddleware(userRepository);
 
-        router.post('/', kitchenController.postKitchen);
+        const roles = rolesConfig;
 
-        router.delete('/:id', kitchenController.deleteKitchen);
+        router.get( //solo un super admin puede ver todas las cocinas
+            '/get-all',
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.SuperAdmin),
+            kitchenController.getKitchens
+        );
 
-        router.put('/:id', kitchenController.updateKitchen);
+        router.get( //cualquier usuario que tenga un kitchenId puede ver la cocina.
+            '/get-by-id/:kitchenId', 
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.AllRoles),
+            authMiddleware.validateKitchenAccess,
+            kitchenController.getKitchenById
+        );
+
+        router.post( //solo un super admin puede crear una cocina
+            '/register',
+            authMiddleware.validateJWT, //verifica que sea mi token que firme por mi api
+            authMiddleware.validateRole(roles.SuperAdmin),// -> Valida que el rol del usuario sea el que puede consultarlo -> SuperAdmin
+            kitchenController.postKitchen
+        );
+
+        router.delete( //solo un super admin puede eliminar una cocina
+            '/delete-by-id/:kitchenId',
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.SuperAdmin),
+            kitchenController.deleteKitchen
+        );
+
+        router.put( //solo un super admin o admin puede actualizar una cocina
+            '/put-by-id/:kitchenId', 
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.Admin),
+            kitchenController.updateKitchen
+        );
 
         return router;
     }

@@ -19,9 +19,6 @@ export class CreateUser implements CreateUserUseCase {
   ) {}
 
   async exucute(registerUserDto: RegisterUserDto): Promise<object> {
-
-    //TODO: Validar que solo un SuperAdmin pueda crear un SuperAdmin o Admin
-
     if(registerUserDto.kitchenId) await this.kitchenRepository.getKitchenById(registerUserDto.kitchenId);
     const hashedPassword = bcryptAdapter.hash(registerUserDto.password);
     const newRegisterUserDto = { ...registerUserDto, password: hashedPassword };

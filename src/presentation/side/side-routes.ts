@@ -15,13 +15,13 @@ export class SideRoutes {
 
         router.get('/', sideController.getSides);
 
-        router.get('/:id', sideController.getSideById);
+        router.get('/:kitchenId', sideController.getSideById);
 
         router.post('/', sideController.postSide);
 
-        router.delete('/:id', sideController.deleteSide);
+        router.delete('/:kitchenId', sideController.deleteSide);
 
-        router.put('/:id', sideController.updateSide);
+        router.put('/:kitchenId', sideController.updateSide);
 
 
         return router;
