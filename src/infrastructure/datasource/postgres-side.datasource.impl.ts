@@ -51,10 +51,10 @@ export class PosgresSideDatasourceImpl implements SideDatasource {
     }
 
     async updateSide( UpdateSideDto: UpdateSideDto ): Promise<Side> {
-        await this.getSideById(UpdateSideDto.id)
+        await this.getSideById(UpdateSideDto.sideId);
         const side = await this.prisma.update({
             where: {
-                id: UpdateSideDto.id
+                id: UpdateSideDto.sideId
             },
             data: {
                 nombre: UpdateSideDto.name,
