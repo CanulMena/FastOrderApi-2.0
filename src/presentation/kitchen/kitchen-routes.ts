@@ -21,21 +21,41 @@ export class KitchenRoutes {
 
         const roles = rolesConfig;
 
-        router.get('/', kitchenController.getKitchens); //debería proteger tambien estas rutas? si el usuario no esta atutenticado, un rol especifico y pertenece a una cocina el usuario? 
+        router.get( //solo un super admin puede ver todas las cocinas
+            '/get-all',
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.SuperAdmin),
+            kitchenController.getKitchens
+        );
 
-        router.get('/:id', kitchenController.getKitchenById);
+        router.get( //cualquier usuario que tenga un kitchenId puede ver la cocina.
+            '/get-by-id/:kitchenId', 
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.AllRoles),
+            authMiddleware.validateKitchenAccess,
+            kitchenController.getKitchenById
+        );
 
-        router.post(
-            '/register', 
+        router.post( //solo un super admin puede crear una cocina
+            '/register',
             authMiddleware.validateJWT, //verifica que sea mi token que firme por mi api
             authMiddleware.validateRole(roles.SuperAdmin),// -> Valida que el rol del usuario sea el que puede consultarlo -> SuperAdmin
-            authMiddleware.validateKitchenAccess, // -> Valida que el usuario pertenezca a la cocina
             kitchenController.postKitchen
         );
 
-        router.delete('/:id', kitchenController.deleteKitchen);
+        router.delete( //solo un super admin puede eliminar una cocina
+            '/delete-by-id/:kitchenId',
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.SuperAdmin),
+            kitchenController.deleteKitchen
+        );
 
-        router.put('/:id', kitchenController.updateKitchen);
+        router.put( //solo un super admin o admin puede actualizar una cocina
+            '/put-by-id/:kitchenId', 
+            authMiddleware.validateJWT,
+            authMiddleware.validateRole(roles.Admin),
+            kitchenController.updateKitchen
+        );
 
         return router;
     }
