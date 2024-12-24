@@ -84,9 +84,14 @@ export class AuthMiddleware {
     if (user.rol === 'SUPER_ADMIN') {
       return next();
     }
+
+    if(!kitchenIdFromRequest){
+      res.status(403).json({ error: "Access denied. Kitchen not found in the request." });
+      return;
+    }
   
     // Si no pertenece a la cocina especificada, denegar acceso
-    if (!kitchenIdFromRequest || user.kitchenId !== parseInt(kitchenIdFromRequest as string, 10)) {
+    if (!kitchenIdFromRequest || user.kitchenId !== parseInt(kitchenIdFromRequest as string, 10)) { //si el id de la cocina del usuario no es igual al id de la cocina de la peticion
       res.status(403).json({ error: "Access denied. User does not belong to this kitchen." });
       return;
     }
