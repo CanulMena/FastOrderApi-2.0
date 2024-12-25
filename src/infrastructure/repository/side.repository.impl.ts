@@ -22,7 +22,7 @@ export class SideRepositoryImpl implements SideRepository {
         return this.datasource.getSideById(sideId);
     }
 
-    deleteSide( sideId: number ) : Promise<Side>{
+    deleteBySide( sideId: number ) : Promise<Side>{
         return this.datasource.deleteSide(sideId);
     }
     

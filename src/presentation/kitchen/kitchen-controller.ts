@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
 import { KitchenRepository } from '../../domain/repositories';
+import { CreateKitchen, GetKitchens, DeleteKitchen, GetKitchen } from '../../domain/use-cases/kitchen';
+import { CustomError } from '../../domain/errors';
 
 export class KitchenController {
 
@@ -9,10 +11,19 @@ export class KitchenController {
         public kitchenRepository: KitchenRepository
     ){}
 
+    private handleError(error: unknown, res: Response) {
+        if (error instanceof CustomError) {
+        return res.status(error.statusCode).json({ error: error.message });
+        }
+        console.log(`${error}`);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
     public getKitchens = (req: Request, res: Response) => { //GET /api/kitchen
-        this.kitchenRepository.getKitchens()
+        new GetKitchens(this.kitchenRepository)
+        .execute()
         .then( kitchens => res.status(200).json(kitchens) ) // 200 OK
-        .catch( error => res.status(500).json({error}) ); // 500 internal
+        .catch( error => this.handleError(error, res));
     }
 
     public getKitchenById = (req: Request, res: Response) => { //GET /api/kitchen/:id
@@ -22,9 +33,10 @@ export class KitchenController {
             res.status(400).json({error: 'ID argument is not a number' }); //? 400 Bad Request
         }
 
-        this.kitchenRepository.getKitchenById(kitchenId)        
+        new GetKitchen(this.kitchenRepository)
+        .execute(kitchenId)
         .then( kitchen => res.status(200).json(kitchen) ) //? 200 OK
-        .catch( error => res.status(404).json({ "error": error.message}) ); //? 404 Not Found
+        .catch( error => this.handleError(error, res));
     }
 
     public postKitchen = (req: Request, res: Response) => { //POST /api/kitchen
@@ -36,9 +48,10 @@ export class KitchenController {
             return;
         }
 
-        this.kitchenRepository.createKitchen(kitchenDto!)
+        new CreateKitchen(this.kitchenRepository)
+        .execute(kitchenDto!)
         .then( kitchen => res.status(201).json(kitchen) ) // 201 Created
-        .catch( error => res.status(404).json({ error: error.message }) ); // 404 Not Found
+        .catch( error => this.handleError(error, res));
     }
 
     public deleteKitchen = (req: Request, res: Response) => { //DELETE /api/kitchen/:id
@@ -48,9 +61,10 @@ export class KitchenController {
             res.status(400).json({error: 'ID argument is not a number' });
         }
 
-        this.kitchenRepository.deleteKitchen(kitchenId)
+        new DeleteKitchen(this.kitchenRepository)
+        .execute(kitchenId)
         .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
-        .catch( error => res.status(404).json({ "error": error.message}) ); // 404 Not Found
+        .catch( error => this.handleError(error, res));
     }
 
     public updateKitchen = (req: Request, res: Response) => { //PUT /api/kitchen/:id
@@ -62,9 +76,10 @@ export class KitchenController {
             return;
         }
 
-        this.kitchenRepository.updateKitchen(updateKitchenDto!)
+        new CreateKitchen(this.kitchenRepository)
+        .execute(updateKitchenDto!)
         .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
-        .catch( error => res.status(404).json({ "error": error.message}) ); // 404
+        .catch( error => this.handleError(error, res));
     }
 
 }

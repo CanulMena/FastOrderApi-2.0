@@ -28,14 +28,20 @@ export class CustomerRoutes {
 
     const roles = rolesConfig;
     
-    router.post(
+    router.post( // admin
       '/register', 
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
       authMiddleware.validateKitchenAccess,
       routesController.postCustomer
     );
-    
+
+    //get-customers-by-kitchenId //-todos      Obtener todos los clientes de una cocina
+
+    //put-customer-by-CustomerId. //admin      Actualizar un cliente por id -> validar el acceso a la cocina desde el caso de uso por que el request no tiene el id de la cocina
+
+    //delete-customer-by-Customerid //admin    Eliminar un cliente por id -> validar el acceso a la cocina desde el caso de uso por que el request no tiene el id de la cocina
+
     return router;
   }
 }
