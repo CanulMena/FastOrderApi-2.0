@@ -11,7 +11,9 @@ export class UpdateSideDto {
         const { name, description, imageUrl, sideId } = props;
 
         if ( !sideId || isNaN(Number(sideId)) ) return ['ID argument must be a valid number', undefined]; 
-        if (sideId) return ['Kitchen ID cannot be modified 👌', undefined];
+        //TODO: validar el imageUrl
+        //TODO: validar el nombre
+        //TODO: validar la descripción
 
         return [undefined, new UpdateSideDto(
             sideId,
