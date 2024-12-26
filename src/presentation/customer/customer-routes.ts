@@ -36,6 +36,7 @@ export class CustomerRoutes {
       routesController.postCustomer
     );
 
+    //TODO: Implementar los siguientes endpoints
     //get-customers-by-kitchenId //-todos      Obtener todos los clientes de una cocina
 
     //put-customer-by-CustomerId. //admin      Actualizar un cliente por id -> validar el acceso a la cocina desde el caso de uso por que el request no tiene el id de la cocina

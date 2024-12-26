@@ -3,6 +3,7 @@ import { SideRepository } from "../../domain/repositories/index";
 import { CreateSideDto, UpdateSideDto } from '../../domain/dtos/side/index';
 import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide } from '../../domain/use-cases/side';
 import { CustomError } from '../../domain/errors';
+import { User } from '../../domain/entities/user.entity';
 
 export class SideController {
 
@@ -19,21 +20,25 @@ export class SideController {
     }
 
     public getSides = (req: Request, res: Response) => {
+
+        const user = req.body.user as User;
+
         new GetSides(this.sideRepository)
-        .execute()
+        .execute(user)
         .then( sides => res.status(200).json(sides))
         .catch( error => this.handleError(error, res));
     }
 
     public getSideById = (req: Request, res: Response) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
         }
 
         new GetSide(this.sideRepository)
-        .execute(sideId)
+        .execute(sideId, user)
         .then(side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }
@@ -55,19 +60,21 @@ export class SideController {
 
     public deleteSide = (req: Request, res: Response) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
         }
 
         new DeleteSide(this.sideRepository)
-        .execute(sideId)
+        .execute(sideId, user)
         .then( side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }
 
     public updateSide = ( req: Request, res: Response ) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
         const [error, updateSideDto] = UpdateSideDto.create({...req.body, sideId});
 
         if ( error ) {
@@ -76,7 +83,7 @@ export class SideController {
         }
 
         new UpdateSide(this.sideRepository)
-        .execute(updateSideDto!)
+        .execute(updateSideDto!, user)
         .then( side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }
