@@ -23,10 +23,11 @@ export class SideRoutes {
         const roles = rolesConfig;
 
         router.get(
-            '/get-all', sideController.getSides,
+            '/get-all', 
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
-        ); //manejarlo en el caso de uso por que no tenemos el id de la cocina
+            sideController.getSides,
+        );
 
         router.get(
             '/get-by-id/:sideId',
