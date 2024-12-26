@@ -31,13 +31,14 @@ export class SideController {
 
     public getSideById = (req: Request, res: Response) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
         }
 
         new GetSide(this.sideRepository)
-        .execute(sideId)
+        .execute(sideId, user)
         .then(side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }
@@ -59,19 +60,21 @@ export class SideController {
 
     public deleteSide = (req: Request, res: Response) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
 
         if ( isNaN(sideId) ) {
             res.status(400).json({error: 'ID argument is not a number'});
         }
 
         new DeleteSide(this.sideRepository)
-        .execute(sideId)
+        .execute(sideId, user)
         .then( side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }
 
     public updateSide = ( req: Request, res: Response ) => {
         const sideId = +req.params.sideId;
+        const user = req.body.user as User;
         const [error, updateSideDto] = UpdateSideDto.create({...req.body, sideId});
 
         if ( error ) {
@@ -80,7 +83,7 @@ export class SideController {
         }
 
         new UpdateSide(this.sideRepository)
-        .execute(updateSideDto!)
+        .execute(updateSideDto!, user)
         .then( side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
     }

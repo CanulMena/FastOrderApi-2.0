@@ -34,7 +34,7 @@ export class SideRoutes {
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.AllRoles),
             sideController.getSideById
-        ); //manejarlo en el caso de uso por que no tenemos el id de la cocina
+        );
 
         router.post(
             '/register',
@@ -49,14 +49,14 @@ export class SideRoutes {
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
             sideController.deleteSide
-        ); //manejarlo en el caso de uso por que no tenemos el id de la cocina
+        );
 
         router.put(
             '/put-by-id/:sideId',
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
             sideController.updateSide
-        ); //manejarlo en el caso de uso por que no tenemos el id de la cocina
+        );
 
         return router;
 
