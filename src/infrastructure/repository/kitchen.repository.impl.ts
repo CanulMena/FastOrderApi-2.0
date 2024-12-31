@@ -1,5 +1,5 @@
 import { KitchenDatasource } from '../../domain/datasource';
-import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
+import { CreateKitchenDto, UpdateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { Kitchen } from '../../domain/entities/index'; 
 import { KitchenRepository } from '../../domain/repositories';
 
@@ -21,7 +21,7 @@ export class KitchenRepositoryImpl implements KitchenRepository {
   deleteKitchen( kitchenId: number ) : Promise<Kitchen>{
     return this.datasource.deleteKitchen(kitchenId);
   }
-  updateKitchen( kitchen: CreateKitchenDto ) : Promise<Kitchen>{
+  updateKitchen( kitchen: UpdateKitchenDto ) : Promise<Kitchen>{
     return this.datasource.updateKitchen(kitchen);
   }
 }
