@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { jwtAdapter } from "../../configuration";
 import { User } from "../../domain/entities";
 import { UserRepository } from "../../domain/repositories";
-
+/**
+ * * validateKitchenAccess puede ser utilizado en cualquier que dentro del body tenga un campo kitchenId y dentro del url tenga un parametro kitchenId.
+ * * si el kitchenId no se encuentra en el body o en el url, se realiza la validación dentro del caso de uso.
+ */
 
 export class AuthMiddleware {
 
