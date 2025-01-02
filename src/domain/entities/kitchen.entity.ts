@@ -1,3 +1,4 @@
+import { CustomError } from "../errors";
 
 export class Kitchen {
     constructor(
@@ -10,10 +11,10 @@ export class Kitchen {
     static fromJson = ( object: {[key: string] : any} ) : Kitchen => {
         const { id, nombre, direccion, telefono } = object;
 
-        if ( !id ) throw new Error('id is required');
-        if ( !nombre ) throw new Error('nombre is required');
-        if ( !direccion ) throw new Error('direccion is required');
-        if ( !telefono ) throw new Error('telefono is required');
+        if ( !id ) throw CustomError.badRequest('id is required');
+        if ( !nombre ) throw CustomError.badRequest('nombre is required');
+        if ( !direccion ) throw CustomError.badRequest('direccion is required');
+        if ( !telefono ) throw CustomError.badRequest('telefono is required');
 
         return new Kitchen(id, nombre, direccion, telefono);
     }
