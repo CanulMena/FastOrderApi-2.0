@@ -2,11 +2,12 @@ import { Request, Response } from 'express';
 import { DishRepository } from '../../domain/repositories';
 import { CreateDishDto } from '../../domain/dtos/dish/create-dish.dto';
 import { CustomError } from '../../domain/errors';
+import { CreateDish } from '../../domain/use-cases/dish/index';
 
 export class DishController {
 
   constructor(
-    private dishRepositoryImpl: DishRepository
+    private dishRepositoryImpl: DishRepository,
   ) {}
 
   private handleError(error: unknown, res: Response) {
@@ -24,8 +25,9 @@ export class DishController {
       res.status(400).json({error});
       return;
     }
-    //TODO: AGREGAR EL CASO DE USO PARA CREAR UN PLATILLO
-    this.dishRepositoryImpl.createDish(dishDto!)
+    
+    new CreateDish(this.dishRepositoryImpl)
+    .execute(dishDto!)
     .then( user => res.status(200).json(user))
     .catch( error => this.handleError(error, res));
   }
