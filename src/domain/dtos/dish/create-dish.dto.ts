@@ -15,11 +15,11 @@ export class CreateDishDto {
     if (!pricePerHalfServing) return ['Missing pricePerHalfServing'];
     if (!pricePerServing) return ['Missing pricePerServing'];
     if (!kitchenId) return ['Missing kitchenId'];
-    if (sidesId.length === 0) return ['sidesId is required'];
-    if ( typeof kitchenId !== 'number' || kitchenId <= 0 ) return ['Kitchen ID must be a positive number', undefined];
-    if (sidesId.length === 0) return ['Sides ID is required'];
-    // if (sidesId && sidesId.some((side: any) => typeof side !== 'number' || side <= 0)) return ['Sides ID must be an array of positive numbers or null'];
-    if (imagePath !== null && typeof imagePath !== 'string') return ['Image Path must be a string or null'];
+    if (!sidesId) return ['Missing sidesId'];
+    if ( !Array.isArray(sidesId) ) return ['sidesId must be an array of positive numbers', undefined];
+    if ( typeof kitchenId !== 'number' || kitchenId <= 0 ) return ['kitchenId must be a positive number', undefined];
+    if (sidesId && sidesId.some((side: any) => typeof side !== 'number' || side <= 0)) return ['sidesId must be an array of positive numbers'];
+    if (imagePath !== null && typeof imagePath !== 'string') return ['imagePath must be a string or null'];
     return [undefined, new CreateDishDto( name, pricePerHalfServing, pricePerServing, kitchenId, sidesId, imagePath )];
   }
 
