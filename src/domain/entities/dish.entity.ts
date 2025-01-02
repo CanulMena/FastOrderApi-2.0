@@ -9,7 +9,7 @@ export class Dish {
     public kitchenId: number,
     public sidesId: number[],
     public imagePath?: string,
-  ) {}
+  ) {} 
   
   static fromJson = ( object: {[key: string] : any} ): Dish => {
     const { id, nombre, precioEntera, precioMedia, rutaImagen, complementos, cocinaId } = object;
@@ -20,6 +20,7 @@ export class Dish {
     if ( !cocinaId ) throw CustomError.badRequest('cocinaId is required');
     const sidesId = complementos.map((complemento: { complementoId: number}) => complemento.complementoId);
     if (sidesId.length === 0) throw CustomError.badRequest('sidesId is required');
+    if (rutaImagen !== null && typeof rutaImagen !== 'string') throw CustomError.badRequest('Image Path must be a string or null');
 
     return new Dish(id, nombre, precioEntera, precioMedia, cocinaId, sidesId, rutaImagen);
   }
