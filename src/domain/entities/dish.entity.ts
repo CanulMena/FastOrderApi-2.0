@@ -1,11 +1,26 @@
+import { CustomError } from "../errors";
+
 export class Dish {
   constructor(
-    public dishId: number, //obligatorio
-    public name: string, //obligatorio
-    public pricePerServing: number, //obligatorio
-    public pricePerHalfServing: number, //obligatorio
-    public sideId: number, //obligatorio
-    public kitchenId: number, //relacion a la cocina para identificar de donde es el plato
+    public dishId: number,
+    public name: string,
+    public pricePerServing: number,
+    public pricePerHalfServing: number,
+    public kitchenId: number,
+    public sidesId: number[],
+    public imagePath?: string,
   ) {}
-  //TODO: Create from object to create a new instance of the class
+  
+  static fromJson = ( object: {[key: string] : any} ): Dish => {
+    const { id, nombre, precioEntera, precioMedia, rutaImagen, complementos, cocinaId } = object;
+    if ( !id ) throw CustomError.badRequest('id is required');
+    if ( !nombre ) throw CustomError.badRequest('nombre is required');
+    if ( !precioEntera ) throw CustomError.badRequest('precioEntera is required');
+    if ( !precioMedia ) throw CustomError.badRequest('precioMedia is required');
+    if ( !cocinaId ) throw CustomError.badRequest('cocinaId is required');
+    const sidesId = complementos.map((complemento: { complementoId: number}) => complemento.complementoId);
+    if (sidesId.length === 0) throw CustomError.badRequest('sidesId is required');
+
+    return new Dish(id, nombre, precioEntera, precioMedia, cocinaId, sidesId, rutaImagen);
+  }
 }

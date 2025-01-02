@@ -10,7 +10,10 @@ export class PosgresSideDatasourceImpl implements SideDatasource {
     private readonly prisma = new PrismaClient().complemento;
 
     async createSide( createSideDto: CreateSideDto ) : Promise<Side> {
-        const sideObj = await this.prisma.create({
+
+        //TODO: validar que no exista un side con el mismo nombre en la misma cocina
+
+        const createdSide = await this.prisma.create({
             data: {
                 nombre: createSideDto.name,
                 descripcion: createSideDto.description || null,
@@ -18,8 +21,7 @@ export class PosgresSideDatasourceImpl implements SideDatasource {
                 cocinaId: createSideDto.kitchenId,
             }
         });
-        const side = Side.fromJson(sideObj);
-        return side;
+        return Side.fromJson(createdSide);
     }
 
     async getSides() : Promise<Side[]> {
