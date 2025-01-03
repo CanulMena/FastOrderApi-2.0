@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { DishController } from "./dish-controller";
-import { PosgresUserDataSourceImpl, PostgresDishDatasourceImpl } from "../../infrastructure/datasource";
-import { DishRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
+import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl } from "../../infrastructure/datasource";
+import { DishRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { GetSide } from "../../domain/use-cases/side";
 
 export class DishRoutes {
   static get routes(): Router {
@@ -12,9 +13,14 @@ export class DishRoutes {
     const dishDatasource = new PostgresDishDatasourceImpl();
     const dishRepository = new DishRepositoryImpl(dishDatasource);
 
-    const dishController = new DishController(dishRepository);
+    const sideDatasource = new  PostgresSideDatasourceImpl();
+    const sideRepository = new SideRepositoryImpl(sideDatasource);
 
-    const userDataSourceImpl = new PosgresUserDataSourceImpl();
+    const getSide = new GetSide(sideRepository);
+
+    const dishController = new DishController(dishRepository, getSide);
+
+    const userDataSourceImpl = new PostgresUserDataSourceImpl();
     const userRepository = new UserRepositoryImpl(userDataSourceImpl);
 
     const authMiddleware = new AuthMiddleware(userRepository);
@@ -24,8 +30,8 @@ export class DishRoutes {
     router.post(
       '/register', 
       authMiddleware.validateJWT,
-      authMiddleware.validateKitchenAccess,
       authMiddleware.validateRole(roles.Admin),
+      authMiddleware.validateKitchenAccess,
       dishController.postDish,
     );
 
