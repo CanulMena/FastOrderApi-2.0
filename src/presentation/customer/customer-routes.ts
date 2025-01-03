@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { CustomerController } from "./customer-controller";
-import { PostgresCustomerDatasourceImpl, PostgresKitchenDatasourceImpl, PosgresUserDataSourceImpl } from '../../infrastructure/datasource';
+import { PostgresCustomerDatasourceImpl, PostgresKitchenDatasourceImpl, PostgresUserDataSourceImpl } from '../../infrastructure/datasource';
 import { CustomerRepositoryImpl, KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { rolesConfig } from "../../configuration";
@@ -16,7 +16,7 @@ export class CustomerRoutes {
     const kitchenDatasourceImpl = new PostgresKitchenDatasourceImpl();
     const kitchenRepositoryImpl = new KitchenRepositoryImpl(kitchenDatasourceImpl);
 
-    const userDatasourceImpl = new PosgresUserDataSourceImpl();
+    const userDatasourceImpl = new PostgresUserDataSourceImpl();
     const userRepository = new UserRepositoryImpl(userDatasourceImpl);
 
     const routesController = new CustomerController(

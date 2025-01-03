@@ -4,7 +4,7 @@ import { User } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
 import { RegisterUserDto } from "../../domain/dtos/auth/index";
 
-export class PosgresUserDataSourceImpl implements UserDatasource {
+export class PostgresUserDataSourceImpl implements UserDatasource {
 
   private readonly prisma = new PrismaClient().usuario;
 

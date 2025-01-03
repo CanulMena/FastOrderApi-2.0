@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PosgresSideDatasourceImpl, PosgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
+import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
 import { SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
 import { SideController } from "./side-controller";
 import { rolesConfig } from "../../configuration";
@@ -11,11 +11,11 @@ export class SideRoutes {
     static get routes(): Router {
 
         const router = Router();
-        const sideDatasourceImpl = new PosgresSideDatasourceImpl();
+        const sideDatasourceImpl = new PostgresSideDatasourceImpl();
         const sideRepositoryImpl = new SideRepositoryImpl( sideDatasourceImpl );
         const sideController = new SideController( sideRepositoryImpl );
 
-        const userDatasourceImpl = new PosgresUserDataSourceImpl();
+        const userDatasourceImpl = new PostgresUserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasourceImpl);
 
         const authMiddleware = new AuthMiddleware(userRepository);

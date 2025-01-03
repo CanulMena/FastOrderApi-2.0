@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { KitchenController } from "./kitchen-controller";
-import { PostgresKitchenDatasourceImpl, PosgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
+import { PostgresKitchenDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
 import { AuthMiddleware } from "../middlewares/auth.middleware"
 import { rolesConfig } from "../../configuration";
@@ -14,7 +14,7 @@ export class KitchenRoutes {
         const kichenRepositoryImpl = new KitchenRepositoryImpl( kitchenDatasourceImpl );
         const kitchenController = new KitchenController(  kichenRepositoryImpl );
 
-        const userDataSourceImpl = new PosgresUserDataSourceImpl();
+        const userDataSourceImpl = new PostgresUserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDataSourceImpl);
 
         const authMiddleware = new AuthMiddleware(userRepository);
