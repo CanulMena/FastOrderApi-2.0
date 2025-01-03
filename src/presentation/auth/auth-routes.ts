@@ -2,7 +2,7 @@ import { Router } from "express";
 import { envs, rolesConfig } from "../../configuration";
 import { AuthController } from "./auth-controller";
 import { EmailService } from "../email/email-service";
-import { PosgresUserDataSourceImpl, PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
+import { PostgresUserDataSourceImpl, PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl, UserRepositoryImpl } from '../../infrastructure/repository/index';
 import { SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
 import { AuthMiddleware } from "../middlewares/auth.middleware";
@@ -15,7 +15,7 @@ export class AuthRoutes {
     const kitchenDatasourceImpl = new PostgresKitchenDatasourceImpl();
     const kitchenRepositoryImpl = new KitchenRepositoryImpl(kitchenDatasourceImpl);
 
-    const userDatasourceImpl = new PosgresUserDataSourceImpl();
+    const userDatasourceImpl = new PostgresUserDataSourceImpl();
     const userRepositoryImpl = new UserRepositoryImpl(userDatasourceImpl);
 
     const emailService = new EmailService(
