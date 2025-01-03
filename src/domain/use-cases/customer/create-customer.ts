@@ -15,7 +15,6 @@ export class CreateCustomer implements CreateCustomerUseCase {
 
   async execute( registerCustomerDto: RegisterCustomerDto ): Promise<object> {
 
-    //TODO: Validar que solo un ADMIN o SUPER_ADMIN pueda registrar un Customer
     await this.kitchenRepositoryImpl.getKitchenById(registerCustomerDto.kitchenId);
     const customerCreated = await this.customerRepositoryImpl.registerCustomer(registerCustomerDto);
 
