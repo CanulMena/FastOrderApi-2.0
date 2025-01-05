@@ -18,6 +18,7 @@ export class Dish {
     if ( !precioEntera ) throw CustomError.badRequest('precioEntera is required');
     if ( !precioMedia ) throw CustomError.badRequest('precioMedia is required');
     if ( !cocinaId ) throw CustomError.badRequest('cocinaId is required');
+    if ( !complementos ) throw CustomError.badRequest('complementos is required');
     const sidesId = complementos.map((complemento: { complementoId: number}) => complemento.complementoId);
     if (sidesId.length === 0) throw CustomError.badRequest('sidesId is required');
     if (rutaImagen !== null && typeof rutaImagen !== 'string') throw CustomError.badRequest('Image Path must be a string or null');
