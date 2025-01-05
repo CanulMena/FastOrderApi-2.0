@@ -1,5 +1,5 @@
 import { SideDatasource } from "../../domain/datasource/side.datasource";
-import { UpdateSideDto, CreateSideDto } from "../../domain/dtos/side/index";
+import { UpdateSideDto, CreateSideDto, PaginationDto } from "../../domain/dtos/index";
 import { Side } from "../../domain/entities";
 import { SideRepository } from "../../domain/repositories/side.repository";
 
@@ -14,8 +14,8 @@ export class SideRepositoryImpl implements SideRepository {
         return this.datasource.createSide(side);
     }
 
-    getSides() : Promise<Side[]>{
-        return this.datasource.getSides();
+    getSides(pagination: PaginationDto) : Promise<Side[]>{
+        return this.datasource.getSides(pagination);
     }
 
     getSideById( sideId: number ) : Promise<Side>{
