@@ -21,13 +21,16 @@ export class SideController {
 
     public getSides = (req: Request, res: Response) => {
 
-        const { page = 1, limit = 10 } = req.query;
-        const paginationDto = PaginationDto.create(+page, +limit);
-
         const user = req.body.user as User;
-
+        const { page = 1, limit = 10 } = req.query;
+        const [error, paginationDto] = PaginationDto.create(+page, +limit);
+        if( error ){
+            res.status(400).json({error});
+            return;
+        }
+        
         new GetSides(this.sideRepository)
-        .execute(user)
+        .execute(user, paginationDto!)
         .then( sides => res.status(200).json(sides))
         .catch( error => this.handleError(error, res));
     }
