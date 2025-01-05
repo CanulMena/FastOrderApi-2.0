@@ -39,10 +39,17 @@ export class DishRoutes {
       '/get-by-id/:dishId',
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.AllRoles),
-      authMiddleware.validateKitchenAccess,
+      // authMiddleware.validateKitchenAccess,
       dishController.getDishById
     );
 
+
+    router.delete(
+      '/delete-by-id/:dishId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      dishController.deleteDish
+    )
     return router;
   }
 }

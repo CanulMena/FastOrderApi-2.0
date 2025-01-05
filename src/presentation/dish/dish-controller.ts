@@ -6,6 +6,8 @@ import { CreateDish } from '../../domain/use-cases/dish/index';
 import { GetSide } from '../../domain/use-cases/side';
 import { User } from '../../domain/entities';
 import { GetDish } from '../../domain/use-cases/dish/get-dish';
+import { error } from 'console';
+import { DeleteDish } from '../../domain/use-cases/dish/delete-dish';
 
 export class DishController {
 
@@ -46,6 +48,20 @@ export class DishController {
     }
 
     new GetDish(this.dishRepositoryImpl)
+    .execute(dishId, user)
+    .then( dish => res.status(200).json(dish))
+    .catch( error => this.handleError(error, res));
+  }
+
+  public deleteDish = (req: Request, res: Response) => {
+    const dishId = +req.params.dishId;
+    const user = req.body.user as User;
+
+    if (isNaN(dishId)) {
+      res.status(400).json({error: 'ID argument is not a number'});
+    }
+
+    new DeleteDish(this.dishRepositoryImpl)
     .execute(dishId, user)
     .then( dish => res.status(200).json(dish))
     .catch( error => this.handleError(error, res));
