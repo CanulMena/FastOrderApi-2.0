@@ -1,9 +1,10 @@
+import { PaginationDto } from "../../dtos";
 import { User } from "../../entities";
 import { CustomError } from "../../errors";
 import { SideRepository } from "../../repositories";
 
 interface GetSidesUseCase {
-  execute(user: User): Promise<object>;
+  execute(user: User, paginationDto: PaginationDto): Promise<object>;
 }
 
 export class GetSides implements GetSidesUseCase {
@@ -11,12 +12,12 @@ export class GetSides implements GetSidesUseCase {
     private readonly sideRepository: SideRepository
   ) {}
 
-  async execute(user: User): Promise<object> {
+  async execute(user: User, paginationDto: PaginationDto): Promise<object> {
     if (!user.rol) {
       throw CustomError.unAurothorized('User role is required');
     }
 
-    const sides = await this.sideRepository.getSides();
+    const sides = await this.sideRepository.getSides(paginationDto);
 
     // Si el usuario es SUPER_ADMIN, devolver todos los sides
     if (user.rol === 'SUPER_ADMIN') {
@@ -30,6 +31,8 @@ export class GetSides implements GetSidesUseCase {
       throw CustomError.unAurothorized('User does not have access to this kitchen');
     }
 
-    return { sides: filteredSides };
+    return { 
+      sides: filteredSides
+    };
   }
 }
