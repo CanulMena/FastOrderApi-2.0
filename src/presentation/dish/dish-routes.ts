@@ -39,7 +39,6 @@ export class DishRoutes {
       '/get-by-id/:dishId',
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.AllRoles),
-      authMiddleware.validateKitchenAccess,
       dishController.getDishById
     );
 
