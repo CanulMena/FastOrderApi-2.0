@@ -35,6 +35,13 @@ export class DishRoutes {
       dishController.postDish,
     );
 
+    router.get(
+      '/get-by-id/:dishId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.AllRoles),
+      dishController.getDishById
+    );
+
     return router;
   }
 }

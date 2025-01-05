@@ -2,6 +2,7 @@ import { DishDatasource } from "../../domain/datasource";
 import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
 import { CreateDishDto } from "../../domain/dtos/dish/create-dish.dto";
+import { CustomError } from "../../domain/errors";
 
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
@@ -35,5 +36,22 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     });
 
     return Dish.fromJson(dishCreated);
+  }
+
+  async getDishById( dishId: number ): Promise<Dish> {
+    const dish = await this.prisma.findUnique({  // findUnique is a Prisma method that returns a single record that matches the unique key value provided
+      where: {
+        id: dishId
+      },
+      include: {
+        complementos: true
+      }
+    });
+
+    if ( !dish ) {
+      throw CustomError.notFound('Dish ID does not exist');
+    }
+
+    return Dish.fromJson(dish);
   }
 }
