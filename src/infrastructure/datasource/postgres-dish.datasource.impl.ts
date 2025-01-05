@@ -42,6 +42,9 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     const dish = await this.prisma.findUnique({  // findUnique is a Prisma method that returns a single record that matches the unique key value provided
       where: {
         id: dishId
+      },
+      include: {
+        complementos: true
       }
     });
 
