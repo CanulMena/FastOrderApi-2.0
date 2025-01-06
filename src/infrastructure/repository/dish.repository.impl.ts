@@ -15,5 +15,9 @@ export class DishRepositoryImpl implements DishRepository {
   async getDishById( dishId: number ): Promise<Dish>{
     return this.dishDatasource.getDishById(dishId);
   }
+
+  async deleteDish(dishId: number): Promise<Dish> {
+    return this.dishDatasource.deleteDish(dishId);
+  }
   
 }

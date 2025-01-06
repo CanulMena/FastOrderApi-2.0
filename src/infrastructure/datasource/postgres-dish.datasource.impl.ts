@@ -54,4 +54,16 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
 
     return Dish.fromJson(dish);
   }
+
+
+  async deleteDish(dishId: number): Promise<Dish> {
+    await this.getDishById(dishId);
+    const dish = await this.prisma.delete({
+      where: {
+        id: dishId
+      },
+      
+    });
+    return Dish.fromJson(dish);
+  }
 }
