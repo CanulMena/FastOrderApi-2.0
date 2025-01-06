@@ -6,5 +6,4 @@ export abstract class DishRepository {
 
   abstract deleteDish(dishId: number): Promise<Dish>;
 
-  abstract deleteDishSide(dishId: number): Promise<number>;
 }

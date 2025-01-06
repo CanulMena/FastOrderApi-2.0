@@ -5,6 +5,8 @@ import { DishRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../.
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { GetSide } from "../../domain/use-cases/side";
+import { PostgresDishSideDatasourceImpl } from "../../infrastructure/datasource/postgres-dish-side.datasource.impl";
+import { DishSideRespositoryImpl } from "../../infrastructure/repository/dish-side.repository.impl";
 
 export class DishRoutes {
   static get routes(): Router {
@@ -16,9 +18,12 @@ export class DishRoutes {
     const sideDatasource = new  PostgresSideDatasourceImpl();
     const sideRepository = new SideRepositoryImpl(sideDatasource);
 
+    const dishSideDatasource = new PostgresDishSideDatasourceImpl();
+    const dishSideRepository = new DishSideRespositoryImpl(dishSideDatasource);
+
     const getSide = new GetSide(sideRepository);
 
-    const dishController = new DishController(dishRepository, getSide);
+    const dishController = new DishController(dishRepository, dishSideRepository, getSide);
 
     const userDataSourceImpl = new PostgresUserDataSourceImpl();
     const userRepository = new UserRepositoryImpl(userDataSourceImpl);

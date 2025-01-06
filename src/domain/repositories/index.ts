@@ -3,3 +3,4 @@ export * from "./kitchen.repository";
 export * from "./customer.repository";
 export * from "./side.repository";
 export * from "./dish.repository";
+export * from "./dish-side.repository";

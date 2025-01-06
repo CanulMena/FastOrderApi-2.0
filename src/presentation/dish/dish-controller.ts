@@ -8,11 +8,13 @@ import { User } from '../../domain/entities';
 import { GetDish } from '../../domain/use-cases/dish/get-dish';
 import { error } from 'console';
 import { DeleteDish } from '../../domain/use-cases/dish/delete-dish';
+import { DishSideRepository } from '../../domain/repositories/dish-side.repository';
 
 export class DishController {
 
   constructor(
     private dishRepositoryImpl: DishRepository,
+    private dishSideRepository: DishSideRepository,
     private getSide: GetSide
   ) {}
 
@@ -61,7 +63,7 @@ export class DishController {
       res.status(400).json({error: 'ID argument is not a number'});
     }
 
-    new DeleteDish(this.dishRepositoryImpl)
+    new DeleteDish(this.dishRepositoryImpl, this.dishSideRepository)
     .execute(dishId, user)
     .then( dish => res.status(200).json(dish))
     .catch( error => this.handleError(error, res));
