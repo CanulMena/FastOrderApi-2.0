@@ -18,6 +18,18 @@ export class SideRepositoryImpl implements SideRepository {
         return this.datasource.getSides(pagination);
     }
 
+    getSidesCount(): Promise<number>{
+        return this.datasource.getSidesCount();
+    }
+
+    getSidesByKitchenId(kitchenId: number, pagination: PaginationDto) : Promise<Side[]>{
+        return this.datasource.getSidesByKitchenId(kitchenId, pagination);
+    }
+
+    getSidesByKitchenIdCount(kitchenId: number): Promise<number>{
+        return this.datasource.getSidesByKitchenIdCount(kitchenId);
+    }
+
     getSideById( sideId: number ) : Promise<Side>{
         return this.datasource.getSideById(sideId);
     }

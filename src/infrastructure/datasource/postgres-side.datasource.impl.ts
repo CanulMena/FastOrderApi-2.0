@@ -25,13 +25,41 @@ export class PostgresSideDatasourceImpl implements SideDatasource {
     }
 
     async getSides( paginationDto: PaginationDto ) : Promise<Side[]> {
+        const { page, limit } = paginationDto;
         return await this.prisma
         .findMany({
-            skip: (paginationDto.page - 1) * paginationDto.limit,
-            take: paginationDto.limit
+            skip: (page - 1) * limit,
+            take: limit
         })
         .then( 
             sides => sides.map( side => Side.fromJson(side) ) 
+        );
+    }
+
+    async getSidesCount() : Promise<number> {
+        return await this.prisma.count();
+    }
+
+    async getSidesByKitchenIdCount( kitchenId: number ) : Promise<number> {
+        return await this.prisma.count({
+            where: {
+                cocinaId: kitchenId
+            }
+        });
+    }
+
+    async getSidesByKitchenId( kitchenId: number, paginationDto: PaginationDto ) : Promise<Side[]> {
+        const { page, limit } = paginationDto;
+        return await this.prisma
+        .findMany({
+            where: {
+                cocinaId: kitchenId
+            },
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        .then( 
+            sides => sides.map( side => Side.fromJson(side) )
         );
     }
 
