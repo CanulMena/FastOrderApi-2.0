@@ -1,6 +1,5 @@
 import { User } from "../../entities";
-import { DishRepository } from "../../repositories";
-import { DishSideRepository } from "../../repositories/dish-side.repository";
+import { DishRepository, DishSideRepository } from "../../repositories";
 
 interface DeleteDishUseCase {
     execute(dishId: number, user: User): Promise<object>

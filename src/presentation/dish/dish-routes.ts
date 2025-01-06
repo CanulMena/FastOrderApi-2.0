@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { DishController } from "./dish-controller";
-import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl } from "../../infrastructure/datasource";
-import { DishRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
+import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl, PostgresDishSideDatasourceImpl } from "../../infrastructure/datasource";
+import { DishRepositoryImpl, DishSideRespositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { GetSide } from "../../domain/use-cases/side";
-import { PostgresDishSideDatasourceImpl } from "../../infrastructure/datasource/postgres-dish-side.datasource.impl";
-import { DishSideRespositoryImpl } from "../../infrastructure/repository/dish-side.repository.impl";
+
 
 export class DishRoutes {
   static get routes(): Router {

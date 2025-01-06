@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
-import { DishRepository } from '../../domain/repositories';
+import { DishRepository, DishSideRepository } from '../../domain/repositories';
 import { CreateDishDto } from '../../domain/dtos/dish/index';
 import { CustomError } from '../../domain/errors';
 import { CreateDish } from '../../domain/use-cases/dish/index';
 import { GetSide } from '../../domain/use-cases/side';
 import { User } from '../../domain/entities';
 import { GetDish } from '../../domain/use-cases/dish/get-dish';
-import { error } from 'console';
 import { DeleteDish } from '../../domain/use-cases/dish/delete-dish';
-import { DishSideRepository } from '../../domain/repositories/dish-side.repository';
 
 export class DishController {
 

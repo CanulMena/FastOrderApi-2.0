@@ -3,7 +3,6 @@ import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
 import { CreateDishDto } from "../../domain/dtos/dish/create-dish.dto";
 import { CustomError } from "../../domain/errors";
-import { disconnect } from "process";
 
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
