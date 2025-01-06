@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { SideDatasource } from "../../domain/datasource/index";
-import { CreateSideDto } from "../../domain/dtos/side/index";
+import { CreateSideDto, PaginationDto } from "../../domain/dtos/index";
 import { Side } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
 import { UpdateSideDto } from "../../domain/dtos/side/index";
@@ -24,8 +24,43 @@ export class PostgresSideDatasourceImpl implements SideDatasource {
         return Side.fromJson(createdSide);
     }
 
-    async getSides() : Promise<Side[]> {
-        return await this.prisma.findMany().then( sides => sides.map( side => Side.fromJson(side) ) );
+    async getSides( paginationDto: PaginationDto ) : Promise<Side[]> {
+        const { page, limit } = paginationDto;
+        return await this.prisma
+        .findMany({
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        .then( 
+            sides => sides.map( side => Side.fromJson(side) ) 
+        );
+    }
+
+    async getSidesCount() : Promise<number> {
+        return await this.prisma.count();
+    }
+
+    async getSidesByKitchenIdCount( kitchenId: number ) : Promise<number> {
+        return await this.prisma.count({
+            where: {
+                cocinaId: kitchenId
+            }
+        });
+    }
+
+    async getSidesByKitchenId( kitchenId: number, paginationDto: PaginationDto ) : Promise<Side[]> {
+        const { page, limit } = paginationDto;
+        return await this.prisma
+        .findMany({
+            where: {
+                cocinaId: kitchenId
+            },
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        .then( 
+            sides => sides.map( side => Side.fromJson(side) )
+        );
     }
 
     async getSideById( sideId: number ) : Promise<Side> {

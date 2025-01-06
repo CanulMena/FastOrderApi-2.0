@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { SideRepository } from "../../domain/repositories/index";
-import { CreateSideDto, UpdateSideDto } from '../../domain/dtos/side/index';
+import { CreateSideDto, UpdateSideDto, PaginationDto } from '../../domain/dtos/index';
 import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide } from '../../domain/use-cases/side';
 import { CustomError } from '../../domain/errors';
 import { User } from '../../domain/entities/user.entity';
@@ -22,9 +22,15 @@ export class SideController {
     public getSides = (req: Request, res: Response) => {
 
         const user = req.body.user as User;
-
+        const { page = 1, limit = 10 } = req.query;
+        const [error, paginationDto] = PaginationDto.create(+page, +limit);
+        if( error ){
+            res.status(400).json({error});
+            return;
+        }
+        
         new GetSides(this.sideRepository)
-        .execute(user)
+        .execute(user, paginationDto!)
         .then( sides => res.status(200).json(sides))
         .catch( error => this.handleError(error, res));
     }
