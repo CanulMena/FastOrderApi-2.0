@@ -17,6 +17,7 @@ export class GetSides implements GetSidesUseCase {
     const { page, limit } = paginationDto;
 
     if (user.rol === 'SUPER_ADMIN') {
+      //TODO: Refactorizar esto para mejorar la velocidad e la consulta
       const sides = await this.sideRepository.getSides(paginationDto);
       const sidesCount = await this.sideRepository.getSidesCount();
       return this.buildResponse(sides, page, limit, sidesCount);
@@ -26,7 +27,7 @@ export class GetSides implements GetSidesUseCase {
       throw CustomError.unAurothorized('User does not have access to any kitchen');
     }
 
-    //*solo me va a traer los sides de la cocina a la que pertenece el usuario
+    //TODO: Refactorizar esto para mejorar la velocidad e la consulta
     const sidesByKitchenIdCount = await this.sideRepository.getSidesByKitchenIdCount(user.kitchenId);
     const sidesByKitchenId = await this.sideRepository.getSidesByKitchenId(user.kitchenId, paginationDto);
 
@@ -34,6 +35,7 @@ export class GetSides implements GetSidesUseCase {
   }
 
   private buildResponse(sides: Side[], page: number, limit: number, count: number): object {
+    //TODO: VER COMO PUEDO REUTILIZAR ESTE CODIGO EN DIFERENTES LUGARES CON PAGINACIÓN
     return {
       page,
       limit,

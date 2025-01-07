@@ -1,17 +1,14 @@
 import { Request, Response } from 'express';
 import { DishRepository, DishSideRepository } from '../../domain/repositories';
-import { CreateDishDto } from '../../domain/dtos/dish/index';
+import { PaginationDto, CreateDishDto } from '../../domain/dtos';
 import { CustomError } from '../../domain/errors';
-import { CreateDish } from '../../domain/use-cases/dish/index';
-import { GetSide } from '../../domain/use-cases/side';
+import { CreateDish, GetDishes, GetDish, DeleteDish, GetSide } from '../../domain/use-cases/index';
 import { User } from '../../domain/entities';
-import { GetDish } from '../../domain/use-cases/dish/get-dish';
-import { DeleteDish } from '../../domain/use-cases/dish/delete-dish';
 
 export class DishController {
 
   constructor(
-    private dishRepositoryImpl: DishRepository,
+    private dishRepository: DishRepository,
     private dishSideRepository: DishSideRepository,
     private getSide: GetSide
   ) {}
@@ -33,7 +30,7 @@ export class DishController {
       return;
     }
     
-    new CreateDish(this.dishRepositoryImpl, this.getSide)
+    new CreateDish(this.dishRepository, this.getSide)
     .execute(dishDto!, user)
     .then( user => res.status(200).json(user))
     .catch( error => this.handleError(error, res));
@@ -47,9 +44,24 @@ export class DishController {
       res.status(400).json({error: 'ID argument is not a number'});
     }
 
-    new GetDish(this.dishRepositoryImpl)
+    new GetDish(this.dishRepository)
     .execute(dishId, user)
     .then( dish => res.status(200).json(dish))
+    .catch( error => this.handleError(error, res));
+  }
+
+  public getDishes = (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const { page = 1, limit = 10 } = req.query;
+    const [error, paginationDto] = PaginationDto.create(+page, +limit);
+    if( error ){
+        res.status(400).json({error});
+        return;
+    }
+    
+    new GetDishes(this.dishRepository)
+    .execute(user, paginationDto!)
+    .then( dishes => res.status(200).json(dishes))
     .catch( error => this.handleError(error, res));
   }
 
@@ -61,7 +73,7 @@ export class DishController {
       res.status(400).json({error: 'ID argument is not a number'});
     }
 
-    new DeleteDish(this.dishRepositoryImpl, this.dishSideRepository)
+    new DeleteDish(this.dishRepository, this.dishSideRepository)
     .execute(dishId, user)
     .then( dish => res.status(200).json(dish))
     .catch( error => this.handleError(error, res));

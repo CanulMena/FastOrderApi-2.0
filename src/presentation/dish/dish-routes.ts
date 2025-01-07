@@ -47,6 +47,12 @@ export class DishRoutes {
       dishController.getDishById
     );
 
+    router.get(
+      '/get-all',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.AllRoles),
+      dishController.getDishes
+    );
 
     router.delete(
       '/delete-by-id/:dishId',
