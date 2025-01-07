@@ -3,6 +3,7 @@ import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
 import { CreateDishDto } from "../../domain/dtos/dish/create-dish.dto";
 import { CustomError } from "../../domain/errors";
+import { PaginationDto } from "../../domain/dtos";
 
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
@@ -55,6 +56,44 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     return Dish.fromJson(dish);
   }
 
+    async getDishes( paginationDto: PaginationDto ) : Promise<Dish[]> {
+        const { page, limit } = paginationDto;
+        return await this.prisma
+        .findMany({
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        .then( 
+            dishes => dishes.map( dish => Dish.fromJson(dish) ) 
+        );
+    }
+
+    async getDishesCount() : Promise<number> {
+        return await this.prisma.count();
+    }
+
+    async getDishesByKitchenIdCount( kitchenId: number ) : Promise<number> {
+        return await this.prisma.count({
+            where: {
+                cocinaId: kitchenId
+            }
+        });
+    }
+
+    async getDishesByKitchenId( kitchenId: number, paginationDto: PaginationDto ) : Promise<Dish[]> {
+        const { page, limit } = paginationDto;
+        return await this.prisma
+        .findMany({
+            where: {
+                cocinaId: kitchenId
+            },
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        .then( 
+            dishes => dishes.map( dish => Dish.fromJson(dish) )
+        );
+    }
 
   async deleteDish(dishId: number): Promise<Dish> {
     await this.getDishById(dishId);
