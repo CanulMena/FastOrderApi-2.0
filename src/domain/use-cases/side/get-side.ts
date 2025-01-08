@@ -1,4 +1,4 @@
-import { User } from "../../entities";
+import { Side, User } from "../../entities";
 import { CustomError } from "../../errors";
 import { SideRepository } from "../../repositories";
 
