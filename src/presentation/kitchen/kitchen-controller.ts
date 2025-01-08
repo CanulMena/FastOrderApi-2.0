@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
 import { KitchenRepository } from '../../domain/repositories';
-import { CreateKitchen, GetKitchens, DeleteKitchen, GetKitchen } from '../../domain/use-cases/kitchen';
+import { CreateKitchen, GetKitchens, DeleteKitchen, GetKitchen, UpdateKitchen } from '../../domain/use-cases/kitchen';
 import { CustomError } from '../../domain/errors';
 
 export class KitchenController {
@@ -76,7 +76,7 @@ export class KitchenController {
             return;
         }
 
-        new CreateKitchen(this.kitchenRepository)
+        new UpdateKitchen(this.kitchenRepository)
         .execute(updateKitchenDto!)
         .then( kitchen => res.status(200).json(kitchen) ) // 200 OK
         .catch( error => this.handleError(error, res));
