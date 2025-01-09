@@ -1,4 +1,4 @@
-import { CreateDishDto, PaginationDto } from "../dtos";
+import { CreateDishDto, PaginationDto, UpdateDishDto } from "../dtos";
 import { Dish } from "../entities";
 
 export abstract class DishDatasource {
@@ -9,4 +9,5 @@ export abstract class DishDatasource {
     abstract getDishesByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Dish[]>;
     abstract getDishById(dishId: number): Promise<Dish>;
     abstract deleteDish(dishId: number): Promise<Dish>;
+    abstract updateDish(dish: UpdateDishDto): Promise<Dish>;
 }
