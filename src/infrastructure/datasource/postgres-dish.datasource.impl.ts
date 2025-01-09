@@ -1,9 +1,8 @@
 import { DishDatasource } from "../../domain/datasource";
 import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
-import { CreateDishDto } from "../../domain/dtos/dish/create-dish.dto";
 import { CustomError } from "../../domain/errors";
-import { PaginationDto } from "../../domain/dtos";
+import { PaginationDto, UpdateDishDto, CreateDishDto } from "../../domain/dtos";
 
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
@@ -50,7 +49,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     });
 
     if ( !dish ) {
-      throw CustomError.notFound('Dish ID does not exist');
+      throw CustomError.notFound(`Dish with id ${dishId} does not exist`);
     }
 
     return Dish.fromJson(dish);
@@ -88,7 +87,10 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
                 cocinaId: kitchenId
             },
             skip: (page - 1) * limit,
-            take: limit
+            take: limit,
+            include: {
+                complementos: true
+            }
         })
         .then( 
             dishes => dishes.map( dish => Dish.fromJson(dish) )
@@ -101,8 +103,29 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
       where: {
         id: dishId
       },
-      
     });
     return Dish.fromJson(dish);
   }
+
+  async updateDish( updateDishDto: UpdateDishDto): Promise<Dish> {
+    await this.getDishById(updateDishDto.dishId);
+
+    const dishUpdated = await this.prisma.update({
+      where: {
+        id: updateDishDto.dishId
+      },
+      data: {
+        nombre: updateDishDto.name,
+        precioMedia: updateDishDto.pricePerHalfServing,
+        precioEntera: updateDishDto.pricePerServing,
+        rutaImagen: updateDishDto.imagePath
+      },
+      include: {
+        complementos: true
+      }
+    });
+
+    return Dish.fromJson(dishUpdated);
+  }
+
 }
