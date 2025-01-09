@@ -20,7 +20,7 @@ export class DeleteDish implements DeleteDishUseCase {
             throw new Error('User does not have access to this kitchen');
         }
         
-        await this.dishSideRepository.deleteDishSide(dishId);
+        await this.dishSideRepository.deleteSidesByDishId(dishId);
         const dishDeleted = await this.dishRespository.deleteDish(dishId)
         return {
             dish: dishDeleted
