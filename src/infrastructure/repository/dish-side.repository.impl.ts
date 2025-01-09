@@ -8,7 +8,11 @@ export class DishSideRespositoryImpl implements DishSideRepository {
         private readonly dishSideDatasource: DishSideDatasource
     ) {}
 
-    async deleteDishSide(dishId: number): Promise<number> {
-        return this.dishSideDatasource.deleteDishSide(dishId);
+    async deleteSidesByDishId(dishId: number): Promise<number> {
+        return this.dishSideDatasource.deleteSidesByDishId(dishId);
+    }
+
+    async createMany(dishId: number, sidesId: number[]): Promise<void> {
+        return this.dishSideDatasource.createMany(dishId, sidesId);
     }
 }
