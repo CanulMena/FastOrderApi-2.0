@@ -6,7 +6,7 @@ export class PostgresDishSideDatasourceImpl implements DishSideDatasource {
 
     private readonly prisma = new PrismaClient().platilloComplemento;
 
-    async deleteDishSide( dishId: number ): Promise<number> {
+    async deleteSidesByDishId( dishId: number ): Promise<number> {
         await this.prisma.deleteMany({
             where: {
                 platilloId: dishId
@@ -14,4 +14,18 @@ export class PostgresDishSideDatasourceImpl implements DishSideDatasource {
         });
         return dishId;
     }
+
+    async createMany( dishId: number, sidesId: number[] ): Promise<void> {
+        const dishSides = sidesId.map( sideId => {
+            return {
+                platilloId: dishId,
+                complementoId: sideId
+            }
+        });
+
+        await this.prisma.createMany({
+            data: dishSides
+        });
+    }
+
 }

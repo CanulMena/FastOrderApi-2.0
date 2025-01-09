@@ -1,5 +1,5 @@
 import { DishDatasource } from '../../domain/datasource';
-import { PaginationDto } from '../../domain/dtos';
+import { PaginationDto, UpdateDishDto } from '../../domain/dtos';
 import { Dish } from '../../domain/entities';
 import { DishRepository } from '../../domain/repositories/dish.repository';
 
@@ -31,6 +31,10 @@ export class DishRepositoryImpl implements DishRepository {
 
   async deleteDish(dishId: number): Promise<Dish> {
     return this.dishDatasource.deleteDish(dishId);
+  }
+
+  async updateDish(dish: UpdateDishDto): Promise<Dish> {
+    return this.dishDatasource.updateDish(dish);
   }
   
 }

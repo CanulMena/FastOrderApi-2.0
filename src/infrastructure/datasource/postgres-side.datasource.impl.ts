@@ -71,7 +71,7 @@ export class PostgresSideDatasourceImpl implements SideDatasource {
         });
 
         if( !side ){
-            throw CustomError.notFound('Side ID does not exist');
+            throw CustomError.notFound(`Side with id ${sideId} does not exist`);
         }
 
         return Side.fromJson(side);

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { DishRepository, DishSideRepository } from '../../domain/repositories';
-import { PaginationDto, CreateDishDto } from '../../domain/dtos';
+import { DishRepository, DishSideRepository, SideRepository } from '../../domain/repositories';
+import { PaginationDto, CreateDishDto, UpdateDishDto } from '../../domain/dtos';
 import { CustomError } from '../../domain/errors';
-import { CreateDish, GetDishes, GetDish, DeleteDish, GetSide } from '../../domain/use-cases/index';
+import { CreateDish, GetDishes, GetDish, DeleteDish, UpdateDish } from '../../domain/use-cases/index';
 import { User } from '../../domain/entities';
 
 export class DishController {
@@ -10,7 +10,7 @@ export class DishController {
   constructor(
     private dishRepository: DishRepository,
     private dishSideRepository: DishSideRepository,
-    private getSide: GetSide
+    private sideRepository: SideRepository
   ) {}
 
   private handleError(error: unknown, res: Response) {
@@ -22,7 +22,7 @@ export class DishController {
   }
 
   public postDish = async (req: Request, res: Response) => {
-    const user = req.body.user as User;
+    //TODO: NO PODER CREAR OTRO PLATILLO CON EL MISMO NOMBRE
     const [error, dishDto] = CreateDishDto.create(req.body);
 
     if (error) {
@@ -30,8 +30,8 @@ export class DishController {
       return;
     }
     
-    new CreateDish(this.dishRepository, this.getSide)
-    .execute(dishDto!, user)
+    new CreateDish(this.dishRepository, this.sideRepository)
+    .execute(dishDto!)
     .then( user => res.status(200).json(user))
     .catch( error => this.handleError(error, res));
   }
@@ -78,4 +78,21 @@ export class DishController {
     .then( dish => res.status(200).json(dish))
     .catch( error => this.handleError(error, res));
   }
+
+  public updateDish = (req: Request, res: Response) => {
+    const dishId = +req.params.dishId;
+    const user = req.body.user as User;
+    const [error, updateDishDto] = UpdateDishDto.create({...req.body, dishId});
+
+    if (error) {
+      res.status(400).json({error});
+      return;
+    }
+
+    new UpdateDish(this.dishRepository, this.sideRepository, this.dishSideRepository)
+    .execute(updateDishDto!, user)
+    .then( dish => res.status(200).json(dish))
+    .catch( error => this.handleError(error, res));
+  }
+
 }

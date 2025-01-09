@@ -4,7 +4,7 @@ import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDat
 import { DishRepositoryImpl, DishSideRespositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
-import { GetSide } from "../../domain/use-cases/side";
+
 
 
 export class DishRoutes {
@@ -20,9 +20,8 @@ export class DishRoutes {
     const dishSideDatasource = new PostgresDishSideDatasourceImpl();
     const dishSideRepository = new DishSideRespositoryImpl(dishSideDatasource);
 
-    const getSide = new GetSide(sideRepository);
 
-    const dishController = new DishController(dishRepository, dishSideRepository, getSide);
+    const dishController = new DishController(dishRepository, dishSideRepository, sideRepository );
 
     const userDataSourceImpl = new PostgresUserDataSourceImpl();
     const userRepository = new UserRepositoryImpl(userDataSourceImpl);
@@ -31,6 +30,7 @@ export class DishRoutes {
 
     const roles = rolesConfig;
 
+    //TODO: VALIDAR SI LA INSERSIÓN DE LOS MIDDLEWARES SI SE PEUDE REFACTORIZAR
     router.post(
       '/register', 
       authMiddleware.validateJWT,
@@ -59,7 +59,15 @@ export class DishRoutes {
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
       dishController.deleteDish
-    )
+    );
+
+    router.put(
+      '/update-dish/:dishId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      dishController.updateDish
+    );
+
     return router;
   }
 }
