@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { DishRepository, DishSideRepository, SideRepository } from '../../domain/repositories';
 import { PaginationDto, CreateDishDto, UpdateDishDto } from '../../domain/dtos';
 import { CustomError } from '../../domain/errors';
-import { CreateDish, GetDishes, GetDish, DeleteDish } from '../../domain/use-cases/index';
+import { CreateDish, GetDishes, GetDish, DeleteDish, UpdateDish } from '../../domain/use-cases/index';
 import { User } from '../../domain/entities';
 
 export class DishController {
@@ -89,10 +89,10 @@ export class DishController {
       return;
     }
 
-    // new UpdateDish(this.dishRepository, this.getSide)
-    // .execute(dishDto!, user)
-    // .then( dish => res.status(200).json(dish))
-    // .catch( error => this.handleError(error, res));
+    new UpdateDish(this.dishRepository, this.sideRepository, this.dishSideRepository)
+    .execute(updateDishDto!, user)
+    .then( dish => res.status(200).json(dish))
+    .catch( error => this.handleError(error, res));
   }
 
 }

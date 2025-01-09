@@ -4,7 +4,7 @@ import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDat
 import { DishRepositoryImpl, DishSideRespositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
-import { GetSide } from "../../domain/use-cases/side";
+
 
 
 export class DishRoutes {
