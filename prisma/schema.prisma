@@ -37,6 +37,7 @@ model Platillo {
   precioMedia  Float                 @db.Real
   precioEntera Float                 @db.Real
   rutaImagen   String?
+  racionesDisponibles Int            @default(0)
   cocinaId     Int
   detalles     DetallePedido[]
   cocina       Cocina                @relation(fields: [cocinaId], references: [id])
@@ -80,6 +81,7 @@ model Pedido {
   estado          EstadoPedido     @default(PENDIENTE)
   tipoEntrega     TipoEntrega      @default(PRESENCIAL)
   tipoPago        TipoPago         @default(EFECTIVO)
+  esPagado        Boolean          @default(false)
   clienteId       Int
   cocinaId        Int
   detalles        DetallePedido[]
