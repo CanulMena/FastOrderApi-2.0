@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { OrderController } from "./order-controller";
-import { PostgresOrderDatasourceImpl } from "../../infrastructure/datasource";
-import { OrderRepositoryImpl } from "../../infrastructure/repository";
+import { PostgresOrderDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource";
+import { OrderRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { rolesConfig } from '../../configuration/roles-config';
 
 export class OrderRoutes {
   public static get routes(): Router {
@@ -12,7 +14,18 @@ export class OrderRoutes {
 
     const orderController = new OrderController(orderRepository);
 
-    router.post('/register', orderController.registerOrder);
+    const userDatasource = new PostgresUserDataSourceImpl();
+    const userRepository = new UserRepositoryImpl(userDatasource);
+
+    const authMiddleware = new AuthMiddleware(userRepository);
+
+    router.post(
+      '/register',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.registerOrder
+    );
     
     return router;
   }
