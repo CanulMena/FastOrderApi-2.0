@@ -4,6 +4,7 @@ import { AuthRoutes } from "./auth/auth-routes";
 import { CustomerRoutes } from "./customer/customer-routes";
 import { SideRoutes } from "./side/side-routes";
 import { DishRoutes } from "./dish/dish-routes";
+import { OrderRoutes } from "./order/order-routes";
 
 export class AppRoutes {
     static get routes(): Router {
@@ -19,6 +20,8 @@ export class AppRoutes {
         router.use('/api/side', SideRoutes.routes); //Ruta de los complementos
 
         router.use('/api/dish', DishRoutes.routes); //Ruta de los platillos
+
+        router.use('/api/order', OrderRoutes.routes); //Ruta de los pedidos
 
         return router;
     }
