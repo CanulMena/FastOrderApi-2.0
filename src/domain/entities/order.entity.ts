@@ -47,11 +47,11 @@ export class Order {
     newDate = new Date(fecha);
     if ( isNaN( newDate.getTime() ) ) throw CustomError.badRequest('date is not a valid date - format: yyyy-mm-dd hh:mm:ss');
     if(!estado) throw CustomError.badRequest('Missing estado');
-    if(!Order.isValidOrderSatus(estado)) throw CustomError.badRequest('Invalid status');
+    if(!Order.isValidOrderSatus(estado)) throw CustomError.badRequest(`Invalid status - valid values: ${this.OrderValidOrderStatus}`);
     if(!tipoEntrega) throw CustomError.badRequest('Missing tipoEntrega');
-    if(!Order.isValidOrderDeliveryType(tipoEntrega)) throw CustomError.badRequest('Invalid order type');
+    if(!Order.isValidOrderDeliveryType(tipoEntrega)) throw CustomError.badRequest(`Invalid order type - valid values: ${Order.OrderTypeDelivery}`);
     if(!tipoPago) throw CustomError.badRequest('Missing tipoPago');
-    if(!Order.isValidOrderPaymentType(tipoPago)) throw CustomError.badRequest('Invalid payment type');
+    if(!Order.isValidOrderPaymentType(tipoPago)) throw CustomError.badRequest(`Invalid payment type - valid values: ${Order.OrderPaymentType}`);
     if(esPagado === undefined) throw CustomError.badRequest('Missing esPagado');
     if(!clienteId) throw CustomError.badRequest('Missing clienteId');
     if(!cocinaId) throw CustomError.badRequest('Missing cocinaId');
