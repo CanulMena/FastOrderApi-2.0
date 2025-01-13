@@ -43,7 +43,7 @@ export class CreateOrderDto {
     let newDate;
     if ( !date ) return ['date is required'];
     newDate = new Date(date);
-    if ( isNaN( newDate.getTime() ) ) return ['CompletedAt is not a valid date'];
+    if ( isNaN( newDate.getTime() ) ) return ['date is not a valid date - format: yyyy-mm-dd hh:mm:ss'];
     if ( !status ) return ['status is required'];
     if (!this.isValidOrderSatus(status)) return ['Invalid status'];
     if ( !orderType ) return ['orderType is required'];
