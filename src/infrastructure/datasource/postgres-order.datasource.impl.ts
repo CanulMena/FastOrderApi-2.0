@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
+import { OrderDatasource } from "../../domain/datasource";
 
-export class PostgresOrderDatasourceImpl {
+export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   private readonly prisma = new PrismaClient().pedido;
 
-  async createOrder( createOrderDto: CreateOrderDto ){
+  async createOder( createOrderDto: CreateOrderDto ): Promise<Order>{
 
     const order = await this.prisma.create({
       data: {

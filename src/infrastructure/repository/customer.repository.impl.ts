@@ -9,9 +9,13 @@ export class CustomerRepositoryImpl implements CustomerRepository {
   constructor(
     private readonly customerDatasource: CustomerDatasource
   ){}
-  
+
   registerCustomer(registerCustomerDto: RegisterCustomerDto): Promise<Customer> {
     return this.customerDatasource.registerCustomer(registerCustomerDto);
+  }
+
+  getCustomerById(CustomerId: number): Promise<Customer> {
+    return this.customerDatasource.getCustomerById(CustomerId);
   }
 
 }

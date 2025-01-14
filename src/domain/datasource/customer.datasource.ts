@@ -4,4 +4,5 @@ import { Customer } from '../entities/index';
 
 export abstract class CustomerDatasource {
   abstract registerCustomer(registerCustomerDto: RegisterCustomerDto): Promise<Customer>;
+  abstract getCustomerById(customerId: number): Promise<Customer>;
 }

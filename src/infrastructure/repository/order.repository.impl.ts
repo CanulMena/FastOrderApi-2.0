@@ -9,7 +9,7 @@ export class OrderRepositoryImpl implements OrderRepository{
     private datasource: OrderDatasource
   ) {}
 
-  crateOder(order: CreateOrderDto): Promise<Order> {
-    return this.datasource.crateOder(order);
+  createOder(order: CreateOrderDto): Promise<Order> {
+    return this.datasource.createOder(order);
   }
 }
