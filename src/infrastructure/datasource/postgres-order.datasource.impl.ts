@@ -7,8 +7,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   private readonly prisma = new PrismaClient().pedido;
 
-  async createOder( createOrderDto: CreateOrderDto ): Promise<Order>{
-
+  async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
     const order = await this.prisma.create({
       data: {
         fecha: createOrderDto.date,
@@ -17,8 +16,18 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         tipoPago: createOrderDto.paymentType,
         esPagado: createOrderDto.isPaid,
         clienteId: createOrderDto.clientId,
-        cocinaId: createOrderDto.kitchenId
-      }
+        cocinaId: createOrderDto.kitchenId,
+        detalles: {
+          create: createOrderDto.orderDetails.map(detail => ({
+            cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
+            cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
+            platilloId: detail.dishId, // ID del platillo relacionado
+          })),
+        },
+      },
+      include: {
+        detalles: true, // Incluir detalles en la respuesta
+      },
     });
 
     return Order.fromJson(order);
