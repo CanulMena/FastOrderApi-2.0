@@ -1,13 +1,14 @@
 import { CreateOrderDto } from "../../domain/dtos";
 import { CustomError } from "../../domain/errors";
 import { Request, Response } from 'express';
-import { OrderRepository } from "../../domain/repositories";
-import { RegisterOrder } from "../../domain/use-cases";
+import { CustomerRepository, OrderRepository } from "../../domain/repositories";
+import { RegisterOrder } from "../../domain/use-cases"
 
 export class OrderController {
 
   constructor(
-    private orderRepository: OrderRepository
+    private orderRepository: OrderRepository,
+    private customerRepository: CustomerRepository
   ) {}
 
   private handleError(error: unknown, res: Response) {
@@ -27,7 +28,7 @@ export class OrderController {
         return;
     }
 
-    new RegisterOrder(this.orderRepository)
+    new RegisterOrder(this.orderRepository, this.customerRepository)
     .execute(orderDto!)
     .then( order => res.status(201).json(order) ) // 201 Created
     .catch( error => this.handleError(error, res));
