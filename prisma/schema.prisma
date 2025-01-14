@@ -37,7 +37,7 @@ model Platillo {
   precioMedia  Float                 @db.Real
   precioEntera Float                 @db.Real
   rutaImagen   String?
-  racionesDisponibles Int            @default(0)
+  racionesDisponibles Float            @default(0.0)
   cocinaId     Int
   detalles     DetallePedido[]
   cocina       Cocina                @relation(fields: [cocinaId], references: [id])
@@ -105,7 +105,6 @@ model DetallePedido {
   id             Int      @id @default(autoincrement())
   cantidadEntera Int
   cantidadMedia  Int
-  subtotal       Float    @db.Real
   pedidoId       Int
   platilloId     Int
   pedido         Pedido   @relation(fields: [pedidoId], references: [id])
