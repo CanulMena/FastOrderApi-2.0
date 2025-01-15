@@ -14,7 +14,7 @@ export class ValidateEmail implements ValidateEmailUseCase {
 
     async execute(token: string): Promise<object> {
     const payload = await jwtAdapter.validateToken(token);
-    if(!payload) throw CustomError.unAurothorized('Invalid token');
+    if(!payload) throw CustomError.unAuthorized('Invalid token');
 
     const { email } = payload as { email: string };
     if(!email) throw CustomError.internalServer('Email not existe in token');

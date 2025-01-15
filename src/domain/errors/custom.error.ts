@@ -12,7 +12,7 @@ export class CustomError extends Error {
     return new CustomError(400, message);// 400 es para errores de cliente
   }
 
-  static unAurothorized(message: string) {
+  static unAuthorized(message: string) {
     return new CustomError(401, message);// 401 es para errores de autenticación
   }
 

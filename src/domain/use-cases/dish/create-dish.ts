@@ -32,7 +32,7 @@ export class CreateDish implements CreateDishUseCase {
 
     if (invalidSides.length > 0) {
       const invalidSideIds = invalidSides.map((side) => side.sideId).join(', ');
-      throw CustomError.unAurothorized(
+      throw CustomError.unAuthorized(
         `The following ${invalidSideIds.length > 1 ? 'sides' : 'side'} do not belong to the same kitchen: ${invalidSideIds}`
       );
     }

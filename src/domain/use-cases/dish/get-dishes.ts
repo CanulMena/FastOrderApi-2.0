@@ -23,7 +23,7 @@ export class GetDishes implements GetDishesUseCase {
       }
   
       if (!user.kitchenId) {
-        throw CustomError.unAurothorized('User does not have access to any kitchen');
+        throw CustomError.unAuthorized('User does not have access to any kitchen');
       }
       
       //TODO: Refactorizar esto para mejorar la velocidad e la consulta
