@@ -1,4 +1,5 @@
 import { CustomError } from "../errors";
+import { OrderDetail } from "./order-detail.entity";
 
 const validOrderStatus = ['PENDIENTE', 'CANCELADO', 'ENTREGADO'] as const;
 export type OrderStatus = typeof validOrderStatus[number]; //type
@@ -20,7 +21,7 @@ export class Order {
     public deliveryType: OrderDeliveryType                , // Tipo de pedido
     public paymentType: OrderPaymentType, // Tipo de pago
     public isPaid: boolean, // Si el pedido está pagado
-    //*public orderDetails: OrderDetail[],
+    public orderDetails: OrderDetail[],
     public clientId: number, // Relación al cliente que hizo el pedido
     public kitchenId: number, // Relación a la cocina para identificar de dónde es el pedido
     //TODO: agregar los pagos pendientes
@@ -39,7 +40,7 @@ export class Order {
   }
 
   static fromJson( object: {[key: string] : any} ): Order {
-    const { id, fecha, estado, tipoEntrega, tipoPago, esPagado,
+    const { id, fecha, estado, tipoEntrega, tipoPago, esPagado, detalles,
       clienteId, cocinaId } = object;
     let newDate;
     if(!id) throw CustomError.badRequest('Missing id');
@@ -53,6 +54,17 @@ export class Order {
     if(!tipoPago) throw CustomError.badRequest('Missing tipoPago');
     if(!Order.isValidOrderPaymentType(tipoPago)) throw CustomError.badRequest(`Invalid payment type - valid values: ${Order.OrderPaymentType}`);
     if(esPagado === undefined) throw CustomError.badRequest('Missing esPagado');
+
+    if(!detalles) throw CustomError.badRequest('Missing detalles');
+    if(!Array.isArray(detalles)) throw CustomError.badRequest('detalles must be an array');
+    if(detalles.length === 0) throw CustomError.badRequest('detalles must have at least one element');
+
+    const validatedDetails: OrderDetail[] = [];
+    for (const detail of detalles) {
+      const validDetail = OrderDetail.fromJson(detail);
+      validatedDetails.push(validDetail);
+    }
+
     if(!clienteId) throw CustomError.badRequest('Missing clienteId');
     if(!cocinaId) throw CustomError.badRequest('Missing cocinaId');
     return new Order(
@@ -62,6 +74,7 @@ export class Order {
       tipoEntrega,
       tipoPago,
       esPagado,
+      validatedDetails,
       clienteId,
       cocinaId
     );

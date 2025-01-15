@@ -20,7 +20,7 @@ export class UpdateDish implements UpdateDishUseCase {
 
     // Verifica si el usuario tiene acceso a la cocina del platillo
     if (dishFound.kitchenId !== user.kitchenId && user.rol !== 'SUPER_ADMIN') {
-      throw CustomError.unAurothorized('User does not have access to this kitchen');
+      throw CustomError.unAuthorized('User does not have access to this kitchen');
     }
 
     // Valida los complementos (sides) si están presentes
@@ -49,7 +49,7 @@ export class UpdateDish implements UpdateDishUseCase {
 
     if (invalidSides.length) {
       const invalidSideIds = invalidSides.map((side) => side.sideId).join(', ');
-      throw CustomError.unAurothorized(
+      throw CustomError.unAuthorized(
         `The following ${invalidSides.length > 1 ? 'sides' : 'side'} do not belong to the same kitchen: ${invalidSideIds}`
       );
     }
