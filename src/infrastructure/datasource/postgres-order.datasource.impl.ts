@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
+import { CustomError } from "../../domain/errors";
+import { UpdateOrderDto } from "../../domain/dtos";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -33,4 +35,45 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     return Order.fromJson(order);
   }
 
+  async getOrderById(orderId: number): Promise<Order> {
+    const order = await this.prisma.findUnique({
+      where: {
+        id: orderId,
+      }
+    });
+
+    if (!order) {
+      throw CustomError.notFound(`Order with id ${orderId} does not exist`);
+    }
+
+    return Order.fromJson(order);
+  }
+
+  async updateOrder(updateOrder: UpdateOrderDto): Promise<Order> {
+    await this.getOrderById(updateOrder.orderId);
+    const order = await this.prisma.update({
+      where: {
+        id: updateOrder.orderId,
+      },
+      data: {
+
+        //TODO: Verificar los enum que se encuentras para datos en especifico
+        estado: updateOrder.status,
+        tipoEntrega: updateOrder.orderType,
+        tipoPago: updateOrder.paymentType,
+        esPagado: updateOrder.isPaid,
+        clienteId: updateOrder.clientId,
+        // detalles: {
+        //   deleteMany: {}, // Eliminar todos los detalles
+        //   create: updaateOrder.orderDetails?.map(detail => ({
+        //     cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
+        //     cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
+        //     platilloId: detail.dishId, // ID del platillo relacionado
+        //   })),
+        // },
+      }
+    })
+
+    return Order.fromJson(order);
+  }
 }

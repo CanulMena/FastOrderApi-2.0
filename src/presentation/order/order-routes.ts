@@ -34,6 +34,21 @@ export class OrderRoutes {
       orderController.registerOrder
     );
     
+    router.get(
+      'get-by-id/:orderId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.getOrderById
+    );
+
+    router.put(
+      '/update/:orderId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.updateOrder
+    );
     return router;
   }
 }
