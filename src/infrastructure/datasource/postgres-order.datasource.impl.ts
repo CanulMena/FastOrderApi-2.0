@@ -63,14 +63,19 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         tipoPago: updateOrder.paymentType,
         esPagado: updateOrder.isPaid,
         clienteId: updateOrder.clientId,
-        // detalles: {
-        //   deleteMany: {}, // Eliminar todos los detalles
-        //   create: updaateOrder.orderDetails?.map(detail => ({
-        //     cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
-        //     cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
-        //     platilloId: detail.dishId, // ID del platillo relacionado
-        //   })),
-        // },
+        detalles: {
+          update: updateOrder.orderDetails?.map(detalle => ({
+            where: { id: detalle.orderDetailId }, 
+            data: {
+              platilloId: detalle.dishId,
+              cantidadEntera: detalle.fullPortion, 
+              cantidadMedia: detalle.halfPortion, 
+            }
+          }))
+        }
+      },
+      include :{
+        detalles: true
       }
     })
 
