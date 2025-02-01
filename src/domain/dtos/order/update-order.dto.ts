@@ -17,10 +17,10 @@ export class UpdateOrderDto {
 
         if (!orderId || isNaN(Number(orderId)) ) return ['ID argument must be a valid number'];
 
-        if ( status && typeof status !== 'string') return [`Invalid status - valid values: ${Order.OrderValidOrderStatus}`];
-        if (orderType && typeof orderType !== 'string') return [`Invalid order type - valid values: ${Order.OrderTypeDelivery}`];
+        if ( status && typeof status !== 'string' && Order.isValidOrderSatus(status)) return [`Invalid status - valid values: ${Order.OrderValidOrderStatus}`];
+        if (orderType && typeof orderType !== 'string' && Order.isValidOrderDeliveryType(orderType)) return [`Invalid order type - valid values: ${Order.OrderTypeDelivery}`];
         
-        if (paymentType && typeof paymentType !== 'string') return [`Invalid payment type - valid values: ${Order.OrderPaymentType}`];
+        if (paymentType && typeof paymentType !== 'string' &&  Order.isValidOrderPaymentType(paymentType)) return [`Invalid payment type - valid values: ${Order.OrderPaymentType}`];
         if (isPaid && typeof isPaid !== 'boolean') return ['isPaid must be a boolean'];
         if (clientId && isNaN(Number(clientId))) return ['clientId must be a number'];
         if (orderDetails && !Array.isArray(orderDetails)) return ['orderDetails must be an array'];
