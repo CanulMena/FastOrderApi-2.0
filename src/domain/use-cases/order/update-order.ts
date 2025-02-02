@@ -25,12 +25,14 @@ export class UpdateOrder implements UpdateOrderUseCase {
             throw CustomError.unAuthorized('User does not have access to this kitchen');
         }
 
-        // Verificar si el cliente existe y que se le esta pasando un cliente que pertenece a la cocina de la orden
+        // Verificar que se quiere actualizar al cliente de la orden
         if (updateOrderDto.clientId) { 
+            // Verifica si el cliente existe
             const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId!);
             if (!customer) {
                 throw CustomError.notFound(`Customer with id ${updateOrderDto.clientId} does not exist`);
             }
+            // Verifica si el cliente pertenece a la cocina de la orden
             if ( customer.kitchenId !== orderFound.kitchenId) {
                 throw CustomError.badRequest('The customer does not belong to the kitchen of the order');
             }
