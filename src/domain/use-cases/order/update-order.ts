@@ -65,17 +65,14 @@ export class UpdateOrder implements UpdateOrderUseCase {
                     throw CustomError.badRequest(`Dish with id ${detail.dishId} does not exist or does not belong to the kitchen of the order`);
                 }
 
-                //3.- Calcular las raciones solicitadas (1 entera = 1, 1 media = 0.5)
-                const previousPortions = (orderDetailFound.portion ?? 0) +( orderDetailFound.halfPortion ?? 0) * 0.5;
-                // const previousPortions = dish.availableServings;
-                const requestServings = detail.fullPortion! + detail.halfPortion! * 0.5;
-                const servingsToUpdate = requestServings -  previousPortions;
-                if (servingsToUpdate > dish.availableServings) {
-                    throw CustomError.badRequest(`There are not enough servings available for dish ${dish.name}`)
-                }
+                const requestServings = (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5;
+
+                if (requestServings > dish.availableServings) {
+                    throw CustomError.badRequest(`There are not enough servings available for dish ${dish.name}`);
+}
 
                 // 5.- Actualizar las raciones disponibles del platillo
-                dish.availableServings -= servingsToUpdate;
+                dish.availableServings -= requestServings;
                 await this.dishRepository.updateDish(dish);
 
                 // 6.- Si se elimina un detalle, restaurar las raciones disponibles
