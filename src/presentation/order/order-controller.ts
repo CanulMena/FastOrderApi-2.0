@@ -64,7 +64,7 @@ export class OrderController {
         return;
     }
 
-    new UpdateOrder(this.orderRepository, this.customerRepository)
+    new UpdateOrder(this.orderRepository, this.customerRepository, this.dishRepository)
     .execute(updateOrderDto!, user)
     .then( order => res.status(200).json(order) ) // 200 OK
     .catch( error => this.handleError(error, res));

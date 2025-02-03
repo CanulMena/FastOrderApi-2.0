@@ -4,10 +4,12 @@ import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { UpdateOrderDto } from "../../domain/dtos";
+import { OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   private readonly prisma = new PrismaClient().pedido;
+  private readonly prismaOrderDetail = new PrismaClient().detallePedido;
 
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
     const order = await this.prisma.create({
@@ -64,7 +66,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         esPagado: updateOrder.isPaid,
         clienteId: updateOrder.clientId,
         detalles: {
-          update: updateOrder.orderDetails?.map(detalle => ({
+          update  : updateOrder.orderDetails?.map(detalle => ({
             where: { id: detalle.orderDetailId }, 
             data: {
               platilloId: detalle.dishId,
@@ -80,5 +82,19 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     })
 
     return Order.fromJson(order);
+  }
+
+  async getOrderDetailById( orderDetailId: number ): Promise<OrderDetail> {
+    const orderDetail  = await this.prismaOrderDetail.findUnique({
+      where: {
+        id: orderDetailId
+      }
+    });
+
+    if (!orderDetail) {
+      throw CustomError.notFound(`Order detail with id ${orderDetailId} does not exist`);
+    }
+
+    return OrderDetail.fromJson(orderDetail);
   }
 }
