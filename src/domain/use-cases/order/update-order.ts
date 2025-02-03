@@ -56,8 +56,11 @@ export class UpdateOrder implements UpdateOrderUseCase {
                 if (!orderDetailFound) {
                     throw CustomError.notFound(`Order detail with id ${detail.orderDetailId} does not exist`);
                 }
-                // TODO: Aun no se como hacer esto
 
+                //Si `dishId` no está definido, continuar con la siguiente iteración
+                if (!detail.dishId) {
+                    continue;
+                }
 
                 //2.- Verificar que el platillo sea valido para la cocina
                 const dish = await this.dishRepository.getDishById(detail.dishId!)
