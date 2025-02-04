@@ -46,7 +46,7 @@ export class OrderRoutes {
       '/update/:orderId',
       authMiddleware.validateJWT,
       authMiddleware.validateRole(rolesConfig.AllRoles),
-      authMiddleware.validateKitchenAccess,
+      // authMiddleware.validateKitchenAccess,
       orderController.updateOrder
     );
     return router;
