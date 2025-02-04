@@ -2,7 +2,6 @@ import { UpdateOrderDto } from "../../dtos";
 import { User } from "../../entities";
 import { CustomError } from "../../errors";
 import { CustomerRepository, DishRepository, OrderRepository } from "../../repositories";
-import { Customer } from '../../entities/customer.entity';
 
 
 interface UpdateOrderUseCase {
@@ -34,33 +33,23 @@ export class UpdateOrder implements UpdateOrderUseCase {
         if (updateOrderDto.clientId) { 
             // Verifica si el cliente existe
             const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId!);
-            if (!customer) {
-                throw CustomError.notFound(`Customer with id ${updateOrderDto.clientId} does not exist`);
-            }
+            
             // Verifica si el cliente pertenece a la cocina de la orden
             if ( customer.kitchenId !== orderFound.kitchenId) {
                 throw CustomError.badRequest('The customer does not belong to the kitchen of the order');
             }
         }
 
-//         // Validar la actualización de los detalle de la orden
+        // Validar la actualización de los detalle de la orden ---> si existe ese detalle de orden, podemos actualizarlo o interactuar con ese detalle de orden.
         if (updateOrderDto.orderDetails) {
             for (const detail of updateOrderDto.orderDetails) {
                 //1.- Verficar que el detalle exista
-                const orderDetailFound = await this.orderRepository.getOrderDetailById(detail.orderDetailId);
-                if (!orderDetailFound) {
-                    throw CustomError.notFound(`Order detail with id ${detail.orderDetailId} does not exist`);
-                }
-
-                //Si `dishId` no está definido, continuar con la siguiente iteración
-                if (!detail.dishId) {
-                    continue;
-                }
+                const orderDetail = await this.orderRepository.getOrderDetailById(detail.orderDetailId);
 
                 //2.- Verificar que el platillo sea valido para la cocina
                 const dish = await this.dishRepository.getDishById(detail.dishId!)
                 if (dish.kitchenId !== orderFound.kitchenId) {
-                    throw CustomError.badRequest(`Dish with id ${detail.dishId} does not exist or does not belong to the kitchen of the order`);
+                    throw CustomError.badRequest(`Dish with id ${detail.dishId} does not belong to the kitchen of the order`);
                 }
 
                 const requestServings = (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5;
