@@ -40,45 +40,36 @@ export class UpdateOrder implements UpdateOrderUseCase {
             }
         }
 
-        // Validar la actualización de los detalle de la orden ---> si existe ese detalle de orden, podemos actualizarlo o interactuar con ese detalle de orden.
-        if (updateOrderDto.orderDetails) {
+        //quiero validar que si order details no es nulo y tiene elementos entonces se ejecute el siguiente bloque
+        if (updateOrderDto.orderDetails?.length) { //* actualiza los detalles de la orden  y las raciones disponibles de los platillos
             for (const detail of updateOrderDto.orderDetails) {
-                //1.- Verficar que el detalle exista
+                //1.- Verficar que el detalle exista si lo voy a actualizar.
                 const orderDetail = await this.orderRepository.getOrderDetailById(detail.orderDetailId);
 
-                //2.- Verificar que el platillo sea valido para la cocina
-                const dish = await this.dishRepository.getDishById(detail.dishId!)
+                const requestServings = (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5;
+
+                const dish = await this.dishRepository.getDishById(orderDetail.dishId);
+
                 if (dish.kitchenId !== orderFound.kitchenId) {
                     throw CustomError.badRequest(`Dish with id ${detail.dishId} does not belong to the kitchen of the order`);
                 }
-
-                const requestServings = (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5;
 
                 if (requestServings > dish.availableServings) {
                     throw CustomError.badRequest(`There are not enough servings available for dish ${dish.name}`);
                 }
 
-                // 5.- Actualizar las raciones disponibles del platillo
                 dish.availableServings -= requestServings;
                 await this.dishRepository.updateDish(dish);
-
-                // Si el detalle se elimina, continuar con la siguiente iteración ---validar la eliminaciónn de un platillo
-                if (detail.isDelete) {
-                    continue;
-                }
-
-
-                // 6.- Si se elimina un detalle, restaurar las raciones disponibles
             }   
         }
-
-            //TODO:  Validar si quiero eliminar el detalle o solo actualizarlo ---Poner el delete como true o false
             //TODO: Validar que pasa si se elimino un detalle del pedido
             //TODO: Tambien validar Si se elimina un detalle, restaurar las raciones disponibles
 
-
         // Actualiza la orden
+        //TODO: verificar que si falla la actualización de la orden, se restauren las raciones disponibles de los platillos
         const orderUpdated = await this.orderRepository.updateOrder(updateOrderDto);
+        
+
 
         return { orderUpdated };
     }
