@@ -53,36 +53,40 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   async updateOrder(updateOrder: UpdateOrderDto): Promise<Order> {
     await this.getOrderById(updateOrder.orderId);
+
+    // Filtrar detalles a actualizar y eliminar
+    const detailsToUpdate = updateOrder.orderDetails?.filter(d => !d.isDelete && d.orderDetailId);
+    const detailsToDelete = updateOrder.orderDetails?.filter(d => d.isDelete && d.orderDetailId);
+
     const order = await this.prisma.update({
       where: {
         id: updateOrder.orderId,
       },
       data: {
-
-        //TODO: Verificar los enum que se encuentras para datos en especifico
         estado: updateOrder.status,
         tipoEntrega: updateOrder.orderType,
         tipoPago: updateOrder.paymentType,
         esPagado: updateOrder.isPaid,
         clienteId: updateOrder.clientId,
         detalles: {
-          update  : updateOrder.orderDetails?.map(detalle => ({
-            where: { id: detalle.orderDetailId }, 
+          update: detailsToUpdate?.map(detalle => ({
+            where: { id: detalle.orderDetailId },
             data: {
               platilloId: detalle.dishId,
-              cantidadEntera: detalle.fullPortion, 
-              cantidadMedia: detalle.halfPortion, 
-            }
-          }))
-        }
+              cantidadEntera: detalle.fullPortion,
+              cantidadMedia: detalle.halfPortion,
+            },
+          })),
+          delete: detailsToDelete?.map(d => ({ id: d.orderDetailId })) ?? [],
+        },
       },
-      include :{
-        detalles: true
+      include: {
+        detalles: true,
       }
-    })
+    });
 
     return Order.fromJson(order);
-  }
+}
 
   async getOrderDetailById( orderDetailId: number ): Promise<OrderDetail> {
     const orderDetail  = await this.prismaOrderDetail.findUnique({

@@ -20,11 +20,6 @@ export class UpdateOrder implements UpdateOrderUseCase {
     async execute(updateOrderDto: UpdateOrderDto, user: User): Promise<Object> {
         // Verifica si la orden existe
         const orderFound = await this.orderRepository.getOrderById(updateOrderDto.orderId);
-
-        if (!orderFound) {
-            throw CustomError.notFound(`Order with id ${updateOrderDto.orderId} does not exist`);
-        }
-
         // Verifica si el usuario tiene acceso a la cocina de la orden
         if (orderFound.kitchenId !== user.kitchenId && user.rol !== 'SUPER_ADMIN') {
             throw CustomError.unAuthorized('User does not have access to this kitchen');
@@ -48,7 +43,7 @@ export class UpdateOrder implements UpdateOrderUseCase {
             }
         }
 
-        // Validar la actualización de los detalle de la orden
+//         // Validar la actualización de los detalle de la orden
         if (updateOrderDto.orderDetails) {
             for (const detail of updateOrderDto.orderDetails) {
                 //1.- Verficar que el detalle exista
@@ -64,7 +59,7 @@ export class UpdateOrder implements UpdateOrderUseCase {
 
                 //2.- Verificar que el platillo sea valido para la cocina
                 const dish = await this.dishRepository.getDishById(detail.dishId!)
-                if (!dish || dish.kitchenId !== orderFound.kitchenId) {
+                if (dish.kitchenId !== orderFound.kitchenId) {
                     throw CustomError.badRequest(`Dish with id ${detail.dishId} does not exist or does not belong to the kitchen of the order`);
                 }
 
@@ -72,17 +67,25 @@ export class UpdateOrder implements UpdateOrderUseCase {
 
                 if (requestServings > dish.availableServings) {
                     throw CustomError.badRequest(`There are not enough servings available for dish ${dish.name}`);
-}
+                }
 
                 // 5.- Actualizar las raciones disponibles del platillo
                 dish.availableServings -= requestServings;
                 await this.dishRepository.updateDish(dish);
 
+                // Si el detalle se elimina, continuar con la siguiente iteración ---validar la eliminaciónn de un platillo
+                if (detail.isDelete) {
+                    continue;
+                }
+
+
                 // 6.- Si se elimina un detalle, restaurar las raciones disponibles
             }   
         }
 
-        //TODO: Validar que pasa si se elimino un detalle del pedido
+            //TODO:  Validar si quiero eliminar el detalle o solo actualizarlo ---Poner el delete como true o false
+            //TODO: Validar que pasa si se elimino un detalle del pedido
+            //TODO: Tambien validar Si se elimina un detalle, restaurar las raciones disponibles
 
 
         // Actualiza la orden
