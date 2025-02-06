@@ -17,11 +17,16 @@ export class OrderRepositoryImpl implements OrderRepository{
     return this.datasource.getOrderById(orderId);
   }
 
-  updateOrder(updateOrder: UpdateOrderDto): Promise<Order> {
-    return this.datasource.updateOrder(updateOrder);
+  updateOrder(updateOrder: UpdateOrderDto, orderDetailsEntity: OrderDetail[]): Promise<Order> {
+    return this.datasource.updateOrder(updateOrder, orderDetailsEntity);
   }
 
   getOrderDetailById(orderDetailId: number): Promise<OrderDetail> {
     return this.datasource.getOrderDetailById(orderDetailId);
   }
+
+  getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]> {
+    return this.datasource.getOrderDetailsByOrderId(orderId);
+  }
+
 }
