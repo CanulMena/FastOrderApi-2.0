@@ -8,11 +8,85 @@ import { OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
-  private readonly prisma = new PrismaClient().pedido;
-  private readonly prismaOrderDetail = new PrismaClient().detallePedido;
+  private readonly prisma = new PrismaClient(); //tiene acceso a todo el prismaClient
+  private readonly prismaPedido = this.prisma.pedido;
+  private readonly prismaOrderDetail = this.prisma.detallePedido;
+
+  async updateOrder(
+    updateOrder: UpdateOrderDto, 
+    orderDetailsEntity: OrderDetail[]
+): Promise<Order> {
+    return await this.prisma.$transaction(async (tx) => {
+
+      for (const detailDto of updateOrder.orderDetails ?? []) {
+        const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === detailDto.orderDetailId);
+        if (!existingDetail) {
+            throw CustomError.badRequest(`Order detail ${detailDto.orderDetailId} not found`);
+        }
+        
+        // Calcular raciones solicitadas solo si se envían en el DTO
+        const requestedServings = 
+            detailDto.fullPortion !== undefined || detailDto.halfPortion !== undefined
+                ? (detailDto.fullPortion ?? 0) + (detailDto.halfPortion ?? 0) * 0.5
+                : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+
+        const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+
+        // Buscar el platillo para obtener las raciones disponibles
+        const dish = await tx.platillo.findUnique({ where: { id: existingDetail.dishId } });
+        if (!dish) {
+            throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
+        }
+
+        // Calcular la diferencia de raciones
+        const servingsDifference = requestedServings - previousServings; // 5 - 1 = 4
+
+        if (servingsDifference > 0) {// si servingsDifference es mayor es no es mayor a 0, 
+            // Si se quieren agregar raciones, verificar disponibilidad
+            if (servingsDifference >= dish.racionesDisponibles) { // 7 >= 7= true
+                throw CustomError.badRequest(`Not enough servings available for dish ${dish.nombre}`);
+            }
+        } 
+        
+        // Actualizar raciones disponibles
+        await tx.platillo.update({
+            where: { id: dish.id },
+            data: { racionesDisponibles: dish.racionesDisponibles - servingsDifference }
+        });
+      }
+
+      const detailsToUpdate = updateOrder.orderDetails?.filter(detailDto => !detailDto.isDelete && detailDto.orderDetailId);
+
+      const updatedOrder = await tx.pedido.update({
+          where: { id: updateOrder.orderId },
+          data: {
+              estado: updateOrder.status,
+              tipoEntrega: updateOrder.orderType,
+              tipoPago: updateOrder.paymentType,
+              esPagado: updateOrder.isPaid,
+              clienteId: updateOrder.clientId,
+              detalles: {
+                  update: detailsToUpdate!.map(detalle => ({
+                      where: { id: detalle.orderDetailId },
+                      data: {
+                          platilloId: detalle.dishId,
+                          cantidadEntera: detalle.fullPortion,
+                          cantidadMedia: detalle.halfPortion,
+                      },
+                  })),
+              },
+          },
+          include: {
+              detalles: true
+          }
+      });
+
+      return Order.fromJson(updatedOrder);
+  });
+}
 
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = await this.prisma.create({
+    const order = await this.prismaPedido.create({
       data: {
         fecha: createOrderDto.date,
         estado: createOrderDto.status,
@@ -38,7 +112,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   }
 
   async getOrderById(orderId: number): Promise<Order> {
-    const order = await this.prisma.findUnique({
+    const order = await this.prismaPedido.findUnique({
       where: {
         id: orderId,
       }
@@ -50,55 +124,6 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
     return Order.fromJson(order);
   }
-
-  async updateOrder(updateOrder: UpdateOrderDto): Promise<Order> {
-    await this.getOrderById(updateOrder.orderId);
-
-    // Filtrar detalles a actualizar y eliminar
-    const detailsToUpdate = updateOrder.orderDetails?.filter(d => !d.isDelete && d.orderDetailId);
-    const detailsToDelete = updateOrder.orderDetails?.filter(d => d.isDelete && d.orderDetailId);
-    const detailsToCreate = updateOrder.orderDetails?.filter(d => !d.orderDetailId);
-
-    const order = await this.prisma.update({
-      where: {
-        id: updateOrder.orderId,
-      },
-      data: {
-        estado: updateOrder.status,
-        tipoEntrega: updateOrder.orderType,
-        tipoPago: updateOrder.paymentType,
-        esPagado: updateOrder.isPaid,
-        clienteId: updateOrder.clientId,
-        detalles: {
-          update: detailsToUpdate?.map(detalle => ({
-            where: { id: detalle.orderDetailId },
-            data: {
-              platilloId: detalle.dishId,
-              cantidadEntera: detalle.fullPortion,
-              cantidadMedia: detalle.halfPortion,
-            },
-          })),
-          delete: detailsToDelete?.map(d => ({ id: d.orderDetailId })) ?? [],
-          // create: detailsToCreate?.map(detail => ({
-          //   platillo: {
-          //     connect: {
-          //       id: detail.dishId,
-          //     }
-          //   },
-          //   cantidadEntera: detail.fullPortion,
-          //   cantidadMedia: detail.halfPortion,
-          // })) ?? [], 
-        },
-      },
-      include: {
-        detalles: true,
-      }
-    });
-
-
-    return Order.fromJson(order);
-}
-
   async getOrderDetailById( orderDetailId: number ): Promise<OrderDetail> {
     const orderDetail  = await this.prismaOrderDetail.findUnique({
       where: {
@@ -122,7 +147,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       }
     });
 
-    const order = await this.prisma.delete({
+    const order = await this.prismaPedido.delete({
       where: {
         id: orderId,
       },
