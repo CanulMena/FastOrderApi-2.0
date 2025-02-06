@@ -32,7 +32,7 @@ export class UpdateOrder implements UpdateOrderUseCase {
         // Verificar que se quiere actualizar al cliente de la orden
         if (updateOrderDto.clientId) { 
             // Verifica si el cliente existe
-            const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId!);
+            const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId!); //*le paso el id del cilente que quiero actualizar en el updateOrderDto
             
             // Verifica si el cliente pertenece a la cocina de la orden
             if ( customer.kitchenId !== orderFound.kitchenId) {
@@ -40,35 +40,8 @@ export class UpdateOrder implements UpdateOrderUseCase {
             }
         }
 
-        //quiero validar que si order details no es nulo y tiene elementos entonces se ejecute el siguiente bloque
-        if (updateOrderDto.orderDetails?.length) { //* actualiza los detalles de la orden  y las raciones disponibles de los platillos
-            for (const detail of updateOrderDto.orderDetails) {
-                //1.- Verficar que el detalle exista si lo voy a actualizar.
-                const orderDetail = await this.orderRepository.getOrderDetailById(detail.orderDetailId);
-
-                const requestServings = (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5;
-
-                const dish = await this.dishRepository.getDishById(orderDetail.dishId);
-
-                if (dish.kitchenId !== orderFound.kitchenId) {
-                    throw CustomError.badRequest(`Dish with id ${detail.dishId} does not belong to the kitchen of the order`);
-                }
-
-                if (requestServings > dish.availableServings) {
-                    throw CustomError.badRequest(`There are not enough servings available for dish ${dish.name}`);
-                }
-
-                dish.availableServings -= requestServings;
-                await this.dishRepository.updateDish(dish);
-            }   
-        }
-            //TODO: Validar que pasa si se elimino un detalle del pedido
-            //TODO: Tambien validar Si se elimina un detalle, restaurar las raciones disponibles
-
-        // Actualiza la orden
-        //TODO: verificar que si falla la actualización de la orden, se restauren las raciones disponibles de los platillos
-        const orderUpdated = await this.orderRepository.updateOrder(updateOrderDto);
-        
+        const orderDetailsByOrderId = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
+        const orderUpdated = await this.orderRepository.updateOrder(updateOrderDto, orderDetailsByOrderId);
 
 
         return { orderUpdated };
