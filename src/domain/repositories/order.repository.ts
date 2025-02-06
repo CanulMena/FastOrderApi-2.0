@@ -6,4 +6,5 @@ export abstract class OrderRepository {
   abstract updateOrder(order: UpdateOrderDto): Promise<Order>;
   abstract getOrderById(orderId: number): Promise<Order>;
   abstract getOrderDetailById(orderDetailId: number): Promise<OrderDetail>;
+  abstract deleteOrder(orderId: number): Promise<Order>;
 }

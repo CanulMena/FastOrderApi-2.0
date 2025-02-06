@@ -3,7 +3,7 @@ import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
-import { UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, UpdateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
 import { OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
@@ -57,6 +57,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     // Filtrar detalles a actualizar y eliminar
     const detailsToUpdate = updateOrder.orderDetails?.filter(d => !d.isDelete && d.orderDetailId);
     const detailsToDelete = updateOrder.orderDetails?.filter(d => d.isDelete && d.orderDetailId);
+    const detailsToCreate = updateOrder.orderDetails?.filter(d => !d.orderDetailId);
 
     const order = await this.prisma.update({
       where: {
@@ -78,12 +79,22 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
             },
           })),
           delete: detailsToDelete?.map(d => ({ id: d.orderDetailId })) ?? [],
+          // create: detailsToCreate?.map(detail => ({
+          //   platillo: {
+          //     connect: {
+          //       id: detail.dishId,
+          //     }
+          //   },
+          //   cantidadEntera: detail.fullPortion,
+          //   cantidadMedia: detail.halfPortion,
+          // })) ?? [], 
         },
       },
       include: {
         detalles: true,
       }
     });
+
 
     return Order.fromJson(order);
 }
@@ -101,4 +112,26 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
     return OrderDetail.fromJson(orderDetail);
   }
+
+  async deleteOrder(orderId: number): Promise<Order> {
+    await this.getOrderById(orderId);
+
+    await this.prismaOrderDetail.deleteMany({
+      where: {
+        pedidoId: orderId,
+      }
+    });
+
+    const order = await this.prisma.delete({
+      where: {
+        id: orderId,
+      },
+      include: {
+        detalles: true,
+      }
+    });
+
+    return Order.fromJson(order);
+  }
+
 }

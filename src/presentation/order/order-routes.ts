@@ -49,6 +49,14 @@ export class OrderRoutes {
       // authMiddleware.validateKitchenAccess,
       orderController.updateOrder
     );
+
+    router.delete(
+      '/delete/:orderId', 
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.deleteOrder
+    )
     return router;
   }
 }

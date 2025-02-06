@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
 import { RegisterOrder } from "../../domain/use-cases"
 import { UpdateOrder } from "../../domain/use-cases/order/update-order";
+import { DeleteOrder } from "../../domain/use-cases/order/delete-order";
 import { User } from "../../domain/entities";
 
 export class OrderController {
@@ -70,4 +71,17 @@ export class OrderController {
     .catch( error => this.handleError(error, res));
   }
 
+  public deleteOrder = (req: Request, res: Response) => {
+    const orderId = +req.params.orderId;
+    const user = req.body.user as User;
+
+    if (isNaN(orderId)) {
+      res.status(400).json({error: 'ID argument is not a number'});
+    }
+
+    new DeleteOrder(this.orderRepository)
+    .execute(orderId, user)
+    .then( order => res.status(200).json(order))
+    .catch( error => this.handleError(error, res));
+  }
 }
