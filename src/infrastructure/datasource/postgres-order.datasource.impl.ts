@@ -14,7 +14,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   async updateOrder(
     updateOrder: UpdateOrderDto, 
-    orderDetailsEntity: OrderDetail[]
+    orderDetailsEntity: OrderDetail[],
 ): Promise<Order> {
     return await this.prisma.$transaction(async (tx) => {
 
@@ -109,6 +109,16 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     });
 
     return Order.fromJson(order);
+  }
+
+  async getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]> {
+    const orderDetails = await this.prismaOrderDetail.findMany({
+      where: {
+        pedidoId: orderId
+      }
+    });
+
+    return orderDetails.map(OrderDetail.fromJson);
   }
 
   async getOrderById(orderId: number): Promise<Order> {
