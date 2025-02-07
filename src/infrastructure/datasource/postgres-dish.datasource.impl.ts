@@ -68,6 +68,20 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         );
     }
 
+    async getDishesById( dishIds: number[] ) : Promise<Dish[]> {
+        return await this.prisma
+        .findMany({
+            where: {
+                id: {
+                    in: dishIds
+                }
+            }
+        })
+        .then( 
+            dishes => dishes.map( dish => Dish.fromJson(dish) ) 
+        );
+    }
+
     async getDishesCount() : Promise<number> {
         return await this.prisma.count();
     }
