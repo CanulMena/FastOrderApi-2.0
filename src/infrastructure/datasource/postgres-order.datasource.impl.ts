@@ -31,7 +31,11 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
             await tx.platillo.update({
                 where: { id: existingDetail.dishId },
-                data: { racionesDisponibles: { decrement: servingsDifference } }
+                data: { 
+                  racionesDisponibles: { 
+                    decrement: servingsDifference,
+                  }
+                }
             });
         }
 

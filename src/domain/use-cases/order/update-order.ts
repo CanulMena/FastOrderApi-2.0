@@ -40,7 +40,7 @@ export class UpdateOrder implements UpdateOrderUseCase {
                 throw CustomError.badRequest('The customer does not belong to the kitchen of the order');
             }
         } 
-        
+
         //* Parte anidada de la orden (detalles de la orden)
         //1. Obtenemos todos los detalles de orden de la orden existente.
         const orderDetailsByOrderId: OrderDetail[] = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
@@ -70,7 +70,7 @@ export class UpdateOrder implements UpdateOrderUseCase {
             }
 
             const servingsDifference = requestedServings - previousServings;
-            if (servingsDifference > 0 && servingsDifference >= dish.availableServings) {
+            if (servingsDifference > 0 && servingsDifference > dish.availableServings) { 
                 throw CustomError.badRequest(`Not enough servings available for dish ${dish.name}`);
             }
         });
