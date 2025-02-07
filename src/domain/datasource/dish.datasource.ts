@@ -10,4 +10,5 @@ export abstract class DishDatasource {
     abstract getDishById(dishId: number): Promise<Dish>;
     abstract deleteDish(dishId: number): Promise<Dish>;
     abstract updateDish(dish: UpdateDishDto): Promise<Dish>;
+    abstract getDishesById( dishIds: number[] ) : Promise<Dish[]>
 }

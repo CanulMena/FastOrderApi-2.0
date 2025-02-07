@@ -8,7 +8,7 @@ import { OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
-  private readonly prisma = new PrismaClient(); //tiene acceso a todo el prismaClient
+  private readonly prisma = new PrismaClient();
   private readonly prismaPedido = this.prisma.pedido;
   private readonly prismaOrderDetail = this.prisma.detallePedido;
 
@@ -17,73 +17,58 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     orderDetailsEntity: OrderDetail[],
 ): Promise<Order> {
     return await this.prisma.$transaction(async (tx) => {
+        // Actualizar raciones disponibles
+        for (const detailDto of updateOrder.orderDetails ?? []) {
+            const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === detailDto.orderDetailId);
+            if (!existingDetail) continue; // No es necesario lanzar error aquí, ya lo validamos en el UseCase
 
-      for (const detailDto of updateOrder.orderDetails ?? []) {
-        const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === detailDto.orderDetailId);
-        if (!existingDetail) {
-            throw CustomError.badRequest(`Order detail ${detailDto.orderDetailId} not found`);
-        }
-        
-        // Calcular raciones solicitadas solo si se envían en el DTO
-        const requestedServings = 
+            const requestedServings = 
             detailDto.fullPortion !== undefined || detailDto.halfPortion !== undefined
                 ? (detailDto.fullPortion ?? 0) + (detailDto.halfPortion ?? 0) * 0.5
                 : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+            const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+            const servingsDifference = requestedServings - previousServings;
 
-        const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-
-        // Buscar el platillo para obtener las raciones disponibles
-        const dish = await tx.platillo.findUnique({ where: { id: existingDetail.dishId } });
-        if (!dish) {
-            throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
+            await tx.platillo.update({
+                where: { id: existingDetail.dishId },
+                data: { 
+                  racionesDisponibles: { 
+                    decrement: servingsDifference,
+                  }
+                }
+            });
         }
 
-        // Calcular la diferencia de raciones
-        const servingsDifference = requestedServings - previousServings; // 5 - 1 = 4
+        // Actualizar detalles del pedido
+        const detailsToUpdate = updateOrder.orderDetails?.filter(detail => !detail.isDelete && detail.orderDetailId);
 
-        if (servingsDifference > 0) {// si servingsDifference es mayor es no es mayor a 0, 
-            // Si se quieren agregar raciones, verificar disponibilidad
-            if (servingsDifference >= dish.racionesDisponibles) { // 7 >= 7= true
-                throw CustomError.badRequest(`Not enough servings available for dish ${dish.nombre}`);
+        const updatedOrder = await tx.pedido.update({
+            where: { id: updateOrder.orderId },
+            data: {
+                estado: updateOrder.status,
+                tipoEntrega: updateOrder.orderType,
+                tipoPago: updateOrder.paymentType,
+                esPagado: updateOrder.isPaid,
+                clienteId: updateOrder.clientId,
+                detalles: {
+                    update: detailsToUpdate!.map(detalle => ({
+                        where: { id: detalle.orderDetailId },
+                        data: {
+                            platilloId: detalle.dishId,
+                            cantidadEntera: detalle.fullPortion,
+                            cantidadMedia: detalle.halfPortion,
+                        },
+                    })),
+                },
+            },
+            include: {
+                detalles: true
             }
-        } 
-        
-        // Actualizar raciones disponibles
-        await tx.platillo.update({
-            where: { id: dish.id },
-            data: { racionesDisponibles: dish.racionesDisponibles - servingsDifference }
         });
-      }
-
-      const detailsToUpdate = updateOrder.orderDetails?.filter(detailDto => !detailDto.isDelete && detailDto.orderDetailId);
-
-      const updatedOrder = await tx.pedido.update({
-          where: { id: updateOrder.orderId },
-          data: {
-              estado: updateOrder.status,
-              tipoEntrega: updateOrder.orderType,
-              tipoPago: updateOrder.paymentType,
-              esPagado: updateOrder.isPaid,
-              clienteId: updateOrder.clientId,
-              detalles: {
-                  update: detailsToUpdate!.map(detalle => ({
-                      where: { id: detalle.orderDetailId },
-                      data: {
-                          platilloId: detalle.dishId,
-                          cantidadEntera: detalle.fullPortion,
-                          cantidadMedia: detalle.halfPortion,
-                      },
-                  })),
-              },
-          },
-          include: {
-              detalles: true
-          }
-      });
-
-      return Order.fromJson(updatedOrder);
-  });
+        return Order.fromJson(updatedOrder);
+    });
 }
+
 
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
     const order = await this.prismaPedido.create({
