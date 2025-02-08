@@ -25,8 +25,8 @@ export class OrderRepositoryImpl implements OrderRepository{
     return this.datasource.getOrderDetailById(orderDetailId);
   }
 
-  deleteOrder(orderId: number): Promise<Order> {
-    return this.datasource.deleteOrder(orderId);
+  deleteOrder(orderId: number, orderDetailsEntity: OrderDetail[]): Promise<Order> {
+    return this.datasource.deleteOrder(orderId, orderDetailsEntity);
   }
   
   getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]> {

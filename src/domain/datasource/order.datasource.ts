@@ -6,6 +6,6 @@ export abstract class OrderDatasource {
   abstract updateOrder(order: UpdateOrderDto, orderDetailsEntity: OrderDetail[]): Promise<Order>;
   abstract getOrderById(orderId: number): Promise<Order>;
   abstract getOrderDetailById(orderDetailId: number): Promise<OrderDetail>;
-  abstract deleteOrder(orderId: number): Promise<Order>;
+  abstract deleteOrder(orderId: number, orderDetails: OrderDetail[]): Promise<Order>;
   abstract getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]>
 }

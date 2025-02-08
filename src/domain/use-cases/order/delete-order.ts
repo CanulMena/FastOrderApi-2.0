@@ -1,5 +1,5 @@
-import { User } from "../../entities";
-import { OrderRepository } from "../../repositories";
+import { OrderDetail, User } from "../../entities";
+import { DishRepository, OrderRepository } from "../../repositories";
 
 interface DeleteOrderUseCase {
     execute(orderId: number, user: User): Promise<object>;
@@ -7,19 +7,22 @@ interface DeleteOrderUseCase {
 
 export class DeleteOrder implements DeleteOrderUseCase {
     constructor(
-        private orderRepository: OrderRepository
+        private orderRepository: OrderRepository, 
+        private dishRepository: DishRepository,
     ) {}
 
     async execute(orderId: number, user: User): Promise<object> {
-        if (!orderId) throw new Error('Order id is required');
         const orderFound = await this.orderRepository.getOrderById(orderId);
 
         if (orderFound.kitchenId !== user.kitchenId && user.rol !== 'SUPER_ADMIN') {
             throw new Error('User does not have access to this kitchen');
         }
 
+        const orderDetailsByOrderId: OrderDetail[] = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
 
-        const orderDeleted = await this.orderRepository.deleteOrder(orderId);
+
+
+        const orderDeleted = await this.orderRepository.deleteOrder(orderId, orderDetailsByOrderId);
         return {
             order: orderDeleted
         }

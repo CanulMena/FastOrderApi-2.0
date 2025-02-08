@@ -133,25 +133,31 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     return OrderDetail.fromJson(orderDetail);
   }
 
-  async deleteOrder(orderId: number): Promise<Order> {
-    await this.getOrderById(orderId);
+  async deleteOrder(orderId: number, orderDetails: OrderDetail[]): Promise<Order> {
+    return await this.prisma.$transaction(async (tx) => {
+      for (const detail of orderDetails) {
+        const existingDetail = orderDetails.find(orderDetail => orderDetail.orderDetailId === detail.orderDetailId);
+        if (!existingDetail) continue;
 
-    await this.prismaOrderDetail.deleteMany({
-      where: {
-        pedidoId: orderId,
+        const savingsToRestore = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+
+        await tx.platillo.update({
+          where: { id: existingDetail.dishId},
+          data: { racionesDisponibles: { increment: savingsToRestore } }
+        })
       }
-    });
 
-    const order = await this.prismaPedido.delete({
-      where: {
-        id: orderId,
-      },
-      include: {
-        detalles: true,
-      }
-    });
+      await tx.detallePedido.deleteMany({
+        where: { pedidoId: orderId }
+      });
 
-    return Order.fromJson(order);
+      const deleteOrder = await tx. pedido.delete({
+        where: { id: orderId }, 
+        include: { detalles: true },
+      });
+
+      return Order.fromJson(deleteOrder);
+    })
   }
 
 }
