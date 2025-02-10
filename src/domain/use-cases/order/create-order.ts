@@ -15,7 +15,7 @@ export class RegisterOrder implements RegisterOrderUseCase {
   ) {}
 
   async execute(order: CreateOrderDto): Promise<object> {
-    const initialDishesState: { dishId: number; availableServings: number }[] = [];
+    // const initialDishesState: { dishId: number; availableServings: number }[] = [];
     // Validar que el cliente pertenezca a la misma cocina del pedido
     const customer = await this.customerRepository.getCustomerById(order.clientId);
     if (customer !== null && customer.kitchenId !== order.kitchenId) {

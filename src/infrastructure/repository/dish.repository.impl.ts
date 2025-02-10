@@ -36,5 +36,9 @@ export class DishRepositoryImpl implements DishRepository {
   async updateDish(dish: UpdateDishDto): Promise<Dish> {
     return this.dishDatasource.updateDish(dish);
   }
+
+  async getDishesById( dishIds: number[] ) : Promise<Dish[]> {
+    return this.dishDatasource.getDishesById(dishIds);
+  }
   
 }

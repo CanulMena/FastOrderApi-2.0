@@ -55,14 +55,17 @@ export class Order {
     if(!Order.isValidOrderPaymentType(tipoPago)) throw CustomError.badRequest(`Invalid payment type - valid values: ${Order.OrderPaymentType}`);
     if(esPagado === undefined) throw CustomError.badRequest('Missing esPagado');
 
-    if(!detalles) throw CustomError.badRequest('Missing detalles');
-    if(!Array.isArray(detalles)) throw CustomError.badRequest('detalles must be an array');
-    if(detalles.length === 0) throw CustomError.badRequest('detalles must have at least one element');
+    // if(!detalles) throw CustomError.badRequest('Missing detalles');
+    // if(!Array.isArray(detalles)) throw CustomError.badRequest('detalles must be an array');
+    // if(detalles.length === 0) throw CustomError.badRequest('detalles must have at least one element');
 
     const validatedDetails: OrderDetail[] = [];
-    for (const detail of detalles) {
-      const validDetail = OrderDetail.fromJson(detail);
-      validatedDetails.push(validDetail);
+    if (detalles) {
+      if (!Array.isArray(detalles)) throw CustomError.badRequest('detalles must be an array');
+      for (const detail of detalles) {
+        const validDetail = OrderDetail.fromJson(detail);
+        validatedDetails.push(validDetail);
+      }
     }
 
     if(!clienteId) throw CustomError.badRequest('Missing clienteId');

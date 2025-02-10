@@ -73,7 +73,7 @@ export class AuthMiddleware {
       next();
     };
   }
-
+//* para utilizar este middleware el usuario tiene que tener en el body o en la url un campo kitchenId
   public validateKitchenAccess = (req: Request, res: Response, next: NextFunction): void => { //middleware para validar que el usuario tenga acceso a la cocina
     const user = req.body.user as User; // Usuario autenticado
     const kitchenIdFromRequest = req.body.kitchenId || req.params.kitchenId || req.query.kitchenId;
