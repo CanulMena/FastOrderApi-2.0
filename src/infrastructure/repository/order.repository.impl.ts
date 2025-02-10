@@ -1,5 +1,5 @@
 import { OrderDatasource } from "../../domain/datasource";
-import { CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
 import { Order, OrderDetail } from "../../domain/entities";
 import { OrderRepository } from "../../domain/repositories";
 
@@ -33,4 +33,11 @@ export class OrderRepositoryImpl implements OrderRepository{
     return this.datasource.getOrderDetailsByOrderId(orderId);
   }
 
+  createOrderDetail(orderDetail: CreateOrderDetailsDto): Promise<OrderDetail> {
+    return this.datasource.createOrderDetail(orderDetail);
+  }
+
+  deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
+    return this.datasource.deleteOrderDetail(orderDetailId);
+  }
 }

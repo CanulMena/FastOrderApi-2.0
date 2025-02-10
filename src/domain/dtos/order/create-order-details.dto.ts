@@ -2,11 +2,12 @@ export class CreateOrderDetailsDto {
   constructor(
     public fullPortion: number,
     public halfPortion: number,
-    public dishId: number
+    public dishId: number,
+    public orderId?: number
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateOrderDetailsDto?] {
-    const { fullPortion = 0, halfPortion = 0, dishId } = props;
+    const { fullPortion = 0, halfPortion = 0, dishId, orderId } = props;
 
     //TODO: VALIDA QUE FULL-PORTION Y HALF-PORTION SEAN NUMEROS NO NEGATIVOS Y NO SEAN UNDEFINED
 
@@ -15,6 +16,7 @@ export class CreateOrderDetailsDto {
     if (typeof halfPortion !== 'number' || halfPortion < 0) return ['halfPortion must be a non-negative number'];
     if (fullPortion === 0 && halfPortion === 0) return ['At least one of portion or halfPortion must be greater than 0'];
 
-    return [undefined, new CreateOrderDetailsDto(fullPortion, halfPortion, dishId)];
+
+    return [undefined, new CreateOrderDetailsDto(fullPortion, halfPortion, dishId, orderId)];
   }
 }

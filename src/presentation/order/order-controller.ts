@@ -79,7 +79,7 @@ export class OrderController {
       res.status(400).json({error: 'ID argument is not a number'});
     }
 
-    new DeleteOrder(this.orderRepository, this.dishRepository)
+    new DeleteOrder(this.orderRepository)
     .execute(orderId, user)
     .then( order => res.status(200).json(order))
     .catch( error => this.handleError(error, res));

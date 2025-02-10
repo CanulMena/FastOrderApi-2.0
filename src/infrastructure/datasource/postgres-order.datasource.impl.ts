@@ -40,7 +40,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         }
 
         // Actualizar detalles del pedido
-        const detailsToUpdate = updateOrder.orderDetails?.filter(detail => !detail.isDelete && detail.orderDetailId);
+        const detailsToUpdate = updateOrder.orderDetails?.filter(detail => detail.orderDetailId);
 
         const updatedOrder = await tx.pedido.update({
             where: { id: updateOrder.orderId },
@@ -158,6 +158,31 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
       return Order.fromJson(deleteOrder);
     })
+  }
+
+  // create a Order Detail
+  async createOrderDetail(createOrderDetail: CreateOrderDetailsDto): Promise<OrderDetail> {
+    await this.getOrderById(createOrderDetail.orderId!);
+    const orderDetail = await this.prismaOrderDetail.create({
+      data: {
+        cantidadEntera: createOrderDetail.fullPortion ?? 0, 
+        cantidadMedia: createOrderDetail.halfPortion ?? 0,
+        platilloId: createOrderDetail.dishId,
+        pedidoId: createOrderDetail.orderId!,
+      }
+    });
+
+    return OrderDetail.fromJson(orderDetail);
+  }
+
+  async deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
+    const deleteOrderDetail = await this.prismaOrderDetail.delete({
+      where: {
+        id: orderDetailId
+      }
+    });
+
+    return OrderDetail.fromJson(deleteOrderDetail);
   }
 
 }
