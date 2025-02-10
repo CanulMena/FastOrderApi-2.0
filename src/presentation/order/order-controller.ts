@@ -1,4 +1,4 @@
-import { CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
 import { CustomError } from "../../domain/errors";
 import { Request, Response } from 'express';
 import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
@@ -6,6 +6,8 @@ import { RegisterOrder } from "../../domain/use-cases"
 import { UpdateOrder } from "../../domain/use-cases/order/update-order";
 import { DeleteOrder } from "../../domain/use-cases/order/delete-order";
 import { User } from "../../domain/entities";
+import { DeleteOrderDetail } from "../../domain/use-cases/order-detail/delete-order-detail";
+import { CreateOrderDetail } from "../../domain/use-cases/order-detail/create-order-detail";
 
 export class OrderController {
 
@@ -81,6 +83,31 @@ export class OrderController {
 
     new DeleteOrder(this.orderRepository)
     .execute(orderId, user)
+    .then( order => res.status(200).json(order))
+    .catch( error => this.handleError(error, res));
+  }
+
+  public createOrderDetail = (req: Request, res: Response) => {
+    const [error, orderDetailDto] = CreateOrderDetailsDto.create(req.body);
+
+    if (error) {
+        res.status(400).json({error});
+        return;
+    }
+
+    new CreateOrderDetail(this.orderRepository, this.dishRepository)
+  }
+
+  public deleteOrderDetail = (req: Request, res: Response) => {
+    const orderDetailId = +req.params.orderDetailId;
+    const user = req.body.user as User;
+
+    if (isNaN(orderDetailId)) {
+      res.status(400).json({error: 'ID argument is not a number'});
+    }
+
+    new DeleteOrderDetail(this.orderRepository, this.dishRepository)
+    .execute(orderDetailId)
     .then( order => res.status(200).json(order))
     .catch( error => this.handleError(error, res));
   }

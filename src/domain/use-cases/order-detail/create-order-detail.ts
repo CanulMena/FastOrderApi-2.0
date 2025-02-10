@@ -26,7 +26,7 @@ export class CreateOrderDetail implements CreateOrderDetailUseCase {
         if (requestServings > dish.availableServings) {
             throw new Error('Dish does not have enough available servings');
         }
-        //TODO: Update dish servings after creating order detail 
+        // //TODO: Update dish servings after creating order detail 
         const newAvailableServings = dish.availableServings - requestServings;
         const [error, updateDishDto] = UpdateDishDto.create({
             availableServings: newAvailableServings,
