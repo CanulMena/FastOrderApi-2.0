@@ -42,38 +42,41 @@ export class UpdateOrder implements UpdateOrderUseCase {
         } 
 
         //* Parte anidada de la orden (detalles de la orden)
-        //1. Obtenemos todos los detalles de orden de la orden existente.
-        const orderDetailsByOrderId: OrderDetail[] = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
+        let orderDetailsByOrderId: OrderDetail[] = [];
+        if (updateOrderDto.orderDetails && updateOrderDto.orderDetails.length > 0) {
+            // 1. Obtenemos todos los detalles de orden de la orden existente.
+            orderDetailsByOrderId = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
     
-        //2. Obtenemos todos los dishId de los detalles de pedido que tenemos.
-        const dishIds: number[] = orderDetailsByOrderId.map(detail => detail.dishId);
-
-        //3. Obtenemos todos los platillos de los detalles de pedido que tenemos.
-        const dishes = await this.dishRepository.getDishesById(dishIds);
-
-        //4. Validar raciones disponibles antes de hacer cualquier actualización
-        updateOrderDto.orderDetails?.forEach(detail => {
+            // 2. Obtenemos todos los dishId de los detalles de pedido que tenemos.
+            const dishIds: number[] = orderDetailsByOrderId.map(detail => detail.dishId);
+    
+            // 3. Obtenemos todos los platillos de los detalles de pedido que tenemos.
+            const dishes = await this.dishRepository.getDishesById(dishIds);
+    
+            // 4. Validar raciones disponibles antes de hacer cualquier actualización
+            updateOrderDto.orderDetails.forEach(detail => {
             const existingDetail = orderDetailsByOrderId.find(d => d.orderDetailId === detail.orderDetailId);
             if (!existingDetail) {
                 throw CustomError.badRequest(`Order detail ${detail.orderDetailId} not found`);
             }
-
-            const requestedServings = 
-            detail.fullPortion !== undefined || detail.halfPortion !== undefined
+    
+            const requestedServings =
+                detail.fullPortion !== undefined || detail.halfPortion !== undefined
                 ? (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5
                 : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-                
+    
             const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
             const dish = dishes.find(d => d.dishId === existingDetail.dishId);
             if (!dish) {
                 throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
             }
-
+    
             const servingsDifference = requestedServings - previousServings;
-            if (servingsDifference > 0 && servingsDifference > dish.availableServings) { 
+            if (servingsDifference > 0 && servingsDifference > dish.availableServings) {
                 throw CustomError.badRequest(`Not enough servings available for dish ${dish.name}`);
             }
-        });
+            });
+        }
 
         const orderUpdated = await this.orderRepository.updateOrder(updateOrderDto, orderDetailsByOrderId);
 
