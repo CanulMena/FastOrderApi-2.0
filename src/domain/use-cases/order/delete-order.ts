@@ -8,7 +8,7 @@ interface DeleteOrderUseCase {
 export class DeleteOrder implements DeleteOrderUseCase {
     constructor(
         private orderRepository: OrderRepository, 
-        private dishRepository: DishRepository,
+        // private dishRepository: DishRepository,
     ) {}
 
     async execute(orderId: number, user: User): Promise<object> {

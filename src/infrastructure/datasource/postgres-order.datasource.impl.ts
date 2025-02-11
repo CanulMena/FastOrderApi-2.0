@@ -3,8 +3,8 @@ import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
-import { CreateOrderDetailsDto, UpdateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
-import { OrderDetail } from "../../domain/entities";
+import { CreateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
+import { Dish, OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -40,7 +40,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         }
 
         // Actualizar detalles del pedido
-        const detailsToUpdate = updateOrder.orderDetails?.filter(detail => !detail.isDelete && detail.orderDetailId);
+        const detailsToUpdate = updateOrder.orderDetails?.filter(detail => detail.orderDetailId);
 
         const updatedOrder = await tx.pedido.update({
             where: { id: updateOrder.orderId },
@@ -71,29 +71,44 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
 
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = await this.prismaPedido.create({
-      data: {
-        fecha: createOrderDto.date,
-        estado: createOrderDto.status,
-        tipoEntrega: createOrderDto.orderType,
-        tipoPago: createOrderDto.paymentType,
-        esPagado: createOrderDto.isPaid,
-        clienteId: createOrderDto.clientId,
-        cocinaId: createOrderDto.kitchenId,
-        detalles: {
-          create: createOrderDto.orderDetails.map(detail => ({
-            cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
-            cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
-            platilloId: detail.dishId, // ID del platillo relacionado
-          })),
+    return this.prisma.$transaction(async (tx) => {
+      // Actualizar raciones disponibles
+      for( const detail of createOrderDto.orderDetails ) { //comenzamos a iterar los orderDetails.
+        await tx.platillo.update({
+          where: { id: detail.dishId },
+          data: { 
+            racionesDisponibles: {//decrementamos las raciones disponibles
+              decrement: detail.fullPortion + detail.halfPortion * 0.5,
+            }
+          }
+        });
+      }
+      //Por ultimo creamos el pedido.
+      const order = await tx.pedido.create({
+        data: {
+          fecha: createOrderDto.date,
+          estado: createOrderDto.status,
+          tipoEntrega: createOrderDto.orderType,
+          tipoPago: createOrderDto.paymentType,
+          esPagado: createOrderDto.isPaid,
+          clienteId: createOrderDto.clientId,
+          cocinaId: createOrderDto.kitchenId,
+          detalles: {
+            create: createOrderDto.orderDetails.map(detail => ({
+              cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
+              cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
+              platilloId: detail.dishId, // ID del platillo relacionado
+            })),
+          },
         },
-      },
-      include: {
-        detalles: true, // Incluir detalles en la respuesta
-      },
+        include: {
+          detalles: true, // Incluir detalles en la respuesta
+        },
+      });
+  
+      return Order.fromJson(order);
     });
 
-    return Order.fromJson(order);
   }
 
   async getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]> {
@@ -158,6 +173,30 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
       return Order.fromJson(deleteOrder);
     })
+  }
+
+  // create a Order Detail
+  async createOrderDetail(createOrderDetail: CreateOrderDetailsDto): Promise<OrderDetail> {
+    const orderDetail = await this.prismaOrderDetail.create({
+      data: {
+        cantidadEntera: createOrderDetail.fullPortion, 
+        cantidadMedia: createOrderDetail.halfPortion,
+        platilloId: createOrderDetail.dishId,
+        pedidoId: createOrderDetail.orderId!,
+      }
+    });
+
+    return OrderDetail.fromJson(orderDetail);
+  }
+
+  async deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
+    const deleteOrderDetail = await this.prismaOrderDetail.delete({
+      where: {
+        id: orderDetailId
+      }
+    });
+
+    return OrderDetail.fromJson(deleteOrderDetail);
   }
 
 }

@@ -57,6 +57,22 @@ export class OrderRoutes {
       authMiddleware.validateKitchenAccess,
       orderController.deleteOrder
     )
+
+    router.post(
+      '/create-order-detail',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.createOrderDetail
+    )
+
+    router.delete(
+      '/delete-order-detail/:orderDetailId', 
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      orderController.deleteOrderDetail
+    )
     return router;
   }
 }
