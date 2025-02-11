@@ -3,8 +3,8 @@ import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
-import { CreateOrderDetailsDto, UpdateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
-import { OrderDetail } from "../../domain/entities";
+import { CreateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
+import { Dish, OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -71,29 +71,44 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
 
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = await this.prismaPedido.create({
-      data: {
-        fecha: createOrderDto.date,
-        estado: createOrderDto.status,
-        tipoEntrega: createOrderDto.orderType,
-        tipoPago: createOrderDto.paymentType,
-        esPagado: createOrderDto.isPaid,
-        clienteId: createOrderDto.clientId,
-        cocinaId: createOrderDto.kitchenId,
-        detalles: {
-          create: createOrderDto.orderDetails.map(detail => ({
-            cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
-            cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
-            platilloId: detail.dishId, // ID del platillo relacionado
-          })),
+    return this.prisma.$transaction(async (tx) => {
+      // Actualizar raciones disponibles
+      for( const detail of createOrderDto.orderDetails ) { //comenzamos a iterar los orderDetails.
+        await tx.platillo.update({
+          where: { id: detail.dishId },
+          data: { 
+            racionesDisponibles: {//decrementamos las raciones disponibles
+              decrement: detail.fullPortion + detail.halfPortion * 0.5,
+            }
+          }
+        });
+      }
+      //Por ultimo creamos el pedido.
+      const order = await tx.pedido.create({
+        data: {
+          fecha: createOrderDto.date,
+          estado: createOrderDto.status,
+          tipoEntrega: createOrderDto.orderType,
+          tipoPago: createOrderDto.paymentType,
+          esPagado: createOrderDto.isPaid,
+          clienteId: createOrderDto.clientId,
+          cocinaId: createOrderDto.kitchenId,
+          detalles: {
+            create: createOrderDto.orderDetails.map(detail => ({
+              cantidadEntera: detail.fullPortion, // Mapeo de cantidad entera
+              cantidadMedia: detail.halfPortion, // Mapeo de cantidad media
+              platilloId: detail.dishId, // ID del platillo relacionado
+            })),
+          },
         },
-      },
-      include: {
-        detalles: true, // Incluir detalles en la respuesta
-      },
+        include: {
+          detalles: true, // Incluir detalles en la respuesta
+        },
+      });
+  
+      return Order.fromJson(order);
     });
 
-    return Order.fromJson(order);
   }
 
   async getOrderDetailsByOrderId(orderId: number): Promise<OrderDetail[]> {
