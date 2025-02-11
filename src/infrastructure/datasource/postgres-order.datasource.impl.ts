@@ -177,6 +177,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   // create a Order Detail
   async createOrderDetail(createOrderDetail: CreateOrderDetailsDto): Promise<OrderDetail> {
+    await this.getOrderById(createOrderDetail.orderId!);
     const orderDetail = await this.prismaOrderDetail.create({
       data: {
         cantidadEntera: createOrderDetail.fullPortion, 
