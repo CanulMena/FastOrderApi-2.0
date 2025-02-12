@@ -177,17 +177,27 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   // create a Order Detail
   async createOrderDetail(createOrderDetail: CreateOrderDetailsDto): Promise<OrderDetail> {
-    await this.getOrderById(createOrderDetail.orderId!);
-    const orderDetail = await this.prismaOrderDetail.create({
-      data: {
-        cantidadEntera: createOrderDetail.fullPortion, 
-        cantidadMedia: createOrderDetail.halfPortion,
-        platilloId: createOrderDetail.dishId,
-        pedidoId: createOrderDetail.orderId!,
-      }
-    });
 
-    return OrderDetail.fromJson(orderDetail);
+    return this.prisma.$transaction(async (tx) => {
+      // Actualizar raciones disponibles
+      await tx.platillo.update({
+        where: { id: createOrderDetail.dishId}, 
+        data: {
+          racionesDisponibles: { decrement: createOrderDetail.fullPortion + createOrderDetail.halfPortion * 0.5 }
+        }
+      });
+
+      // Crear el detalle del pedido
+      const orderDetail = await tx.detallePedido.create({
+        data: {
+          cantidadEntera: createOrderDetail.fullPortion, 
+          cantidadMedia: createOrderDetail.halfPortion, 
+          platilloId: createOrderDetail.dishId,
+          pedidoId: createOrderDetail.orderId!,
+        }
+      });
+      return OrderDetail.fromJson(orderDetail);
+    });
   }
 
   async deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
