@@ -16,7 +16,7 @@ export class GetDishes implements GetDishesUseCase {
       const { page, limit } = paginationDto;
   
       if (user.rol === 'SUPER_ADMIN') {
-        //TODO: Refactorizar esto para mejorar la velocidad e la consulta
+        //TODO: Refactorizar esto para mejorar la velocidad e la consulta]
         const dishesCount = await this.dishRepository.getDishesCount();
         const dishes = await this.dishRepository.getDishes(paginationDto);
         return this.buildResponse(dishes, page, limit, dishesCount);

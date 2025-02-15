@@ -8,6 +8,8 @@ import { DeleteOrder } from "../../domain/use-cases/order/delete-order";
 import { User } from "../../domain/entities";
 import { DeleteOrderDetail } from "../../domain/use-cases/order-detail/delete-order-detail";
 import { CreateOrderDetail } from "../../domain/use-cases/order-detail/create-order-detail";
+import { PaginationDto } from '../../domain/dtos/shared/pagination.dto';
+import { GetOrders } from "../../domain/use-cases/order/get-orders";
 
 export class OrderController {
 
@@ -112,6 +114,21 @@ export class OrderController {
     new DeleteOrderDetail(this.orderRepository, this.dishRepository)
     .execute(orderDetailId)
     .then( order => res.status(200).json(order))
+    .catch( error => this.handleError(error, res));
+  }
+
+  public getOrders = (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const { page = 1, limit = 10 } = req.query;
+    const [error, paginationDto] = PaginationDto.create(+page, +limit);
+    if (error) {
+      res.status(400).json({error});
+      return;
+    }
+
+    new GetOrders(this.orderRepository)
+    .execute(user, paginationDto!)
+    .then( orders => res.status(200).json(orders))
     .catch( error => this.handleError(error, res));
   }
 }

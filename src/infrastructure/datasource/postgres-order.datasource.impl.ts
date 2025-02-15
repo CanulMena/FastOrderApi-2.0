@@ -3,7 +3,7 @@ import { Order } from '../../domain/entities/order.entity';
 import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
-import { CreateOrderDetailsDto, UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
 import { Dish, OrderDetail } from "../../domain/entities";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
@@ -210,4 +210,43 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     return OrderDetail.fromJson(deleteOrderDetail);
   }
 
+  //* Obtener todos los pedidos con paginación
+  async getOrders(pagination: PaginationDto): Promise<Order[]> {
+    const {page, limit} = pagination;
+    return await this.prismaPedido.findMany({
+      skip: (page - 1) * limit,
+      take: limit, 
+      include: {
+        detalles: true
+      }
+    })
+    .then(orders => orders.map(order => Order.fromJson(order)));
+  }
+
+  async getOrdersCount(): Promise<number> {
+    return await this.prismaPedido.count();
+  }
+
+  async getOrdersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Order[]> {
+    const {page, limit} = pagination;
+    return await this.prismaPedido.findMany({
+      where: {
+        cocinaId: kitchenId
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        detalles: true
+      }
+    })
+    .then(orders => orders.map(order => Order.fromJson(order)));
+  }
+
+  getOrdersByKitchenIdCount(kitchenId: number): Promise<number> {
+    return this.prismaPedido.count({
+      where: {
+        cocinaId: kitchenId
+      }
+    });
+  }
 }
