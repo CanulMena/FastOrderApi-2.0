@@ -59,10 +59,10 @@ export class OrderRoutes {
     )
 
     router.post(
-      '/create-order-detail',
+      '/order-detail/register',
       authMiddleware.validateJWT,
       authMiddleware.validateRole(rolesConfig.AllRoles),
-      authMiddleware.validateKitchenAccess,
+      // authMiddleware.validateKitchenAccess,
       orderController.createOrderDetail
     )
 

@@ -1,6 +1,7 @@
 import { OrderRepository } from '../../repositories/order.repository';
 import { DishRepository } from "../../repositories";
 import { UpdateDishDto } from "../../dtos";
+import { CustomError } from '../../errors';
 
 interface DeleteOrderDetailUseCase {
     execute(orderDetailId: number ): Promise<object>;
@@ -34,7 +35,7 @@ export class DeleteOrderDetail implements DeleteOrderDetailUseCase {
 
             const updateDish = await this.dishRepository.updateDish(updateDishDto!);
             if (!updateDish) {
-                throw new Error('Error updating dish');
+                throw CustomError.badRequest(`Dish with id ${dish.dishId} could not be updated`);
             }
         }
 

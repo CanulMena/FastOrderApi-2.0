@@ -24,18 +24,8 @@ export class CreateOrderDetail implements CreateOrderDetailUseCase {
         const requestServings = (orderDetail.fullPortion ?? 0) + (orderDetail.halfPortion ?? 0) * 0.5;
 
         if (requestServings > dish.availableServings) {
-            throw new Error('Dish does not have enough available servings');
+            throw CustomError.badRequest('Dish does not have enough available servings');
         }
-        // //TODO: Update dish servings after creating order detail 
-        const newAvailableServings = dish.availableServings - requestServings;
-        const [error, updateDishDto] = UpdateDishDto.create({
-            availableServings: newAvailableServings,
-            dishId: dish.dishId,
-        });
-        if (error) throw CustomError.badRequest(error);
-        
-        const updatedDish = await this.dishRepository.updateDish(updateDishDto!);
-        if(!updatedDish) throw CustomError.internalServer("Error al actualizar el platillo");
 
         const orderDetailCreated = await this.orderRepository.createOrderDetail(orderDetail);
         return {

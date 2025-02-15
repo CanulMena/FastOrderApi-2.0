@@ -96,6 +96,9 @@ export class OrderController {
     }
 
     new CreateOrderDetail(this.orderRepository, this.dishRepository)
+    .execute(orderDetailDto!)
+    .then( orderDetail => res.status(201).json(orderDetail))
+    .catch( error => this.handleError(error, res));
   }
 
   public deleteOrderDetail = (req: Request, res: Response) => {
