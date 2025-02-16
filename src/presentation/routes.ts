@@ -5,6 +5,7 @@ import { CustomerRoutes } from "./customer/customer-routes";
 import { SideRoutes } from "./side/side-routes";
 import { DishRoutes } from "./dish/dish-routes";
 import { OrderRoutes } from "./order/order-routes";
+import { FileUploadRoutes } from "./file-upload/upload-routes";
 
 export class AppRoutes {
     static get routes(): Router {
@@ -22,6 +23,8 @@ export class AppRoutes {
         router.use('/api/dish', DishRoutes.routes); //Ruta de los platillos
 
         router.use('/api/order', OrderRoutes.routes); //Ruta de los pedidos
+
+        router.use('/api/upload', FileUploadRoutes.routes); //Ruta de las imagenes
 
         return router;
     }
