@@ -1,5 +1,5 @@
 import { OrderDatasource } from "../../domain/datasource";
-import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, CreateOrderDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
 import { Order, OrderDetail } from "../../domain/entities";
 import { OrderRepository } from "../../domain/repositories";
 
@@ -39,5 +39,21 @@ export class OrderRepositoryImpl implements OrderRepository{
 
   deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
     return this.datasource.deleteOrderDetail(orderDetailId);
+  }
+
+  getOrders(pagination: PaginationDto): Promise<Order[]> {
+    return this.datasource.getOrders(pagination);
+  }
+
+  getOrdersCount(): Promise<number> {
+    return this.datasource.getOrdersCount();
+  }
+
+  getOrdersByKitchenIdCount(kitchenId: number): Promise<number> {
+    return this.datasource.getOrdersByKitchenIdCount(kitchenId);
+  }
+
+  getOrdersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Order[]> {
+    return this.datasource.getOrdersByKitchenId(kitchenId, pagination);
   }
 }
