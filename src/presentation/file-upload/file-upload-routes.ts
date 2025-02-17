@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { FileUploadController } from './upload-controller';
+import { FileUploadController } from './file-upload-controller';
 
 export class FileUploadRoutes {
   static get routes(): Router {

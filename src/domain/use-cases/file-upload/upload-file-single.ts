@@ -1,4 +1,4 @@
-interface UploadFileSingleUseCase {
+interface FileUploadSingleUseCase {
   execute(
     file: any,
     folder: string,
@@ -6,7 +6,7 @@ interface UploadFileSingleUseCase {
   ): Promise<any>;
 }
 
-export class UploadFile implements UploadFileSingleUseCase {
+export class FileUploadSingle implements FileUploadSingleUseCase {
   constructor(
     
   ) {}

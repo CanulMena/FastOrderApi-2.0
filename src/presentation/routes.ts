@@ -5,7 +5,7 @@ import { CustomerRoutes } from "./customer/customer-routes";
 import { SideRoutes } from "./side/side-routes";
 import { DishRoutes } from "./dish/dish-routes";
 import { OrderRoutes } from "./order/order-routes";
-import { FileUploadRoutes } from "./file-upload/upload-routes";
+import { FileUploadRoutes } from "./file-upload/file-upload-routes";
 
 export class AppRoutes {
     static get routes(): Router {

@@ -1,4 +1,4 @@
-interface UploadFileMultipleUseCase {
+interface FileUploadMultipleUseCase {
   execute(
     file: any[],
     folder: string,
@@ -6,7 +6,7 @@ interface UploadFileMultipleUseCase {
   ): Promise<any>;
 }
 
-export class UploadMultipleFile implements UploadFileMultipleUseCase {
+export class FileUploadMultiple implements FileUploadMultipleUseCase {
   constructor(
     
   ) {}
