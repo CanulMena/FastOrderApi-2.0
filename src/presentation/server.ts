@@ -1,5 +1,6 @@
 //*It is a plugin but it is implemented within the presentation because it is necessary for the application.
 import express, { Router } from 'express';
+import fileUpload from 'express-fileupload'; //* Crearle su plugin.
 
 export interface ServerAppOptions {
     port: number;
@@ -17,8 +18,12 @@ export class AppServer {
     }
 
     async start(){
-        
         this.app.use(express.json()); //* raw json
+        this.app.use(express.urlencoded({ extended: true })); //* form data
+        this.app.use(fileUpload({
+            limits: { fileSize: 50 * 1024 * 1024 },
+        }));
+
         this.app.use( this.routes );
 
         this.app.listen( this.port, () => {
