@@ -19,22 +19,16 @@ export class FileUploadController {
 
   public fileUploadSingle = (req: Request, res: Response) => {
 
-    //validar
+    //validar -> esto ese puede poner en un middleware
     const type = req.params.type;
     const validTypes = ['dishes', 'sides'];
     if( !validTypes.includes(type as string) ){
       res.status(400).send(`Invalid type, valid types: ${validTypes.join(', ')}`);
       return;
     }
-
-    //validar que se haya subido un archivo
-    if( !req.files || Object.keys(req.files).length === 0 ){
-      res.status(400).send('No files were uploaded.');
-      return;
-    }
-
+    
     //agarramos el archivo subido
-    const file = req.files.files as UploadedFile;
+    const file = req.body.files.at(0) as UploadedFile;
 
     new FileUploadSingle(
       this.FileUploadRepository
