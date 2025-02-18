@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { FileUploadController } from './file-upload-controller';
 import { FileSystemFileUploadDataSourceImpl } from '../../infrastructure/datasource/file-system-file-upload.datasource.impl';
-import { FileUploadRepository } from "../../domain/repositories";
 import { FileUploadRepositoryImpl } from "../../infrastructure/repository";
+import { FileUploadMiddleware } from "../middlewares/file-upload.midleware";
 
 export class FileUploadRoutes {
   static get routes(): Router {
@@ -14,7 +14,7 @@ export class FileUploadRoutes {
     const uploadFileController = new FileUploadController(
       fileUploadRepository
     );
-
+    router.use(FileUploadMiddleware.containFiles);
     router.post('/single/:type', uploadFileController.fileUploadSingle);
     router.post('/multiple/:type', uploadFileController.fileUploadMultiple);
 
