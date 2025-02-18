@@ -1,3 +1,3 @@
-export * from "./upload-file-single";
-export * from "./upload-file-mult"
+export * from "./file-upload-single";
+export * from "./file-upload-mult"
 

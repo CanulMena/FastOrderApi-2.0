@@ -5,3 +5,4 @@ export * from "./side.repository.impl";
 export * from "./dish.repository.impl";
 export * from "./dish-side.repository.impl";
 export * from "./order.repository.impl";
+export * from "./file-system-file-upload.repository.impl";
