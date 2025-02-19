@@ -1,6 +1,6 @@
 //*It is a plugin but it is implemented within the presentation because it is necessary for the application.
 import express, { Router } from 'express';
-import fileUpload from 'express-fileupload'; //* Crearle su plugin.
+import fileUpload from 'express-fileupload'; //*TODO: Crearle su plugin.
 
 export interface ServerAppOptions {
     port: number;
