@@ -2,9 +2,7 @@ import { Router } from "express";
 import { FileUploadController } from './file-upload-controller';
 import { FileSystemFileUploadDataSourceImpl, CloudinaryFileUploadDataSourceImpl } from '../../infrastructure/datasource/index';
 import { FileUploadRepositoryImpl } from "../../infrastructure/repository";
-import { FileUploadMiddleware } from "../middlewares/file-upload.midleware";
-import { TypeMiddleware } from "../middlewares/type.middleware";
-//TODO: REFACTORIZAR RUTAS
+import { FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
 
 export class FileUploadRoutes {
   static get routes(): Router {
