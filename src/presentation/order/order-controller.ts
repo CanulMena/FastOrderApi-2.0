@@ -1,15 +1,9 @@
-import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto } from "../../domain/dtos";
-import { CustomError } from "../../domain/errors";
 import { Request, Response } from 'express';
-import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
-import { RegisterOrder } from "../../domain/use-cases"
-import { UpdateOrder } from "../../domain/use-cases/order/update-order";
-import { DeleteOrder } from "../../domain/use-cases/order/delete-order";
+import { CustomError } from "../../domain/errors";
 import { User } from "../../domain/entities";
-import { DeleteOrderDetail } from "../../domain/use-cases/order-detail/delete-order-detail";
-import { CreateOrderDetail } from "../../domain/use-cases/order-detail/create-order-detail";
-import { PaginationDto } from '../../domain/dtos/shared/pagination.dto';
-import { GetOrders } from "../../domain/use-cases/order/get-orders";
+import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto, PaginationDto } from "../../domain/dtos";
+import { RegisterOrder, UpdateOrder, DeleteOrder, GetOrders, DeleteOrderDetail, CreateOrderDetail } from "../../domain/use-cases/index";
+import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
 
 export class OrderController {
 

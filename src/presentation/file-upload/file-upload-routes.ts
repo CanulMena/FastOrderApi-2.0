@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { FileUploadController } from './file-upload-controller';
-import { FileSystemFileUploadDataSourceImpl } from '../../infrastructure/datasource/file-system-file-upload.datasource.impl';
+import { FileSystemFileUploadDataSourceImpl, CloudinaryFileUploadDataSourceImpl } from '../../infrastructure/datasource/index';
 import { FileUploadRepositoryImpl } from "../../infrastructure/repository";
-import { FileUploadMiddleware } from "../middlewares/file-upload.midleware";
-import { TypeMiddleware } from "../middlewares/type.middleware";
-import { CloudinaryFileUploadDataSourceImpl } from '../../infrastructure/datasource/cloudinary-file-upload.datasource.impl';
-//TODO: REFACTORIZAR RUTAS
+import { FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
 
 export class FileUploadRoutes {
   static get routes(): Router {
@@ -20,7 +17,7 @@ export class FileUploadRoutes {
       fileUploadRepository
     );
     router.use(FileUploadMiddleware.containFiles);
-    router.use( TypeMiddleware.validTypes(['dishes', 'sides']) );
+    router.use( TypeMiddleware.validTypes(['dishes', 'sides']));
     router.post('/single/:type', uploadFileController.fileUploadSingle);
     router.post('/multiple/:type', uploadFileController.fileUploadMultiple);
 
