@@ -9,6 +9,6 @@ postgres/
 #Ignora la carpeta de dependencias de prisma
 prisma/
 #Igonorar imagenes temporales
-/temp
+/tmp
 #ignorar archivos del file-system datasource
 upload/
