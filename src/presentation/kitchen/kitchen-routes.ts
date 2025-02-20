@@ -2,7 +2,7 @@ import { Router } from "express";
 import { KitchenController } from "./kitchen-controller";
 import { PostgresKitchenDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
-import { AuthMiddleware } from "../middlewares/auth.middleware"
+import { AuthMiddleware } from "../middlewares/index";
 import { rolesConfig } from "../../configuration";
 
 export class KitchenRoutes {

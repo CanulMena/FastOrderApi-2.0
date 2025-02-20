@@ -3,7 +3,7 @@ import { DishController } from "./dish-controller";
 import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl, PostgresDishSideDatasourceImpl } from "../../infrastructure/datasource";
 import { DishRepositoryImpl, DishSideRespositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { AuthMiddleware } from "../middlewares/index";
 
 
 

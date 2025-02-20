@@ -3,7 +3,7 @@ import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../in
 import { SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
 import { SideController } from "./side-controller";
 import { rolesConfig } from "../../configuration";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { AuthMiddleware } from "../middlewares/index";
 
 
 export class SideRoutes {

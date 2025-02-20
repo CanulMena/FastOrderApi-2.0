@@ -2,7 +2,7 @@ import { Router } from "express";
 import { CustomerController } from "./customer-controller";
 import { PostgresCustomerDatasourceImpl, PostgresKitchenDatasourceImpl, PostgresUserDataSourceImpl } from '../../infrastructure/datasource';
 import { CustomerRepositoryImpl, KitchenRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
-import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { AuthMiddleware } from '../middlewares/index';
 import { rolesConfig } from "../../configuration";
 
 export class CustomerRoutes {

@@ -5,7 +5,7 @@ import { EmailService } from "../email/email-service";
 import { PostgresUserDataSourceImpl, PostgresKitchenDatasourceImpl } from "../../infrastructure/datasource/index";
 import { KitchenRepositoryImpl, UserRepositoryImpl } from '../../infrastructure/repository/index';
 import { SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { AuthMiddleware } from "../middlewares/index";
 
 export class AuthRoutes {
 

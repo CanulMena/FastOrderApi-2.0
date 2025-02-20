@@ -2,7 +2,7 @@ import { Router } from "express";
 import { OrderController } from "./order-controller";
 import { PostgresCustomerDatasourceImpl, PostgresDishDatasourceImpl, PostgresOrderDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource";
 import { CustomerRepositoryImpl, DishRepositoryImpl, OrderRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { AuthMiddleware } from "../middlewares/index";
 import { rolesConfig } from '../../configuration/roles-config';
 
 export class OrderRoutes {
