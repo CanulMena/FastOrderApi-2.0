@@ -2,15 +2,12 @@ import fs from 'fs';
 import path from 'path';
 
 import { FileUploadDatasource } from "../../domain/datasource/file-upload.datasource";
-import { UploadedFile } from "express-fileupload";
 import { CustomError } from '../../domain/errors';
-import { uuidAdapter } from '../../configuration/plugins/uuid.adapter';
+import { UploadedFile } from "express-fileupload"; //TODO: CREAR UN ADAPTADOR PARA EL UPLOADED FILE
 
 export class FileSystemFileUploadDataSourceImpl implements FileUploadDatasource {
   
-  constructor(
-    private readonly uuid: string = uuidAdapter.v4
-  ){}
+  constructor(){}
   
   private checkFolder( folderPath: string ){
     if( !fs.existsSync(folderPath) ){
