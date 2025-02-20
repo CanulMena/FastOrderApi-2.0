@@ -4,13 +4,17 @@ import { FileSystemFileUploadDataSourceImpl } from '../../infrastructure/datasou
 import { FileUploadRepositoryImpl } from "../../infrastructure/repository";
 import { FileUploadMiddleware } from "../middlewares/file-upload.midleware";
 import { TypeMiddleware } from "../middlewares/type.middleware";
+import { CloudinaryFileUploadDataSourceImpl } from '../../infrastructure/datasource/cloudinary-file-upload.datasource.impl';
+//TODO: REFACTORIZAR RUTAS
 
 export class FileUploadRoutes {
   static get routes(): Router {
     const router = Router();
 
     const fileSystemFileUploadDatasource = new FileSystemFileUploadDataSourceImpl();
-    const fileUploadRepository = new FileUploadRepositoryImpl(fileSystemFileUploadDatasource);
+    const cloudinaryDatasource = new CloudinaryFileUploadDataSourceImpl();
+
+    const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryDatasource);
 
     const uploadFileController = new FileUploadController(
       fileUploadRepository
