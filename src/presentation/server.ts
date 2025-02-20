@@ -21,6 +21,7 @@ export class AppServer {
         this.app.use(express.json()); //* raw json
         this.app.use(express.urlencoded({ extended: true })); //* form data
         this.app.use(fileUpload({
+            useTempFiles : true, //TODO: REFACOTRIZAR USE OF TEMP FILES
             limits: { fileSize: 50 * 1024 * 1024 },
         }));
 
