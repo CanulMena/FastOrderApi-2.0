@@ -8,3 +8,7 @@ dist/
 postgres/
 #Ignora la carpeta de dependencias de prisma
 prisma/
+#Igonorar imagenes temporales
+/temp
+#ignorar archivos del file-system datasource
+upload/
