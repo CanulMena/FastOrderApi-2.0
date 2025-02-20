@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { CreateKitchenDto } from '../../domain/dtos/kitchen/index';
-import { UpdateKitchenDto } from '../../domain/dtos/kitchen/update-kitchen.dto';
+import { CreateKitchenDto, UpdateKitchenDto } from '../../domain/dtos/kitchen/index';
 import { KitchenRepository } from '../../domain/repositories';
-import { CreateKitchen, GetKitchens, DeleteKitchen, GetKitchen, UpdateKitchen } from '../../domain/use-cases/kitchen';
+import { CreateKitchen, GetKitchens, DeleteKitchen, GetKitchen, UpdateKitchen } from '../../domain/use-cases/index';
 import { CustomError } from '../../domain/errors';
 
 export class KitchenController {
