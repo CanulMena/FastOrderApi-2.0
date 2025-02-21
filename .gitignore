@@ -11,4 +11,4 @@ prisma/
 #Igonorar imagenes temporales
 /tmp
 #ignorar archivos del file-system datasource
-upload/
+/upload
