@@ -5,13 +5,12 @@ import { cloudinaryAdapter, ICloudinaryAdapter } from '../../configuration/plugi
 export class CloudinaryFileUploadDataSourceImpl implements FileUploadDatasource {
   
   constructor(
-    private readonly cloudinaryAdaptert = cloudinaryAdapter //TODO: refacotizar esto cloudinaryAdapter
+    private readonly cloudinaryAdaptert: ICloudinaryAdapter = cloudinaryAdapter
   ){}
 
   async fileUploadSingle(folder: string, fileName: string, file: UploadedFile): Promise<string>{
-    //TODO: AGREGAR CONTROL DE ERRORES
-    const filePath = file.tempFilePath; //el path del archivo temporal que se subió.
-    const result = await this.cloudinaryAdaptert.upload(filePath, folder, fileName);
+    
+    const result = await this.cloudinaryAdaptert.uploadFileFromBuffer(file.data, folder, fileName);
     return result.url;
 
   }

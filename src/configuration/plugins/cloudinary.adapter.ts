@@ -1,9 +1,10 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { CustomError } from '../../domain/errors';
 
 export interface ICloudinaryAdapter {
   configure: (cloud_name: string, api_key: string, api_secret: string) => Promise<void>;
-  upload: (filePath: string, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
+  uploadFileFromPath: (filePath: string, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
+  uploadFileFromBuffer: (fileBuffer: Buffer, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
 }
 
 export const cloudinaryAdapter: ICloudinaryAdapter = {
@@ -17,7 +18,7 @@ export const cloudinaryAdapter: ICloudinaryAdapter = {
     });
   },
 
-  upload: async (filePath: string, folder: string, fileName: string): Promise<{ url: string; publicId: string }> => {
+  uploadFileFromPath: async (filePath: string, folder: string, fileName: string): Promise<{ url: string; publicId: string }> => {
     try {
         const result = await cloudinary.uploader.upload(
           filePath, 
@@ -35,6 +36,33 @@ export const cloudinaryAdapter: ICloudinaryAdapter = {
         console.error('Error uploading to Cloudinary:', error);
         throw CustomError.internalServer('Error uploading to Cloudinary');
     }
+  },
+
+  uploadFileFromBuffer: async (fileBuffer: Buffer, folder: string, fileName: string): Promise<{ url: string; publicId: string }> => {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+
+        {
+          folder,
+          public_id: fileName, // Opcional: Si quieres mantener el nombre del archivo
+          use_filename: true,
+          unique_filename: false,
+          overwrite: false,
+        },
+
+        (error, result: UploadApiResponse | undefined) => {
+
+          if (error || !result) { // Si hay un error o no hay resultado
+            console.error('Error uploading to Cloudinary:', error);
+            return reject(CustomError.internalServer('Error uploading to Cloudinary'));
+          }
+
+          resolve({ url: result.secure_url, publicId: result.public_id });
+        }
+
+      ).end(fileBuffer); // Enviar el archivo en memoria
+
+    });
   },
   
 };
