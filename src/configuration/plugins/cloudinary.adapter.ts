@@ -1,12 +1,13 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { CustomError } from '../../domain/errors';
 
-// export interface ICloudinaryAdapter {
-//   configure: (cloud_name: string, api_key: string, api_secret: string) => Promise<void>;
-//   upload: (filePath: string, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
-// }
+export interface ICloudinaryAdapter {
+  configure: (cloud_name: string, api_key: string, api_secret: string) => Promise<void>;
+  uploadFileFromPath: (filePath: string, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
+  uploadFileFromBuffer: (fileBuffer: Buffer, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
+}
 
-export const cloudinaryAdapter = {
+export const cloudinaryAdapter: ICloudinaryAdapter = {
 
   configure: async ( cloud_name: string, api_key: string, api_secret: string ): Promise<void> => {
     cloudinary.config({
