@@ -12,3 +12,6 @@ prisma/
 /tmp
 #ignorar archivos del file-system datasource
 /upload
+
+# Ignorar todas las fotos en la carpeta uploads
+uploads/*
