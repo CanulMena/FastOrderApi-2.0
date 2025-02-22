@@ -31,7 +31,7 @@ export class CreateDish implements CreateDishUseCase {
 
     //ejeutar el fileUploadSingle para subir la imagen del platillo
     const fileUploaded = await this.fileUploadSingle.execute( file, folder, validExtensions );
-    createDishDto.imagePath = fileUploaded.url;
+    createDishDto.imagePath = fileUploaded.url || fileUploaded.fileName;
     /*Obtener todos los sides por IDs para validar para que el side exista y obtener el kitchenId de cada side
     y comparar que el kitchenId de cada side pertenece a el mismo kitchenId de la cocina al que se le quiere agregar*/
     const sides = await Promise.all(

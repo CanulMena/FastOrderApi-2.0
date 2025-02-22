@@ -12,7 +12,7 @@ export class FileSystemFileUploadDataSourceImpl implements FileUploadDatasource 
   
   private checkFolder( folderPath: string ){
     if( !fs.existsSync(folderPath) ){
-      fs.mkdirSync(folderPath);
+      fs.mkdirSync(folderPath, {recursive: true});
     }
   }
 
@@ -24,7 +24,7 @@ export class FileSystemFileUploadDataSourceImpl implements FileUploadDatasource 
     
     try {
 
-      const destination = path.resolve(__dirname, '../../../', folder); //creamos la ruta del destino que donde se almacenará el archivo.
+      const destination = path.resolve(__dirname, '../../../', `uploads/${folder}`); //creamos la ruta del destino que donde se almacenará el archivo.
       this.checkFolder(destination); //si la carpeta no existe, la creamos.
       
       await file.mv(`${destination}/${fileName}`); //movemos el archivo al destination(a la carpeta uploads).
