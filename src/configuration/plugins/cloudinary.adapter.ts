@@ -5,6 +5,7 @@ export interface ICloudinaryAdapter {
   configure: (cloud_name: string, api_key: string, api_secret: string) => Promise<void>;
   uploadFileFromPath: (filePath: string, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
   uploadFileFromBuffer: (fileBuffer: Buffer, folder: string, fileName: string) => Promise<{ url: string; publicId: string }>;
+  deleteUploadedFile: (publicId: string) => Promise<void>;
 }
 
 export const cloudinaryAdapter: ICloudinaryAdapter = {
@@ -63,6 +64,19 @@ export const cloudinaryAdapter: ICloudinaryAdapter = {
       ).end(fileBuffer); // Enviar el archivo en memoria
 
     });
+  },
+
+  deleteUploadedFile: async (publicId: string): Promise<void> => {
+    try {
+      const imageDeteled = await cloudinary.uploader.destroy(
+        publicId,
+        {resource_type: 'image', type: 'upload'}
+      );
+      return imageDeteled;
+    } catch (error) {
+      console.error('Error deleting from Cloudinary:', error);
+      throw CustomError.internalServer('Error deleting from Cloudinary');
+    }
   },
   
 };
