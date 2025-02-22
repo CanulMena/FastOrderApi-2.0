@@ -11,7 +11,18 @@ export class CreateDishDto {
   ){}
 
   static create( props: {[key: string]: any} ): [ string?, CreateDishDto? ] {
-    const { name, pricePerHalfServing, pricePerServing, availableServings, kitchenId, sidesId, imagePath } = props;
+    let { name, pricePerHalfServing, pricePerServing, availableServings, kitchenId, sidesId, imagePath } = props;
+
+    // Convertir valores numéricos que llegan como string
+    pricePerHalfServing = Number(pricePerHalfServing);
+    pricePerServing = Number(pricePerServing);
+    availableServings = availableServings !== undefined ? Number(availableServings) : undefined;
+    kitchenId = Number(kitchenId);
+
+    // Convertir sidesId de string a array si es necesario
+    sidesId = typeof sidesId === "string" ? JSON.parse(sidesId) : sidesId;
+
+
     if (!name) return ['Missing name'];
     if (!pricePerHalfServing) return ['Missing pricePerHalfServing'];
     if (!pricePerServing) return ['Missing pricePerServing'];
