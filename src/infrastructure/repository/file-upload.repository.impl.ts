@@ -11,7 +11,7 @@ export class FileUploadRepositoryImpl implements FileUploadRepository{
     folder: string = 'uploads', 
     fileName?: string,
     file?: UploadedFile,
-  ): Promise<string> {
+  ): Promise<object> {
 
     return this.fileUploadDatasource.fileUploadSingle(
       folder,
@@ -19,6 +19,10 @@ export class FileUploadRepositoryImpl implements FileUploadRepository{
       file,
     );
 
+  }
+
+  deleteUploadedFile(publicId: string): Promise<any> {
+    return this.fileUploadDatasource.deleteUploadedFile(publicId);
   }
 
   fileUploadMultiple() {
