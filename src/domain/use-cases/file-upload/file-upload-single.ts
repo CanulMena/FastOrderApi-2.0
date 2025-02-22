@@ -39,6 +39,6 @@ export class FileUploadSingle implements FileUploadSingleUseCase {
 
     return {uploadedFile};
 
-  } 	
+  }
 
 }
