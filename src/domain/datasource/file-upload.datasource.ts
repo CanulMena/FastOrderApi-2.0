@@ -6,7 +6,9 @@ export abstract class FileUploadDatasource {
     folder?: string, 
     fileName?: string,
     file?: UploadedFile,
-  ): Promise<string>;
+  ): Promise<object>;
+
+  abstract deleteUploadedFile(publicId: string): Promise<any>;
 
   abstract fileUploadMultiple(): void;
 

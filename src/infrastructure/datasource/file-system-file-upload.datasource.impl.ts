@@ -6,12 +6,13 @@ import { CustomError } from '../../domain/errors';
 import { UploadedFile } from "express-fileupload"; //TODO: CREAR UN ADAPTADOR PARA EL UPLOADED FILE
 
 export class FileSystemFileUploadDataSourceImpl implements FileUploadDatasource {
-  
-  constructor(){}
+  deleteUploadedFile(publicId: string): Promise<any> {
+    throw new Error('Method not implemented.');
+  }
   
   private checkFolder( folderPath: string ){
     if( !fs.existsSync(folderPath) ){
-      fs.mkdirSync(folderPath);
+      fs.mkdirSync(folderPath, {recursive: true});
     }
   }
 
@@ -19,16 +20,16 @@ export class FileSystemFileUploadDataSourceImpl implements FileUploadDatasource 
     folder: string = 'uploads', 
     fileName: string,
     file: UploadedFile,
-  ): Promise<string> {
+  ): Promise<object> {
     
     try {
 
-      const destination = path.resolve(__dirname, '../../../', folder); //creamos la ruta del destino que donde se almacenará el archivo.
+      const destination = path.resolve(__dirname, '../../../', `uploads/${folder}`); //creamos la ruta del destino que donde se almacenará el archivo.
       this.checkFolder(destination); //si la carpeta no existe, la creamos.
       
-      file.mv(`${destination}/${fileName}`); //movemos el archivo al destination(a la carpeta uploads).
+      await file.mv(`${destination}/${fileName}`); //movemos el archivo al destination(a la carpeta uploads).
 
-      return fileName; //retornamos el nombre del archivo.
+      return {fileName}; //retornamos el nombre del archivo.
 
     } catch (error) {
       console.log(error);

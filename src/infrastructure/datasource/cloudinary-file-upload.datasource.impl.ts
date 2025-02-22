@@ -8,12 +8,15 @@ export class CloudinaryFileUploadDataSourceImpl implements FileUploadDatasource 
     private readonly cloudinaryAdaptert: ICloudinaryAdapter = cloudinaryAdapter
   ){}
 
-  async fileUploadSingle(folder: string, fileName: string, file: UploadedFile): Promise<string>{
-    
-    const result = await this.cloudinaryAdaptert.uploadFileFromBuffer(file.data, folder, fileName);
-    return result.url;
-
+  async fileUploadSingle(folder: string, fileName: string, file: UploadedFile): Promise<object>{
+    const result: object = await this.cloudinaryAdaptert.uploadFileFromBuffer(file.data, folder, fileName);
+    return result;
   }
+
+  async deleteUploadedFile(publicId: string): Promise<any> {
+    return await this.cloudinaryAdaptert.deleteUploadedFile(publicId);
+  }
+
   fileUploadMultiple(): void {
     throw new Error("Method not implemented.");
   }
