@@ -1,11 +1,9 @@
 import { Router } from "express";
 import { DishController } from "./dish-controller";
-import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl, PostgresDishSideDatasourceImpl } from "../../infrastructure/datasource";
-import { DishRepositoryImpl, DishSideRespositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
+import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl, PostgresDishDatasourceImpl, PostgresDishSideDatasourceImpl, CloudinaryFileUploadDataSourceImpl } from "../../infrastructure/datasource";
+import { DishRepositoryImpl, DishSideRespositoryImpl, FileUploadRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository";
 import { rolesConfig } from "../../configuration";
-import { AuthMiddleware } from "../middlewares/index";
-
-
+import { AuthMiddleware, FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
 
 export class DishRoutes {
   static get routes(): Router {
@@ -20,8 +18,15 @@ export class DishRoutes {
     const dishSideDatasource = new PostgresDishSideDatasourceImpl();
     const dishSideRepository = new DishSideRespositoryImpl(dishSideDatasource);
 
+    const cloudinaryDatasource = new CloudinaryFileUploadDataSourceImpl();
+    const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryDatasource);
 
-    const dishController = new DishController(dishRepository, dishSideRepository, sideRepository );
+    const dishController = new DishController(
+      dishRepository, 
+      dishSideRepository, 
+      sideRepository,
+      fileUploadRepository
+    );
 
     const userDataSourceImpl = new PostgresUserDataSourceImpl();
     const userRepository = new UserRepositoryImpl(userDataSourceImpl);
@@ -32,10 +37,12 @@ export class DishRoutes {
 
     //TODO: VALIDAR SI LA INSERSIÓN DE LOS MIDDLEWARES SI SE PEUDE REFACTORIZAR
     router.post(
-      '/register', 
+      '/register/:type', 
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
       authMiddleware.validateKitchenAccess,
+      TypeMiddleware.validTypes(['dishes', 'sides']),
+      FileUploadMiddleware.containFiles,
       dishController.postDish,
     );
 
