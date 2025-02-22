@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { DishRepository, DishSideRepository, FileUploadRepository, SideRepository } from '../../domain/repositories';
 import { PaginationDto, CreateDishDto, UpdateDishDto } from '../../domain/dtos';
 import { CustomError } from '../../domain/errors';
-import { CreateDish, GetDishes, GetDish, DeleteDish, UpdateDish, FileUploadSingle } from '../../domain/use-cases/index';
+import { CreateDish, GetDishes, GetDish, DeleteDish, UpdateDish, FileUploadSingle, DeleteUploadedFile } from '../../domain/use-cases/index';
 import { User } from '../../domain/entities';
-import fileUpload, { UploadedFile } from 'express-fileupload';
+import { UploadedFile } from 'express-fileupload';
 
 export class DishController {
 
@@ -38,13 +38,15 @@ export class DishController {
     }
 
     const fileUploadSingle: FileUploadSingle = new FileUploadSingle(this.fileUploadRepository);
+    const deleteUploadedFile: DeleteUploadedFile = new DeleteUploadedFile(this.fileUploadRepository);
     const folder = user.rol === 'SUPER_ADMIN' 
     ? `Kitchen1/${folderType}` 
     : `Kitchen${user.kitchenId}/${folderType}`;
     new CreateDish(
       this.dishRepository, 
       this.sideRepository,
-      fileUploadSingle
+      fileUploadSingle,
+      deleteUploadedFile
     )
     .execute(
       dishDto!,
