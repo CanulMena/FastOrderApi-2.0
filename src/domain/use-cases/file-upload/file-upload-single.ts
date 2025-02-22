@@ -3,12 +3,18 @@ import { FileUploadRepository } from '../../repositories/file-upload.repository'
 import { CustomError } from "../../errors";
 import { uuidAdapter } from "../../../configuration/plugins/uuid.adapter";
 
+interface FileUploadResult {
+  url: string;
+  publicId: string;
+  fileName?: string;
+}
+
 interface FileUploadSingleUseCase {
   execute(
     file: UploadedFile,
     folder: string,
     validExtensions: string[],
-  ): Promise<object>;
+  ): Promise<FileUploadResult>;
 }
 
 export class FileUploadSingle implements FileUploadSingleUseCase {
@@ -31,13 +37,13 @@ export class FileUploadSingle implements FileUploadSingleUseCase {
       throw CustomError.badRequest(`invalid file extension, valid extensions: ${validExtensions.join(', ')}`);
     }    
     const fileName = `${this.uuid}.${fileExtension}`; //creamos el nombre del archivo.
-    const uploadedFile: string =  await this.fileUploadRepository.fileUploadSingle(
+    const uploadedFile: object =  await this.fileUploadRepository.fileUploadSingle(
       folder, 
       fileName,
       file,
     );
 
-    return {uploadedFile};
+    return uploadedFile as FileUploadResult;
 
   }
 
