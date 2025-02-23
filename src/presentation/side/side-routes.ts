@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
-import { SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
+import { CloudinaryFileUploadDataSourceImpl, PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
+import { FileUploadRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
 import { SideController } from "./side-controller";
 import { rolesConfig } from "../../configuration";
-import { AuthMiddleware } from "../middlewares/index";
+import { AuthMiddleware, FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
 
 
 export class SideRoutes {
@@ -13,12 +13,14 @@ export class SideRoutes {
         const router = Router();
         const sideDatasourceImpl = new PostgresSideDatasourceImpl();
         const sideRepositoryImpl = new SideRepositoryImpl( sideDatasourceImpl );
-        const sideController = new SideController( sideRepositoryImpl );
 
         const userDatasourceImpl = new PostgresUserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasourceImpl);
 
         const authMiddleware = new AuthMiddleware(userRepository);
+        const cloudinaryDatasource = new CloudinaryFileUploadDataSourceImpl();
+        const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryDatasource)
+        const sideController = new SideController( sideRepositoryImpl, fileUploadRepository );
         
         const roles = rolesConfig;
 
@@ -37,10 +39,12 @@ export class SideRoutes {
         );
 
         router.post(
-            '/register',
+            '/register/:type',
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
             authMiddleware.validateKitchenAccess,
+            FileUploadMiddleware.containFiles,
+            TypeMiddleware.validTypes(['sides']),
             sideController.postSide
         ); 
 
