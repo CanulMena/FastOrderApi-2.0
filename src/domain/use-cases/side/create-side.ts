@@ -27,6 +27,15 @@ export class CreateSide implements CreateSideUseCase {
     validExtensions: string[] = ['jpg', 'jpeg', 'png']
   ): Promise<object> {
 
+    const existingSide = await this.sideRepository.findSideByNameAndKitchenId(
+      createSideDto.name, 
+      createSideDto.kitchenId
+    );
+
+    if (existingSide) {
+      throw CustomError.badRequest(`Side with name ${createSideDto.name} already exists in this kitchen`);
+    }
+
     const fileUploaded = await this.fileUploadSingle.execute( file, folder, validExtensions );
     
     const sideWithImage = {

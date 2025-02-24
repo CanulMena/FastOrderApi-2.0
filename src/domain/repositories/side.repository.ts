@@ -10,4 +10,5 @@ export abstract class SideRepository {
     abstract getSideById( sideId: number ) : Promise<Side>;
     abstract deleteBySide( sideId: number ) : Promise<Side>;
     abstract updateSide( side: UpdateSideDto ) : Promise<Side>;
+    abstract findSideByNameAndKitchenId( name: string, kitchenId: number ) : Promise<Side | null>;
 }
