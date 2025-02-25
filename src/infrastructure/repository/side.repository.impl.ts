@@ -42,4 +42,7 @@ export class SideRepositoryImpl implements SideRepository {
         return this.datasource.updateSide(side);
     }
     
+    findSideByNameAndKitchenId(name: string, kitchenId: number): Promise<Side | null> {
+        return this.datasource.findSideByNameAndKitchenId(name, kitchenId);
+    }
 }

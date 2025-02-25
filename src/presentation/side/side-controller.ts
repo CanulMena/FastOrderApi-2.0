@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
-import { SideRepository } from "../../domain/repositories/index";
+import { FileUploadRepository, SideRepository } from "../../domain/repositories/index";
 import { CreateSideDto, UpdateSideDto, PaginationDto } from '../../domain/dtos/index';
 import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide } from '../../domain/use-cases/side';
 import { CustomError } from '../../domain/errors';
 import { User } from '../../domain/entities/user.entity';
+import { UploadedFile } from 'express-fileupload';
+import { DeleteUploadedFile, FileUploadSingle } from '../../domain/use-cases';
 
 export class SideController {
 
     constructor(
-        public sideRepository: SideRepository
+        public sideRepository: SideRepository,
+        public fileUploadRepository: FileUploadRepository
     ) {}
 
     private handleError(error: unknown, res: Response) {
@@ -53,13 +56,31 @@ export class SideController {
 
         const [error, sideDto] = CreateSideDto.create(req.body);
 
+        const file = req.body.files.at(0) as UploadedFile;
+        const folderType = req.params.type;
+        const user = req.body.user as User;
+
         if ( error ) {
             res.status(400).json({error});
             return;
         }
 
-        new CreateSide(this.sideRepository)
-        .execute(sideDto!)
+        const fileUploadSingle: FileUploadSingle= new FileUploadSingle(this.fileUploadRepository);
+        const deleteUploadedFile: DeleteUploadedFile = new DeleteUploadedFile(this.fileUploadRepository);
+        const folder = user.rol === 'SUPER_ADMIN'
+        ? `Kitchen1/${folderType}`
+        : `Kitchen${user.kitchenId}/${folderType}`;
+        new CreateSide(
+            this.sideRepository, 
+            fileUploadSingle, 
+            deleteUploadedFile
+
+        )
+        .execute(
+            sideDto!, 
+            file, 
+            folder
+        )
         .then( side => res.status(201).json(side))
         .catch( error => this.handleError(error, res));
     }
