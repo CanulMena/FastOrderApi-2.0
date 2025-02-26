@@ -4,6 +4,7 @@ import { FileUploadRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from
 import { SideController } from "./side-controller";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware, FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
+import { FileSystemFileUploadDataSourceImpl } from '../../infrastructure/datasource/file-system-file-upload.datasource.impl';
 
 
 export class SideRoutes {
@@ -18,8 +19,9 @@ export class SideRoutes {
         const userRepository = new UserRepositoryImpl(userDatasourceImpl);
 
         const authMiddleware = new AuthMiddleware(userRepository);
-        const cloudinaryDatasource = new CloudinaryFileUploadDataSourceImpl();
-        const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryDatasource)
+        const cloudinaryFileUploadDatasource = new CloudinaryFileUploadDataSourceImpl();
+        const fileSystemFileUploadDataSource = new FileSystemFileUploadDataSourceImpl();
+        const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryFileUploadDatasource)
         const sideController = new SideController( sideRepositoryImpl, fileUploadRepository );
         
         const roles = rolesConfig;

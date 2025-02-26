@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { FileUploadRepository, SideRepository } from "../../domain/repositories/index";
 import { CreateSideDto, UpdateSideDto, PaginationDto } from '../../domain/dtos/index';
-import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide } from '../../domain/use-cases/side';
+import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide, DeleteUploadedFile, FileUploadSingle } from '../../domain/use-cases/index';
 import { CustomError } from '../../domain/errors';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '../../domain/entities/index';
 import { UploadedFile } from 'express-fileupload';
-import { DeleteUploadedFile, FileUploadSingle } from '../../domain/use-cases';
 
 export class SideController {
 
