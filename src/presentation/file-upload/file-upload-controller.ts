@@ -26,7 +26,7 @@ export class FileUploadController {
     new FileUploadSingle(
       this.FileUploadRepository
     )
-    .execute( file, `uploads/${type}` )
+    .execute( file, `kitchen1/${type}` )
     .then( uploaded => res.json(uploaded) )
     .catch( error => this.handleError(error, res));
   }
