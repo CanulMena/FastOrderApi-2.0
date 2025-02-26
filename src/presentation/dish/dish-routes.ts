@@ -41,7 +41,7 @@ export class DishRoutes {
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
       authMiddleware.validateKitchenAccess,
-      TypeMiddleware.validTypes(['dishes', 'sides']),
+      TypeMiddleware.validTypes(['dishes']),
       FileUploadMiddleware.containFiles,
       dishController.postDish,
     );

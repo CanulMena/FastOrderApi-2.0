@@ -29,6 +29,15 @@ export class CreateDish implements CreateDishUseCase {
     validExtensions: string[] = ['jpg', 'jpeg', 'png']
   ): Promise<object> {
 
+    const existingDish = await this.dishRepository.findDishByNameAndKitchenId(
+      createDishDto.name,
+      createDishDto.kitchenId
+    )
+
+    if (existingDish) {
+      throw CustomError.badRequest(`Dish with name ${createDishDto.name} already exists in this kitchen`);
+    }
+
     //ejeutar el fileUploadSingle para subir la imagen del platillo
     const fileUploaded = await this.fileUploadSingle.execute( file, folder, validExtensions );
     createDishDto.imagePath = fileUploaded.url || fileUploaded.fileName;
