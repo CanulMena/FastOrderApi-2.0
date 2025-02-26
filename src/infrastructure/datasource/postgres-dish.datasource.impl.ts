@@ -144,4 +144,14 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     return Dish.fromJson(dishUpdated);
   }
 
+      async findDishByNameAndKitchenId(name: string, kitchenId: number): Promise<Dish | null> {
+          const dish = await this.prisma.findFirst({
+              where: {
+                  nombre: name,
+                  cocinaId: kitchenId,
+              },
+          });
+          return dish ? Dish.fromJson(dish) : null;
+      }
+
 }
