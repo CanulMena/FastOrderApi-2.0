@@ -17,6 +17,15 @@ export class CreateSideDto {
         if ( typeof kitchenId !== 'number' || kitchenId <= 0 ) return ['Kitchen ID must be a positive number', undefined];
         if (imageUrl && typeof imageUrl !== 'string') return ['Image URL must be a string or null', undefined];
 
-        return [undefined, new CreateSideDto(name, kitchenId, description, imageUrl)];
+        return [undefined, new CreateSideDto(
+            name, 
+            kitchenId, 
+            description 
+                ? description 
+                : null, 
+            imageUrl 
+                ? imageUrl 
+                : null
+            )];
     }
 }
