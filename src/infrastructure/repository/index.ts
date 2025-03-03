@@ -6,3 +6,4 @@ export * from "./dish.repository.impl";
 export * from "./dish-side.repository.impl";
 export * from "./order.repository.impl";
 export * from "./file-upload.repository.impl";
+export * from "./jwt.repository.impl";

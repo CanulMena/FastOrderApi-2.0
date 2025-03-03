@@ -24,7 +24,6 @@ export class DishController {
   }
 
   public postDish = async (req: Request, res: Response) => {
-    //TODO: NO PODER CREAR OTRO PLATILLO CON EL MISMO NOMBRE
     const [error, dishDto] = CreateDishDto.create(req.body);
 
     //agarramos el archivo subido y el tipo de archivo
