@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserRepository, KitchenRepository } from '../../domain/repositories';
+import { UserRepository, KitchenRepository, JwtRepository } from '../../domain/repositories';
 import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
 import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
@@ -8,6 +8,7 @@ export class AuthController {
   constructor(
     public kitchenRepository: KitchenRepository,
     public userRepositoryImpl: UserRepository,
+    public jwtRepository: JwtRepository,
     public sendEmailValidationLink: SendEmailValidationLink,
     public validateUserEmail: ValidateEmail
   ){}
@@ -43,7 +44,10 @@ export class AuthController {
       res.status(400).json({ error: error }); //400 Bad Request
       return
     }
-    new LoginUser( this.userRepositoryImpl )
+    new LoginUser( 
+      this.userRepositoryImpl,
+      this.jwtRepository
+    )
     .execute(loginUserDto!)
     .then( response => res.status(200).json(response))
     .catch( error => this.handleError(error, res));
