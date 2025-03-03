@@ -29,6 +29,7 @@ model Usuario {
   contrasena String  @db.VarChar(255)
   rol        Rol     @default(ADMIN)
   cocina     Cocina? @relation(fields: [cocinaId], references: [id])
+  refreshTokens RefreshToken[]
 }
 
 model Platillo {
@@ -109,6 +110,18 @@ model DetallePedido {
   platilloId     Int
   pedido         Pedido   @relation(fields: [pedidoId], references: [id])
   platillo       Platillo @relation(fields: [platilloId], references: [id])
+}
+
+model RefreshToken {
+  id          Int   @id @default(autoincrement()) // Identificador único del registro
+  userId      Int                          // Relaciona el token con un usuario
+  token       String   @unique             // El refresh token
+  createdAt   DateTime @default(now())     // Fecha de creación
+  expiresAt   DateTime                     // Fecha de expiración
+
+  usuario     Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])                        // Indexar por userId para búsquedas rápidas
 }
 
 enum EstadoPago {
