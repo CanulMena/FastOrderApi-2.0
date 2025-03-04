@@ -57,6 +57,11 @@ export class AuthRoutes {
 
     router.get('/validate-email/:token', authController.validateEmail);//no es necesario implementar ningun tipo de middleware
 
+    router.post(
+      '/refresh-token',
+      authController.refreshToken
+    );//no es necesario implementar ningun tipo de middleware
+
     //existe parametros de consulta  /ruta?id=1
     //existen parametros de ruta /:id
     //existen segmentos de ruta /ruta/segmento
