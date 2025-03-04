@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { UserRepository, KitchenRepository, JwtRepository } from '../../domain/repositories';
-import { LoginUserDto, RegisterUserDto } from '../../domain/dtos/auth';
+import { LoginUserDto, RefreshTokenDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
 import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
+import { RefreshToken } from '../../domain/use-cases/auth/refresh-token';
 
 export class AuthController {
   constructor(
@@ -61,4 +62,17 @@ export class AuthController {
     .catch( error => this.handleError(error, res));
   }
 
+  public refreshToken = async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+    const [ error ] = RefreshTokenDto.create(req.body);
+    if( error ) {
+      res.status(400).json({ error: error });
+      return;
+    }
+    new RefreshToken(this.jwtRepository)
+    .execute(refreshToken)
+    .then( response => res.status(200).json(response))
+    .catch( error => this.handleError(error, res));
+  }
+  
 } 
