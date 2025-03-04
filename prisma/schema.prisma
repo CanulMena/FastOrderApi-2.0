@@ -122,6 +122,7 @@ model RefreshToken {
   usuario     Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])                        // Indexar por userId para búsquedas rápidas
+  @@index([token])                         // Indexar por token para búsquedas rápidas
 }
 
 enum EstadoPago {

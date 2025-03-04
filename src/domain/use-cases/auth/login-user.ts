@@ -31,15 +31,11 @@ export class LoginUser implements LoginUserUseCase {
     const accessToken = await jwtAdapter.generateToken({ id: userEntity.userId });
     const refreshToken = await jwtAdapter.generateToken({ id: userEntity.userId }, '7d');
     if( !accessToken || !refreshToken ) throw CustomError.internalServer('Error generating token');
-
-    try {
-      // Guardamos el refresh token en la base de datos
-      const expireIn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await this.jwtRepository.saveRefreshToken(userEntity.userId, refreshToken, expireIn);
-
-    } catch (error) {
-      throw CustomError.internalServer('Error saving refresh token');
-    }
+    
+    // Guardamos el refresh token en la base de datos
+    const expireIn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const jwtSaved = await this.jwtRepository.saveRefreshToken(userEntity.userId, refreshToken, expireIn);
+    if( !jwtSaved ) throw CustomError.internalServer('Error saving refresh token');
 
     return {
       user: userEntity,
