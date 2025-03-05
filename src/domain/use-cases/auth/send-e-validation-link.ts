@@ -1,9 +1,9 @@
-import { jwtAdapter } from "../../../configuration/plugins";
+import { envs, jwtAdapter } from "../../../configuration/plugins";
 import { EmailService } from "../../../presentation/email/email-service";
 import { CustomError } from "../../errors";
 
 interface SendEmailValidationLinkUseCase {
-  execute(email: string): Promise<boolean>;
+  execute(id: number, email: string): Promise<boolean>;
 }
 
 export class SendEmailValidationLink implements SendEmailValidationLinkUseCase {
@@ -12,8 +12,8 @@ export class SendEmailValidationLink implements SendEmailValidationLinkUseCase {
     readonly WEB_SERVICE_URL: string
   ) {}
 
-  async execute(email: string): Promise<boolean> {
-    const token = await jwtAdapter.generateToken({ email });
+  async execute(id: number, email: string): Promise<boolean> {
+    const token = await jwtAdapter.generateToken({ payload: {id: id, email: email }, secret: envs.JWT_SEED });
     if(!token) throw CustomError.internalServer('Error generating token');
 
     const link = `${this.WEB_SERVICE_URL}/auth/validate-email/${token}`;
