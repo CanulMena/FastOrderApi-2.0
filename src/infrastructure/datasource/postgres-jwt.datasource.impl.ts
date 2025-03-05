@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { JwtDataSource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { Jwt } from "../../domain/entities";
-import jwt from 'jsonwebtoken';
 
 export class PostgresJwtDatsourceImpl implements JwtDataSource {
 

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { jwtAdapter } from "../../configuration";
+import { envs, jwtAdapter } from "../../configuration";
 import { User } from "../../domain/entities";
 import { UserRepository } from "../../domain/repositories";
 /**
@@ -28,7 +28,7 @@ export class AuthMiddleware {
 
       const token = authorization.split(' ').at(1) || ''; //tomamos el token del header      
 
-      const payload = await jwtAdapter.validateToken<{ id: number }>(token); // sacamos el payload del token { id: number }
+      const payload = await jwtAdapter.validateToken<{ id: number }>(token, envs.JWT_SEED); // sacamos el payload del token { id: number }
       if (!payload) {
         res.status(401).json({ error: 'Invalid token' });
         return;

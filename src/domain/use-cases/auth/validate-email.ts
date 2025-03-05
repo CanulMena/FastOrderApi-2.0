@@ -1,4 +1,4 @@
-import { jwtAdapter } from "../../../configuration/plugins";
+import { envs, jwtAdapter } from "../../../configuration/plugins";
 import { CustomError } from "../../errors";
 import { UserRepository } from "../../repositories";
 
@@ -13,7 +13,7 @@ export class ValidateEmail implements ValidateEmailUseCase {
   ){}
 
     async execute(token: string): Promise<object> {
-    const payload = await jwtAdapter.validateToken(token);
+    const payload = await jwtAdapter.validateToken(token, envs.JWT_SEED);
     if(!payload) throw CustomError.unAuthorized('Invalid token');
 
     const { email } = payload as { email: string };
