@@ -29,7 +29,7 @@ export class RefreshToken implements RefreshTokenUseCase {
       }
 
       // Generar nuevos tokens
-      const accessToken = await this.generateToken({
+      const newAccessToken = await this.generateToken({
         payload: { id: decoded.id },
         secret: envs.JWT_SEED,
       });
@@ -46,7 +46,7 @@ export class RefreshToken implements RefreshTokenUseCase {
       const updatedToken = await this.jwtRepository.updateRefreshToken(refreshToken, newRefreshToken, expireIn);
       if (!updatedToken) throw CustomError.internalServer('Error updating refresh token');
 
-      return { accessToken, refreshToken: newRefreshToken };
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error: any) {
       throw CustomError.internalServer(error.message || 'Failed to refresh token');
     }
