@@ -5,7 +5,7 @@ import { CustomError } from "../../errors";
 import { UserRepository, JwtRepository } from "../../repositories";
 
 export interface LoginUserUseCase {
-  execute(loginUserDto: LoginUserDto): Promise<{ user: object, acessToken: string, refreshToken: string }>;
+  execute(loginUserDto: LoginUserDto): Promise<{ user: object, accessToken: string, refreshToken: string }>;
 }
 
 export class LoginUser implements LoginUserUseCase {
@@ -15,7 +15,7 @@ export class LoginUser implements LoginUserUseCase {
     private readonly jwtRepository: JwtRepository
   ) {}
 
-  async execute(loginUserDto: LoginUserDto): Promise<{ user: object, acessToken: string, refreshToken: string }> {
+  async execute(loginUserDto: LoginUserDto): Promise<{ user: object, accessToken: string, refreshToken: string }> {
     const userFound = await this.userRepository.getUserByEmail(loginUserDto.email);
     const isMatchingPassword = await bcryptAdapter.compare(loginUserDto.password, userFound.passwordHash);
     if (!isMatchingPassword) throw CustomError.badRequest('Invalid password');
@@ -36,7 +36,7 @@ export class LoginUser implements LoginUserUseCase {
 
     return {
       user: userEntity,
-      acessToken: accessToken,
+      accessToken: accessToken,
       refreshToken: refreshToken
     };
   }
