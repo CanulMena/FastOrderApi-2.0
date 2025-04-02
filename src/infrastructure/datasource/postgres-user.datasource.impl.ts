@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { UserDatasource } from "../../domain/datasource/index";
 import { User } from "../../domain/entities/index";
 import { CustomError } from "../../domain/errors";
@@ -9,26 +9,35 @@ export class PostgresUserDataSourceImpl implements UserDatasource {
   private readonly prisma = new PrismaClient().usuario;
 
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
-
-    const existeEmail = await this.prisma.findUnique({
-      where: {
-        email: registerUserDto.email
+    try {
+      const existeEmail = await this.prisma.findUnique({
+        where: {
+          email: registerUserDto.email
+        }
+      })
+  
+      if (existeEmail) throw CustomError.badRequest('Email already exists');
+  
+      const userCreated = await this.prisma.create({ 
+        data: {
+          nombre: registerUserDto.name,
+          email: registerUserDto.email,
+          contrasena: registerUserDto.password,
+          rol: registerUserDto.rol,
+          cocinaId: registerUserDto.kitchenId || null,
+        }
+      });
+      
+      return User.fromJson(userCreated);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') { // Código de error para clave única violada
+          // Manejo del error de clave única
+          throw CustomError.badRequest(`The ${error.meta?.target} already exist`); 
+        }
       }
-    })
-
-    if (existeEmail) throw CustomError.badRequest('Email already exists');
-
-    const userCreated = await this.prisma.create({ 
-      data: {
-        nombre: registerUserDto.name,
-        email: registerUserDto.email,
-        contrasena: registerUserDto.password,
-        rol: registerUserDto.rol,
-        cocinaId: registerUserDto.kitchenId || null,
-      }
-    });
-    
-    return User.fromJson(userCreated);
+      throw CustomError.internalServer('error not controlled'); // Relanza otros errores no controlados
+    }
   }
 
   async getUserByEmail(email: string): Promise<User> {
