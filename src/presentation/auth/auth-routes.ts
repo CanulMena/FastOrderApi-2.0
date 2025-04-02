@@ -53,13 +53,16 @@ export class AuthRoutes {
       authController.registerUser
     );
 
-    router.post('/login',authController.loginUser); // cualquier usuario puede loguearse
+    router.post('/login', authController.loginUser); // cualquier usuario puede loguearse
 
     router.get('/validate-email/:token', authController.validateEmail);//no es necesario implementar ningun tipo de middleware
 
     router.post('/refresh-token', authController.refreshToken);//no es necesario implementar ningun tipo de middleware
 
-    router.post('/check-auth-status', authController.checkAuthStatus)
+    router.post(
+      '/check-auth-status',
+      authMiddleware.validateJWT,
+      authController.checkAuthStatus);
     //existe parametros de consulta  /ruta?id=1
     //existen parametros de ruta /:id
     //existen segmentos de ruta /ruta/segmento
