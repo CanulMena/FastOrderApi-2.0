@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { UserRepository, KitchenRepository, JwtRepository } from '../../domain/repositories';
 import { LoginUserDto, RefreshTokenDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
-import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail } from '../../domain/use-cases/auth/index';
-import { RefreshToken } from '../../domain/use-cases/auth/refresh-token';
+import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken } from '../../domain/use-cases/auth/index';
+import { User } from '../../domain/entities';
 
 export class AuthController {
   constructor(
@@ -73,6 +73,12 @@ export class AuthController {
     .execute(refreshToken)
     .then( response => res.status(200).json(response))
     .catch( error => this.handleError(error, res));
+  }
+
+  public checkAuthStatus = async (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const { passwordHash, ...userWithoutPassword } = user;
+    res.status(200).json({user: userWithoutPassword});
   }
   
 } 
