@@ -4,7 +4,7 @@ version: '3.8'
 services:
 
   postgres-db:
-    image: postgres:17.4
+    image: postgres:15.3
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

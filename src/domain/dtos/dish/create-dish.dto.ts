@@ -22,7 +22,7 @@ export class CreateDishDto {
     // Convertir sidesId de string a array si es necesario
     sidesId = typeof sidesId === "string" ? JSON.parse(sidesId) : sidesId;
 
-
+    
     if (!name) return ['Missing name'];
     if (!pricePerHalfServing) return ['Missing pricePerHalfServing'];
     if (!pricePerServing) return ['Missing pricePerServing'];

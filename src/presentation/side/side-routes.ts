@@ -43,7 +43,7 @@ export class SideRoutes {
         router.post(
             '/register/:type',
             authMiddleware.validateJWT,
-            authMiddleware.validateRole(roles.Admin),
+            authMiddleware.validateRole(roles.AllRoles),
             authMiddleware.validateKitchenAccess,
             FileUploadMiddleware.containFiles,
             TypeMiddleware.validTypes(['sides']),

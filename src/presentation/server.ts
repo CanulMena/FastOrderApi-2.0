@@ -1,6 +1,8 @@
 //*It is a plugin but it is implemented within the presentation because it is necessary for the application.
 import express, { Router } from 'express';
 import fileUpload from 'express-fileupload'; //*TODO: Crearle su plugin.
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 export interface ServerAppOptions {
     port: number;
@@ -18,6 +20,9 @@ export class AppServer {
     }
 
     async start(){
+        // this.app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+        this.app.use(cors({ origin: '*' }));
+        // this.app.use(cookieParser());
         this.app.use(express.json()); //* raw json
         this.app.use(express.urlencoded({ extended: true })); //* form data
         this.app.use(fileUpload({
@@ -32,4 +37,7 @@ export class AppServer {
         });
 
     }
+
 }
+
+
