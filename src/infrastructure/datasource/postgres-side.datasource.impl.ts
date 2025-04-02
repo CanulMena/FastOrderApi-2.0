@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { SideDatasource } from "../../domain/datasource/index";
 import { CreateSideDto, PaginationDto } from "../../domain/dtos/index";
 import { Side } from "../../domain/entities/index";
@@ -10,15 +10,25 @@ export class PostgresSideDatasourceImpl implements SideDatasource {
     private readonly prisma = new PrismaClient().complemento;
 
     async createSide( createSideDto: CreateSideDto ) : Promise<Side> {
-        const createdSide = await this.prisma.create({
-            data: {
-                nombre: createSideDto.name,
-                descripcion: createSideDto.description || null,
-                rutaImagen: createSideDto.imageUrl || null,
-                cocinaId: createSideDto.kitchenId,
-            }
-        });
-        return Side.fromJson(createdSide);
+        try {
+            const createdSide = await this.prisma.create({
+                data: {
+                    nombre: createSideDto.name,
+                    descripcion: createSideDto.description || null,
+                    rutaImagen: createSideDto.imageUrl || null,
+                    cocinaId: createSideDto.kitchenId,
+                }
+            });
+            return Side.fromJson(createdSide);
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') { // Código de error para clave única violada
+                    // Manejo del error de clave única
+                    throw CustomError.badRequest(`The ${error.meta?.target} already exist`); 
+                    }
+                }
+            throw CustomError.internalServer('error not controlled'); // Relanza otros errores no controlados
+        }
     }
 
     async getSides( paginationDto: PaginationDto ) : Promise<Side[]> {
