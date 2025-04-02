@@ -36,7 +36,7 @@ export class AuthMiddleware {
 
       const userFound = await this.userRepository.getUserById(payload.id);
       if (!userFound) {
-        res.status(401).json({ error: 'Invalid token - user' });
+        res.status(401).json({ error: 'Invalid user in token' });
         return;
       }
 
