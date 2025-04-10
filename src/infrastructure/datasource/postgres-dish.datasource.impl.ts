@@ -15,9 +15,10 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         precioMedia: registerDishDto.pricePerHalfServing,
         precioEntera: registerDishDto.pricePerServing,
         racionesDisponibles: registerDishDto.availableServings,
-        rutaImagen: registerDishDto.imagePath || null,
+        rutaImagen: registerDishDto.imagePath ? registerDishDto.imagePath : null,
         cocinaId: registerDishDto.kitchenId,
-        complementos: {
+        complementos: registerDishDto.sidesId 
+        ? {
           create: registerDishDto.sidesId.map((sideId) => (
             
             {
@@ -29,7 +30,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
             }
           
         ))
-        }
+        } : undefined
       },
       include: {
         complementos: true
