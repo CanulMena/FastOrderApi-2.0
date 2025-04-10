@@ -20,11 +20,11 @@ export class RefreshToken implements RefreshTokenUseCase {
       // Validar el refresh token con la firma
       const decoded = await jwtAdapter.validateToken<{ id: number }>(refreshToken, envs.REFRESH_JWT_SEED);
       if (!decoded) { // si el token no es valido o ha expirado
-        const isExpired = new Date(storedToken.expiresAt) < new Date();// Verificar si el refresh token ha expirado
-        if (isExpired) {
-          await this.jwtRepository.deleteRefreshToken(refreshToken); // Eliminar el token expirado
-          throw CustomError.unAuthorized('Refresh token expired');
-        }
+        // const isExpired = new Date(storedToken.expiresAt) < new Date();// Verificar si el refresh token ha expirado
+        // if (isExpired) {
+        //   await this.jwtRepository.deleteRefreshToken(refreshToken); // Eliminar el token expirado
+        //   throw CustomError.unAuthorized('Refresh token expired');
+        // }
         throw CustomError.unAuthorized('Invalid refresh token');
       }
 
