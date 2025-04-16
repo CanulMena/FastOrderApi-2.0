@@ -22,8 +22,12 @@ export class AuthController {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 
+  public ping = async (req: Request, res: Response) => {
+    res.status(200).json({ message: 'active' });
+    return 
+  }
+
   public registerUser = async (req: Request, res: Response) => {
-    
     const [ error, registerUserDto ] = RegisterUserDto.create(req.body);
     if( error ) {
       res.status(400).json({ error: error });
