@@ -6,5 +6,6 @@ export * from "./side.entity";
 export * from "./order.entity";
 export * from "./order-detail.entity";
 export * from "./jwt.entity";
+export * from "./sched-dish.entity";
 
 
