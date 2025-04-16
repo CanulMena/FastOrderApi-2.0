@@ -59,6 +59,8 @@ export class AuthRoutes {
 
     router.post('/refresh-token', authController.refreshToken);//no es necesario implementar ningun tipo de middleware
 
+    router.get('/ping', authController.ping); //no es necesario implementar ningun tipo de middleware
+
     router.post(
       '/check-auth-status',
       authMiddleware.validateJWT,
