@@ -7,7 +7,7 @@ dist/
 # Ignora la carpeta de dependencias de postgres - Docker
 postgres/
 #Ignora la carpeta de dependencias de prisma
-prisma/
+# prisma/
 #Igonorar imagenes temporales
 /tmp
 #ignorar archivos del file-system datasource
