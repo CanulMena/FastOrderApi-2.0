@@ -24,6 +24,12 @@ export class CreateSchedDish implements CreateSchedDishUseCase {
       }
     });
 
+    if(!dish) {
+      throw CustomError.notFound(
+        `The dish with ID ${schedDishDto.dishId} does not exist.`
+      );
+    }
+
     //al ya haber validado que este platillo es de la misma cocina tambien valida que el usuario pertenece a esa cocina.
     if (dish!.cocinaId !== schedDishDto.kitchenId) {
       throw CustomError.unAuthorized(
