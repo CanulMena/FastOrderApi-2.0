@@ -6,6 +6,7 @@ import { SideRoutes } from "./side/side-routes";
 import { DishRoutes } from "./dish/dish-routes";
 import { OrderRoutes } from "./order/order-routes";
 import { FileUploadRoutes } from "./file-upload/file-upload-routes";
+import { SchedDishRoutes } from "./dish/sched-dish-routes";
 
 export class AppRoutes {
     static get routes(): Router {
@@ -25,6 +26,8 @@ export class AppRoutes {
         router.use('/api/order', OrderRoutes.routes); //Ruta de los pedidos
 
         router.use('/api/upload', FileUploadRoutes.routes); //Ruta de las imagenes
+
+        router.use('/api/sched-dish', SchedDishRoutes.routes); //Ruta de los platillos programados
 
         return router;
     }

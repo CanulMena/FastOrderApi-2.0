@@ -18,6 +18,7 @@ model Cocina {
   pedidos         Pedido[]
   platillos       Platillo[]
   usuarios        Usuario[]
+  platillosProgramados PlatilloProgramado[]
 }
 
 model Usuario {
@@ -43,6 +44,7 @@ model Platillo {
   detalles     DetallePedido[]
   cocina       Cocina                @relation(fields: [cocinaId], references: [id])
   complementos PlatilloComplemento[]
+  platillosProgramados PlatilloProgramado[]
 }
 
 model Complemento {
@@ -125,6 +127,19 @@ model RefreshToken {
   @@index([token])                         // Indexar por token para búsquedas rápidas
 }
 
+model PlatilloProgramado {
+  id                  Int       @id @default(autoincrement())
+  platilloId          Int
+  cocinaId            Int
+  diaSemana           DiaSemana
+  racionesProgramadas Float     @db.Real
+
+  platillo            Platillo  @relation(fields: [platilloId], references: [id])
+  cocina              Cocina    @relation(fields: [cocinaId], references: [id])
+
+  @@unique([platilloId, cocinaId, diaSemana]) //en un platillo no se puede programar la misma fecha en la misma cocina
+}
+
 enum EstadoPago {
   PENDIENTE
   PAGADO
@@ -152,4 +167,14 @@ enum TipoPago {
   EFECTIVO
   TARJETA
   FIADO
+}
+
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
 }
