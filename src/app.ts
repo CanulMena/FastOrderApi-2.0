@@ -2,15 +2,14 @@ import { AppRoutes } from "./presentation/routes";
 import { AppServer } from "./presentation/server";
 import { envs } from "./configuration/plugins/envs";
 import { cloudinaryAdapter } from "./configuration";
-import { CronService } from "./presentation/cron/cron-service";
-import { LoadingDailyRations } from "./domain/use-cases/index";
+import { CronJobs } from "./presentation/cron-jobs";
 
 (async => {
     main();
 })();
 
 function main(){
-
+    // Configurar Cloudinary
     cloudinaryAdapter
     .configure(
         envs.CLOUDINARY_CLOUD_NAME,
@@ -18,14 +17,10 @@ function main(){
         envs.CLOUDINARY_API_SECRET
     );
 
-    CronService.createCronJob(
-        '0 5 * * *' /* '* * * * *' */,
-        async () => {
-            // console.log('⏰ Ejecutando cron para cargar raciones del día...');
-            await new LoadingDailyRations().execute();
-        }
-    )
+    // Inicializar tareas programadas
+    CronJobs.executeRationsLoad();
 
+    // Configurar y iniciar el servidor.
     const server = new AppServer({
         port: envs.PORT,
         routes: AppRoutes.routes

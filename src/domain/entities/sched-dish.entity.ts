@@ -32,9 +32,10 @@ export class SchedDish {
     if (!racionesProgramadas) throw CustomError.badRequest('Missing racionesProgramadas');
     if (typeof racionesProgramadas !== 'number') throw CustomError.badRequest('racionesProgramadas must be a number');
     if (racionesProgramadas < 0) throw CustomError.badRequest('racionesProgramadas must be greater than 0');
-    if (platillo) Dish.fromJson(platillo); //validamos que el platillo sea del formato esperado.
+    // Convertir el objeto platillo a una instancia de Dish si está presente
+    const dish = platillo ? Dish.fromJson(platillo) : undefined;
 
-    return new SchedDish( id, platilloId, cocinaId, diaSemana, racionesProgramadas, platillo );
+    return new SchedDish( id, platilloId, cocinaId, diaSemana, racionesProgramadas, dish );
   }
 
 }
