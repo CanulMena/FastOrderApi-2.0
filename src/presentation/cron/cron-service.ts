@@ -15,6 +15,7 @@ export class CronService {
             cronTime: CronTime,
             onTick: ontick,
             start: true,
+            timeZone: 'America/Merida'
         });        
 
         return job; 

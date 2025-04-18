@@ -1,5 +1,6 @@
 import { DishRepository, SchedDishRepository } from '../../repositories';
 import { UpdateDishDto } from '../../dtos';
+import { luxonAdapter } from '../../../configuration/plugins/luxon.adapter';
 
 interface LoadingDailyRationsUseCase {
   execute(): Promise<void>;
@@ -13,12 +14,11 @@ export class LoadingDailyRations implements LoadingDailyRationsUseCase {
   ) {}
 
   async execute() {
-    const allDate = new Date(); //TODO: CONFIGURAR FECHAD MEXICO YUCATAN.. POR SI LA DEL SERVIDOR ES DIFERENTE.
-    allDate.setHours(0, 0, 0, 0); // para ignorar horas
-    const diasEnum = [
-      'DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'
-    ] as const;
-    const today = diasEnum[allDate.getDay()]; //getDay() devuelve el día de la semana (0-6) y lo convertimos a string.
+    const nowInZone = luxonAdapter.getCurrentDateTimeInYucatan('America/Merida');
+    const startOfDay = luxonAdapter.getStartOfDay(nowInZone);
+    const today = luxonAdapter.getDayName(startOfDay);
+
+    console.log(`📅 Hoy en Yucatán es: ${today} (${luxonAdapter.formatDateTime(nowInZone)})`);
 
     const platillosProgramados = await this.schedDishRespository.findScheduledDishesByDay(today);
 
