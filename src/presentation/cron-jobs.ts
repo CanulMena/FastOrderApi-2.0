@@ -7,10 +7,11 @@ export class CronJobs {
   static executeRationsLoad() {
     // Configurar el cron job para cargar raciones diarias
     CronService.createCronJob(
-      '* * * * *',
+      // '* * * * *', // Ejecutar cada minuto (para pruebas)
       // '0 5 * * *', // Ejecutar todos los días a las 5:00 AM
+      '49 0 * * *', // Ejecutar todos los días a las 12:40 AM//ejecutar a las 12:40 am. 
       async () => {
-        console.log('⏰ Ejecutando cron para cargar raciones del día...');
+        // console.log('⏰ Ejecutando cron para cargar raciones del día...');
         
         // Instanciar dependencias necesarias
         const schedDishDatasource = new PostgresSchedDishDataSourceImpl();
