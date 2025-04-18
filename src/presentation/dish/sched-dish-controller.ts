@@ -2,10 +2,14 @@ import { Request, Response } from "express";
 import { CreateSchedDishDto } from "../../domain/dtos";
 import { CreateSchedDish } from "../../domain/use-cases/dish/create-sched-dish";
 import { CustomError } from "../../domain/errors";
+import { DishRepository, SchedDishRepository } from "../../domain/repositories";
 
 export class SchedDishController {
 
-  constructor(){}
+  constructor(
+    private readonly dishRepository: DishRepository,
+    private readonly schedDishRepository: SchedDishRepository,
+  ){}
 
   private handleError(error: unknown, res: Response) {
     if (error instanceof CustomError) {
@@ -24,7 +28,10 @@ export class SchedDishController {
       return;
     }
 
-    new CreateSchedDish()
+    new CreateSchedDish(
+      this.schedDishRepository,
+      this.dishRepository
+    )
     .execute(schedDishDto!)
     .then( schedDish => res.status(200).json(schedDish))
     .catch( error => this.handleError(error, res));

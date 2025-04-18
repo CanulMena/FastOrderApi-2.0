@@ -6,3 +6,4 @@ export * from "./dish-side.datasource";
 export * from "./order.datasource";
 export * from "./file-upload.datasource";
 export * from "./jwt.datasource";
+export * from "./sched-dish.datasource";

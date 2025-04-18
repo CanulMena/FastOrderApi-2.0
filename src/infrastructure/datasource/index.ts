@@ -8,3 +8,4 @@ export * from "./postgres-order.datasource.impl";
 export * from "./file-system-file-upload.datasource.impl";
 export * from "./cloudinary-file-upload.datasource.impl";
 export * from "./postgres-jwt.datasource.impl";
+export * from "./postgres-sched-dish.datasource.impl";

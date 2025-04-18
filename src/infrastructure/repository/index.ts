@@ -7,3 +7,4 @@ export * from "./dish-side.repository.impl";
 export * from "./order.repository.impl";
 export * from "./file-upload.repository.impl";
 export * from "./jwt.repository.impl";
+export * from "./sched-dish.repository.impl";
