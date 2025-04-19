@@ -4,9 +4,9 @@ import { CustomError } from "../../errors";
 import { uuidAdapter } from "../../../configuration/plugins/uuid.adapter";
 
 interface FileUploadResult {
-  url: string;
-  publicId: string;
-  fileName?: string;
+  url: string; //solo para el cloudinary-file-upload.datasource.impl.ts 
+  publicId: string; //solo para el cloudinary-file-upload.datasource.impl.ts
+  fileName?: string; //*solo para el file-system-file-upload.datasource.impl.ts -> SOLO ESTO RETORNA. 
 }
 
 interface FileUploadSingleUseCase {
@@ -19,8 +19,7 @@ interface FileUploadSingleUseCase {
 
 export class FileUploadSingle implements FileUploadSingleUseCase {
   constructor(
-    private readonly fileUploadRepository: FileUploadRepository,
-    private readonly uuid: string = uuidAdapter.v4
+    private readonly fileUploadRepository: FileUploadRepository, //TODO: HACER QUE COINCIDA EL RETORNO DEL FILE-UPLOAD-DATA-SOURCE-IMPL CON EL DE CLOUDINARY.
   ) {}
 
   async execute(
@@ -35,8 +34,9 @@ export class FileUploadSingle implements FileUploadSingleUseCase {
     const fileExtension = file.mimetype.split('/').at(1) ?? ''; //agarramos la extesión del archivo: 'image/jpg' -> 'jpg'.
     if( !validExtensions.includes(fileExtension) ){ //verificamos si la extensión del archivo es válida.
       throw CustomError.badRequest(`invalid file extension, valid extensions: ${validExtensions.join(', ')}`);
-    }    
-    const fileName = `${this.uuid}.${fileExtension}`; //creamos el nombre del archivo.
+    }
+    const uuid = uuidAdapter.v4(); //generamos un uuid para el nombre del archivo.
+    const fileName = `${uuid}.${fileExtension}`; //creamos el nombre del archivo.
     const uploadedFile: object =  await this.fileUploadRepository.fileUploadSingle(
       folder, 
       fileName,

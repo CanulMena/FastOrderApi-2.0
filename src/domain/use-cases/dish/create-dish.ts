@@ -40,7 +40,7 @@ export class CreateDish implements CreateDishUseCase {
 
     //ejeutar el fileUploadSingle para subir la imagen del platillo
     const fileUploaded = await this.fileUploadSingle.execute( file, folder, validExtensions );
-    createDishDto.imagePath = fileUploaded.url || fileUploaded.fileName;
+    createDishDto.imagePath = fileUploaded.url || fileUploaded.fileName; //TODO: Parche mientras se adapta el retorno del FileSystemeFileUpload y el CloudinaryFileUpload.
     /*Obtener todos los sides por IDs para validar para que el side exista y obtener el kitchenId de cada side
     y comparar que el kitchenId de cada side pertenece a el mismo kitchenId de la cocina al que se le quiere agregar*/
     if (createDishDto.sidesId) {
@@ -64,11 +64,12 @@ export class CreateDish implements CreateDishUseCase {
     }
 
     try{
-      const dishCreated = await this.dishRepository.createDish(createDishDto);
+      const dishCreated = await this.dishRepository.createDish(createDishDto); //se podría almacenar el id de la imagen de clodinary en la base de datos.
       return {dish: dishCreated}
     } catch (error) {
       const deleteUploadedFile = await this.deleteUploadedFile.execute(fileUploaded.publicId);
       //?--> Estaría ultra chido hacer que si falla el eliminar la imagen subida se mande un correo o algo así al admin.
+      //TODO: MENAJEAR POSIBLES ERRORES SI FALLA EL DELETEUPLOADFILE TAMBIEN.
       throw CustomError.internalServer(`Error creating dish - deleteUploadedFile: ${deleteUploadedFile.result}`);
     }
 

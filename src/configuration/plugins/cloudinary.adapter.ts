@@ -21,13 +21,16 @@ export const cloudinaryAdapter: ICloudinaryAdapter = {
 
   uploadFileFromPath: async (filePath: string, folder: string, fileName: string): Promise<{ url: string; publicId: string }> => {
     try {
+        //Eliminar la extensión del fileName
+        const cleanFileName = fileName.replace(/\.[^/.]+$/, ''); // Elimina cualquier extesión.
+
         const result = await cloudinary.uploader.upload(
           filePath, 
           {
             use_filename: true,//Si es true, cloudinary usará el nombre del archivo original, si es false, cloudinary usará un nombre aleatorio.
             unique_filename: false, //Si es true, cloudinary agregará un sufijo al nombre del archivo para hacerlo único.
             overwrite: false, //Si es true, cloudinary sobreescribirá el archivo si ya existe.
-            public_id: fileName, //El nombre que tendrá el archivo en cloudinary.
+            public_id: cleanFileName, //El nombre que tendrá el archivo en cloudinary.
             folder,
           }
         );
@@ -41,11 +44,13 @@ export const cloudinaryAdapter: ICloudinaryAdapter = {
 
   uploadFileFromBuffer: async (fileBuffer: Buffer, folder: string, fileName: string): Promise<{ url: string; publicId: string }> => {
     return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
+      //Eliminar la extensión del fileName
+      const cleanFileName = fileName.replace(/\.[^/.]+$/, ''); // Elimina cualquier extesión.
+      cloudinary.uploader.upload_stream(
 
         {
           folder,
-          public_id: fileName, // Opcional: Si quieres mantener el nombre del archivo
+          public_id: cleanFileName, // Opcional: Si quieres mantener el nombre del archivo
           use_filename: true,
           unique_filename: false,
           overwrite: false,
