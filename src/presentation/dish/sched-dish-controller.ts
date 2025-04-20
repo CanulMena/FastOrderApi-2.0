@@ -3,6 +3,8 @@ import { CreateSchedDishDto } from "../../domain/dtos";
 import { CreateSchedDish } from "../../domain/use-cases/dish/create-sched-dish";
 import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository } from "../../domain/repositories";
+import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
+import { User } from "../../domain/entities";
 
 export class SchedDishController {
 
@@ -36,8 +38,17 @@ export class SchedDishController {
     .then( schedDish => res.status(200).json(schedDish))
     .catch( error => this.handleError(error, res));
   }
-  
-  //TODO: Crear un get para obtener los platillos programados de una cocina.
+
+  public getAvailableDishes = async (req: Request, res: Response) => {
+    
+    const user = req.body.user as User;
+
+    new GetAvailableDishes(this.schedDishRepository)
+    .execute(user)
+    .then( availableDishes => res.status(200).json(availableDishes))
+    .catch( error => this.handleError(error, res));
+
+  }
 
   //TODO: Actualizar los platillos programados
 

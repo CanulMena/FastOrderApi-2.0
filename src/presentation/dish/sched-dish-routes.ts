@@ -33,6 +33,13 @@ export class SchedDishRoutes {
       schedDishController.postSchedDish
     );
 
+    router.get(
+      '/available-dishes', 
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.AllRoles),
+      schedDishController.getAvailableDishes
+    );
+
     return router;
 
   }
