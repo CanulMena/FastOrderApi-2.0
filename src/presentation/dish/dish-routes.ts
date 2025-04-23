@@ -39,7 +39,7 @@ export class DishRoutes {
     router.post(
       '/register/:type', 
       authMiddleware.validateJWT,
-      authMiddleware.validateRole(roles.Admin),
+      authMiddleware.validateRole(roles.AllRoles),
       authMiddleware.validateKitchenAccess,
       TypeMiddleware.validTypes(['dishes']),
       FileUploadMiddleware.containFiles,
