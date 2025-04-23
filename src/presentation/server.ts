@@ -2,7 +2,6 @@
 import express, { Router } from 'express';
 import fileUpload from 'express-fileupload'; //*TODO: Crearle su plugin.
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 
 export interface ServerAppOptions {
     port: number;
