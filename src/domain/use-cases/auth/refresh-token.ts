@@ -48,6 +48,9 @@ export class RefreshToken implements RefreshTokenUseCase {
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error: any) {
+      if (error instanceof CustomError) {
+        throw error; // Si ya es un CustomError, vuelve a lanzarlo
+      }
       throw CustomError.internalServer(error.message || 'Failed to refresh token');
     }
   }
