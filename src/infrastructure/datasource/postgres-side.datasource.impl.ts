@@ -118,4 +118,14 @@ export class PostgresSideDatasourceImpl implements SideDatasource {
         });
         return side ? Side.fromJson(side) : null;
     }
+
+    async getSidesByIds( ids: number[] ): Promise<Side[]> {
+        if (!ids || ids.length === 0) return [];
+        const sides = await this.prisma.findMany({
+            where: {
+                id: { in: ids}
+            }
+        });
+        return sides.map( side => Side.fromJson(side) );
+    }
 }

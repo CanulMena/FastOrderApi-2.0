@@ -64,7 +64,7 @@ export class DishController {
       res.status(400).json({error: 'ID argument is not a number'});
     }
 
-    new GetDish(this.dishRepository)
+    new GetDish(this.dishRepository, this.sideRepository)
     .execute(dishId, user)
     .then( dish => res.status(200).json(dish))
     .catch( error => this.handleError(error, res));
