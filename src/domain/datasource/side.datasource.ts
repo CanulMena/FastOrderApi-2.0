@@ -12,5 +12,6 @@ export abstract class  SideDatasource {
     abstract deleteSide( sideId: number ) : Promise<Side>;
     abstract updateSide( side: UpdateSideDto ) : Promise<Side>;
     abstract findSideByNameAndKitchenId( name: string, kitchenId: number ) : Promise<Side | null>;
+    abstract getSidesByIds( sidesIds: number[] ) : Promise<Side[]>;
 
 }

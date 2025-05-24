@@ -46,7 +46,11 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         id: dishId
       },
       include: {
-        complementos: true
+        complementos: {
+          include: {
+            complemento: true
+          }
+        }
       }
     });
 

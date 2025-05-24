@@ -45,4 +45,8 @@ export class SideRepositoryImpl implements SideRepository {
     findSideByNameAndKitchenId(name: string, kitchenId: number): Promise<Side | null> {
         return this.datasource.findSideByNameAndKitchenId(name, kitchenId);
     }
+
+    getSidesByIds( sidesIds: number[]): Promise<Side[]> {
+        return this.datasource.getSidesByIds(sidesIds);
+    }
 }

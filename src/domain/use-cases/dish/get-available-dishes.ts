@@ -30,7 +30,7 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
         precioEntera: dish!.pricePerServing,
         racionesDisponibles: dish!.availableServings,
       }));
-      return result;
+      return {dia: today, platillos: result};
     }
 
     const scheduledDishes = await this.schedDishRepository.findAllSchedDishByKitchen(user.kitchenId!, today);
@@ -44,7 +44,7 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
       racionesDisponibles: dish!.availableServings,
     }));
 
-    return result
+    return {dia: today, platillos: result};
   }
 
 }

@@ -20,7 +20,6 @@ export class CreateDishDto {
     kitchenId = Number(kitchenId);
 
 
-    // Validar y convertir sidesId de string a array si es necesario
     if (typeof sidesId === "string") { //si se envia como string.
       try {
         sidesId = JSON.parse(sidesId); //Si o si tiene que ser un array, sino se lanza un error.
@@ -28,7 +27,7 @@ export class CreateDishDto {
           return ['Invalid sidesId format. Must be a valid JSON array'];
       }
     }
-
+    
     if (sidesId) {
       if (!Array.isArray(sidesId) ) return ['sidesId must be an array of positive numbers'];
       if (sidesId && sidesId.some((side: any) => typeof side !== 'number' || side <= 0)) return ['sidesId must be an array of positive numbers'];

@@ -29,6 +29,16 @@ export class PostgresKitchenDatasourceImpl implements KitchenDatasource {
     const kitchen = await this.prisma.findUnique({
       where: {
         id: kitchenId
+      }, 
+      include: {
+        _count: {
+          select: {
+            platillos: true, 
+            complementos: true, 
+            clientes: true, 
+            usuarios: true
+          }
+        }
       }
     });
 
