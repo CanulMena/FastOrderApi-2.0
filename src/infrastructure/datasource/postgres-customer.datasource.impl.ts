@@ -3,6 +3,7 @@ import { CustomerDatasource } from "../../domain/datasource/customer.datasource"
 import { RegisterCustomerDto } from "../../domain/dtos/customer";
 import { Customer } from "../../domain/entities";
 import { CustomError } from "../../domain/errors";
+import { PaginationDto } from "../../domain/dtos";
 
 export class PostgresCustomerDatasourceImpl implements CustomerDatasource {
   
@@ -35,6 +36,28 @@ export class PostgresCustomerDatasourceImpl implements CustomerDatasource {
 
     return Customer.fromJson(customer);
 
+  }
+
+  async getCustomersByKitchenIdCount(kitchenId: number): Promise<number> {
+    return this.prisma.count({
+      where: {
+        cocinaId: kitchenId
+      }
+    })
+  }
+
+  async getCustomersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Customer[]> {
+    const { page, limit } = pagination;
+    return this.prisma.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        cocinaId: kitchenId
+      }
+    })
+    .then(
+      (customers) => customers.map((customer) => Customer.fromJson(customer))
+    );
   }
 
 }

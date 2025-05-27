@@ -3,6 +3,9 @@ import { CustomerRepository, KitchenRepository } from '../../domain/repositories
 import { RegisterCustomerDto } from '../../domain/dtos/customer';
 import { CreateCustomer } from '../../domain/use-cases/customer/create-customer';
 import { CustomError } from '../../domain/errors';
+import { PaginationDto } from '../../domain/dtos';
+import { GetCustomersByIdKitchen } from '../../domain/use-cases';
+import { User } from '../../domain/entities';
 
 export class CustomerController{
 
@@ -32,6 +35,22 @@ export class CustomerController{
     )
     .execute(registerCustomerDto!)
     .then((customer) => res.status(201).json(customer))
+    .catch((err) => this.handleError(err, res));
+  }
+
+  public getCustomersByIdKitchen = (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const kitchenId = +req.params.kitchenId;
+    const {page = 1, limit = 10} = req.query;
+    const [error, paginationDto] = PaginationDto.create(+page, +limit);
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    new GetCustomersByIdKitchen(this.customerRepository)
+    .execute(user, kitchenId, paginationDto!)
+    .then((customers) => res.status(200).json(customers))
     .catch((err) => this.handleError(err, res));
   }
 }

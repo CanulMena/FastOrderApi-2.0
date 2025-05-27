@@ -37,7 +37,14 @@ export class CustomerRoutes {
     );
 
     //TODO: Implementar los siguientes endpoints
-    //get-customers-by-kitchenId //-todos      Obtener todos los clientes de una cocina
+    // get-customers-by-kitchenId //-todos      Obtener todos los clientes de una cocina
+    router.get(
+      '/kitchen/:kitchenId', 
+      authMiddleware.validateJWT, 
+      authMiddleware.validateRole(roles.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      routesController.getCustomersByIdKitchen
+    );  
 
     //put-customer-by-CustomerId. //admin      Actualizar un cliente por id -> validar el acceso a la cocina desde el caso de uso por que el request no tiene el id de la cocina
 
