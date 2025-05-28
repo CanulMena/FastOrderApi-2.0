@@ -1,4 +1,5 @@
 import { UserDatasource } from "../../domain/datasource";
+import { PaginationDto } from "../../domain/dtos";
 import { LoginUserDto } from "../../domain/dtos/auth";
 import { User } from "../../domain/entities";
 import { UserRepository } from "../../domain/repositories";
@@ -33,4 +34,11 @@ export class UserRepositoryImpl implements UserRepository {
     return this.userDatasource.updateUser(user);
   }
   
+  getUsersByKitchenIdCount(kitchenId: number): Promise<number> {
+    return this.userDatasource.getUsersByKitchenIdCount(kitchenId);
+  }
+  
+  getUsersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<User[]> {
+    return this.userDatasource.getUsersByKitchenId(kitchenId, pagination);
+  }
 }

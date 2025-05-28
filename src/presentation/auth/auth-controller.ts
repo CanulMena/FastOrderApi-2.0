@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { UserRepository, KitchenRepository, JwtRepository } from '../../domain/repositories';
 import { LoginUserDto, RefreshTokenDto, RegisterUserDto } from '../../domain/dtos/auth';
 import { CustomError } from '../../domain/errors';
-import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken } from '../../domain/use-cases/auth/index';
+import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken, GetUsersByIdKitchen } from '../../domain/use-cases/auth/index';
 import { User } from '../../domain/entities';
+import { PaginationDto } from '../../domain/dtos';
+
 
 export class AuthController {
   constructor(
@@ -85,4 +87,19 @@ export class AuthController {
     res.status(200).json({user: userWithoutPassword});
   }
   
+  public getUsersByIdKitchen = (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const kitchenId = +req.params.kitchenId;
+    const { page = 1, limit = 10 } = req.query;
+    const [ error, paginationDto ] = PaginationDto.create(+page, +limit);
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    new GetUsersByIdKitchen(this.userRepositoryImpl)
+    .execute(user, kitchenId, paginationDto!)
+    .then((users) => res.status(200).json(users))
+    .catch((error) => this.handleError(error, res));
+  }
 } 

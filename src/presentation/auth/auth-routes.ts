@@ -69,6 +69,15 @@ export class AuthRoutes {
     //existen parametros de ruta /:id
     //existen segmentos de ruta /ruta/segmento
 
+    // get to users by kitchen
+    router.get(
+      '/kitchen/:kitchenId/users',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      authMiddleware.validateKitchenAccess,
+      authController.getUsersByIdKitchen
+    )
+
     return router;
   }
 }
