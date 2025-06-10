@@ -3,7 +3,7 @@ import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from "../../domain/errors";
 import { PaginationDto, UpdateDishDto, CreateDishDto } from "../../domain/dtos";
-
+type DishWithScheduledDays = Dish & { scheduledDays: { dia: string }[] };
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
   private readonly prisma = new PrismaClient().platillo;
@@ -40,7 +40,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     return Dish.fromJson(dishCreated);
   }
 
-  async getDishById( dishId: number ): Promise<Dish> {
+  async getDishById( dishId: number ): Promise<DishWithScheduledDays> {
     const dish = await this.prisma.findUnique({  // findUnique is a Prisma method that returns a single record that matches the unique key value provided
       where: {
         id: dishId
@@ -50,6 +50,11 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
           include: {
             complemento: true
           }
+        }, 
+        platillosProgramados: {
+          select: {
+            diaSemana: true,
+          }
         }
       }
     });
@@ -58,7 +63,12 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
       throw CustomError.notFound(`Dish with id ${dishId} does not exist`);
     }
 
-    return Dish.fromJson(dish);
+    const scheduledDays = dish.platillosProgramados.map((p: any) => p.diaSemana) || [];
+
+    return {
+      ...Dish.fromJson(dish), 
+      scheduledDays
+    }
   }
 
     async getDishes( paginationDto: PaginationDto ) : Promise<Dish[]> {
