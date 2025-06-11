@@ -3,7 +3,7 @@ import { Dish } from "../../domain/entities";
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from "../../domain/errors";
 import { PaginationDto, UpdateDishDto, CreateDishDto } from "../../domain/dtos";
-type DishWithScheduledDays = Dish & { scheduledDays: { dia: string }[] };
+
 export class PostgresDishDatasourceImpl implements DishDatasource {
 
   private readonly prisma = new PrismaClient().platillo;
@@ -40,7 +40,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
     return Dish.fromJson(dishCreated);
   }
 
-  async getDishById( dishId: number ): Promise<DishWithScheduledDays> {
+  async getDishById( dishId: number ): Promise<Dish> {
     const dish = await this.prisma.findUnique({  // findUnique is a Prisma method that returns a single record that matches the unique key value provided
       where: {
         id: dishId
@@ -63,12 +63,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
       throw CustomError.notFound(`Dish with id ${dishId} does not exist`);
     }
 
-    const scheduledDays = dish.platillosProgramados.map((p: any) => p.diaSemana) || [];
-
-    return {
-      ...Dish.fromJson(dish), 
-      scheduledDays
-    }
+    return Dish.fromJson(dish);
   }
 
     async getDishes( paginationDto: PaginationDto ) : Promise<Dish[]> {
@@ -76,7 +71,14 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         return await this.prisma
         .findMany({
             skip: (page - 1) * limit,
-            take: limit
+            take: limit, 
+            include: {
+              platillosProgramados: {
+                select: {
+                  diaSemana: true,
+                }
+              }
+            }
         })
         .then( 
             dishes => dishes.map( dish => Dish.fromJson(dish) ) 
@@ -119,7 +121,12 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
             skip: (page - 1) * limit,
             take: limit,
             include: {
-                complementos: true
+                complementos: true,
+                platillosProgramados: {
+                  select: {
+                      diaSemana: true,
+                  }
+                }
             }
         })
         .then( 
