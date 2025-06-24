@@ -6,6 +6,7 @@ import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshT
 import { User } from '../../domain/entities';
 import { PaginationDto } from '../../domain/dtos';
 import { LoginUniversalUser } from '../../domain/use-cases/auth/login-universal-user';
+import { LogoutUser } from '../../domain/use-cases/auth/logout-user';
 
 
 export class AuthController {
@@ -99,11 +100,16 @@ export class AuthController {
     let refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
+      const [ error ] = RefreshTokenDto.create(req.body);
+      if( error ) {
+        res.status(400).json({ error: error });
+        return;
+      }
       refreshToken = req.body.refreshToken;
     }
-    const [ error ] = RefreshTokenDto.create(req.body);
-    if( error ) {
-      res.status(400).json({ error: error });
+
+    if (!refreshToken) {
+      res.status(400).json({ error: 'Missing refreshToken' });
       return;
     }
 
@@ -117,14 +123,14 @@ export class AuthController {
           secure: true,
           sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 2, // 2 hours
-        });
-        res.cookie('refreshToken', response.refreshToken, {
-          httpOnly: true,
-          secure: true,
+        })
+        res.cookie('refreshToken', response.refreshToken,  {
+          httpOnly: true, 
+          secure: true, 
           sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 24 * 7,
         });
-        res.status(200).json({ ok: true });
+        res.status(200).json({ message: 'Tokens refreshed successfully' });
       } else {
         // Para móvil, responde con los tokens en el body
         res.status(200).json(response);
@@ -153,5 +159,28 @@ export class AuthController {
     .execute(user, kitchenId, paginationDto!)
     .then((users) => res.status(200).json(users))
     .catch((error) => this.handleError(error, res));
+  }
+
+  public logoutUser = async (req: Request, res: Response) => {
+    const clientType = req.headers['x-client-type'];
+    const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+
+    if (!refreshToken) {
+      res.status(400).json({ error: 'Missing refreshToken' });
+      return;
+    }
+
+    new LogoutUser(this.jwtRepository)
+    .execute(refreshToken)
+    .then( response => {
+      if (clientType === 'web') {
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+        res.status(200).json({ message: 'Logged out successfully' });
+      } else {
+        res.status(200).json(response);
+      }
+    })
+    
   }
 } 
