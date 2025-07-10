@@ -29,14 +29,16 @@ export class GetUsersByIdKitchen implements GetCustomersByIdKitchenUseCase {
     }
 
     private buildResponse(user: User[], page: number, limit: number, count: number): object {
+        const sanitizedUsers = user.map(({ passwordHash, ...rest}) => rest);
         return {
             page,
             limit,
             total: count,
             next: (page * limit) < count ? `/api/dish/get-all?page=${ (page + 1) }&limit=${ limit }` : null,
             prev: ( page - 1 > 0 ) ? `http://localhost:3000/dish/get-all?page=${ (page - 1) }&limit=${ limit }` : null,
-            users: user,
+            users: sanitizedUsers,
             message: user.length === 0 ? 'No more dishes available for this query.' : null,
         };
     }
+
 }
