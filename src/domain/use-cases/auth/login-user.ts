@@ -33,7 +33,7 @@ export class LoginUser implements LoginUserUseCase {
     const expireIn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const jwtSaved = await this.jwtRepository.saveRefreshToken(userEntity.userId, refreshToken, expireIn);
     if( !jwtSaved ) throw CustomError.internalServer('Error saving refresh token');
-
+        
     return {
       user: userEntity,
       accessToken: accessToken,

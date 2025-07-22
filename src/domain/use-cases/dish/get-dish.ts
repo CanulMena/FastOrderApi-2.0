@@ -29,7 +29,8 @@ export class GetDish implements GetDishUseCase {
         }
         return {
             ...dish, 
-            sides
+            sides, 
+            // scheduledDays: dish.}
         }
     }
 

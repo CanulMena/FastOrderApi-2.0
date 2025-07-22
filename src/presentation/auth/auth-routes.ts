@@ -71,12 +71,18 @@ export class AuthRoutes {
 
     // get to users by kitchen
     router.get(
-      '/kitchen/:kitchenId/users',
+      '/users/kitchen/:kitchenId',
       authMiddleware.validateJWT,
       authMiddleware.validateRole(rolesConfig.AllRoles),
       authMiddleware.validateKitchenAccess,
       authController.getUsersByIdKitchen
-    )
+    );
+
+    router.post(
+      '/logout', 
+      authMiddleware.validateJWT,
+      authController.logoutUser
+    );
 
     return router;
   }

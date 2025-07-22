@@ -2,6 +2,7 @@
 import express, { Router } from 'express';
 import fileUpload from 'express-fileupload'; //*TODO: Crearle su plugin.
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 export interface ServerAppOptions {
     port: number;
@@ -20,8 +21,24 @@ export class AppServer {
 
     async start(){
         // this.app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
-        this.app.use(cors({ origin: '*' }));
-        // this.app.use(cookieParser());
+        const allowedOrigins = [
+            'http://localhost:4200', // Web Angular
+          // Agrega aquí los orígenes de producción cuando los tengas
+        ];
+
+        this.app.use(cors({
+          origin: (origin, callback) => {
+            // Permite requests sin origen (por ejemplo, desde Postman o curl)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+              return callback(null, true);
+            }
+            return callback(new Error('Not allowed by CORS'));
+          },
+          credentials: true
+        }));
+        // this.app.use(cors({ origin: '*', credentials: true }));
+        this.app.use(cookieParser());
         this.app.use(express.json()); //* raw json
         this.app.use(express.urlencoded({ extended: true })); //* form data
         this.app.use(fileUpload({

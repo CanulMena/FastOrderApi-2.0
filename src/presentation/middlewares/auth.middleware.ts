@@ -15,18 +15,22 @@ export class AuthMiddleware {
 
   public validateJWT = async (req: Request, res: Response, next: NextFunction): Promise<void> => { //Lo que hace este middleware es validar el token y si es valido, agrega el usuario al request
     try {
-      const authorization = req.header('Authorization');
-      if (!authorization) {
-        res.status(401).json({ error: 'No token provided' });
-        return;
-      }
+      let token = req.cookies?.accessToken;
 
-      if (!authorization.startsWith('Bearer ')) {
-        res.status(401).json({ error: 'Invalid Bearer token' });
-        return;
-      }
+      if (!token) {
+        const authorization = req.header('Authorization');
+        if (!authorization) {
+          res.status(401).json({ error: 'No token provided' });
+          return;
+        }
 
-      const token = authorization.split(' ').at(1) || ''; //tomamos el token del header      
+        if (!authorization.startsWith('Bearer ')) {
+          res.status(401).json({ error: 'Invalid Bearer token' });
+          return;
+        }
+
+        token = authorization.split(' ').at(1) || ''; //tomamos el token del header      
+      }
 
       const payload = await jwtAdapter.validateToken<{ id: number }>(token, envs.JWT_SEED); // sacamos el payload del token { id: number }
       if (!payload) {

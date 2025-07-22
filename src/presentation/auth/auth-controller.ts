@@ -5,6 +5,8 @@ import { CustomError } from '../../domain/errors';
 import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken, GetUsersByIdKitchen } from '../../domain/use-cases/auth/index';
 import { User } from '../../domain/entities';
 import { PaginationDto } from '../../domain/dtos';
+import { LoginUniversalUser } from '../../domain/use-cases/auth/login-universal-user';
+import { LogoutUser } from '../../domain/use-cases/auth/logout-user';
 
 
 export class AuthController {
@@ -51,12 +53,42 @@ export class AuthController {
       res.status(400).json({ error: error }); //400 Bad Request
       return
     }
-    new LoginUser( 
+
+    const clientType = req.headers['x-client-type'];
+    
+    new LoginUniversalUser( 
       this.userRepositoryImpl,
       this.jwtRepository
     )
-    .execute(loginUserDto!)
-    .then( response => res.status(200).json(response))
+    .execute(loginUserDto!, clientType as string)
+    .then( response => {
+
+      if (response.setCookies) {
+        res.cookie('accessToken', response.accessToken, {
+          httpOnly: true,
+          // secure: true,
+          // sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 2, // 2 hours
+          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          path: '/', // Asegúrate de que el path sea correcto para tu aplicación
+        })
+        res.cookie('refreshToken', response.refreshToken,  {
+          httpOnly: true, 
+          // secure: true, 
+          // sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          path: '/', // Asegúrate de que el path sea correcto para tu aplicación
+        });
+        res.status(200).json({ user: response.user })
+      } else {
+        res.status(200).json({
+          user: response.user, 
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken
+        })
+      }
+    })
     .catch( error => this.handleError(error, res));
   }
 
@@ -69,15 +101,49 @@ export class AuthController {
   }
 
   public refreshToken = async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
-    const [ error ] = RefreshTokenDto.create(req.body);
-    if( error ) {
-      res.status(400).json({ error: error });
+    let refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      const [ error ] = RefreshTokenDto.create(req.body);
+      if( error ) {
+        res.status(400).json({ error: error });
+        return;
+      }
+      refreshToken = req.body.refreshToken;
+    }
+
+    if (!refreshToken) {
+      res.status(400).json({ error: 'Missing refreshToken' });
       return;
     }
+
     new RefreshToken(this.jwtRepository)
     .execute(refreshToken)
-    .then( response => res.status(200).json(response))
+    .then(response => {
+      // Si es web, puedes volver a setear la cookie httpOnly
+      if (req.headers['x-client-type'] === 'web') {
+        res.cookie('accessToken', response.accessToken, {
+          httpOnly: true,
+          // secure: true,
+          // sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 2, // 2 hours
+          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          path: '/', // Asegúrate de que el path sea correcto para tu aplicación
+        })
+        res.cookie('refreshToken', response.refreshToken,  {
+          httpOnly: true, 
+          // secure: true, 
+          // sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          path: '/', // Asegúrate de que el path sea correcto para tu aplicación
+        });
+        res.status(200).json({ message: 'Tokens refreshed successfully' });
+      } else {
+        // Para móvil, responde con los tokens en el body
+        res.status(200).json(response);
+      }
+    })
     .catch( error => this.handleError(error, res));
   }
 
@@ -101,5 +167,28 @@ export class AuthController {
     .execute(user, kitchenId, paginationDto!)
     .then((users) => res.status(200).json(users))
     .catch((error) => this.handleError(error, res));
+  }
+
+  public logoutUser = async (req: Request, res: Response) => {
+    const clientType = req.headers['x-client-type'];
+    const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+
+    if (!refreshToken) {
+      res.status(400).json({ error: 'Missing refreshToken' });
+      return;
+    }
+
+    new LogoutUser(this.jwtRepository)
+    .execute(refreshToken)
+    .then( response => {
+      if (clientType === 'web') {
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+        res.status(200).json({ message: 'Logged out successfully' });
+      } else {
+        res.status(200).json(response);
+      }
+    })
+    
   }
 } 

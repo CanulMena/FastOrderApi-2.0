@@ -50,6 +50,11 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
           include: {
             complemento: true
           }
+        }, 
+        platillosProgramados: {
+          select: {
+            diaSemana: true,
+          }
         }
       }
     });
@@ -66,7 +71,14 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         return await this.prisma
         .findMany({
             skip: (page - 1) * limit,
-            take: limit
+            take: limit, 
+            include: {
+              platillosProgramados: {
+                select: {
+                  diaSemana: true,
+                }
+              }
+            }
         })
         .then( 
             dishes => dishes.map( dish => Dish.fromJson(dish) ) 
@@ -109,7 +121,12 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
             skip: (page - 1) * limit,
             take: limit,
             include: {
-                complementos: true
+                complementos: true,
+                platillosProgramados: {
+                  select: {
+                      diaSemana: true,
+                  }
+                }
             }
         })
         .then( 
