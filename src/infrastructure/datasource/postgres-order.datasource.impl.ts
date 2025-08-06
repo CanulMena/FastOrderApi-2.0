@@ -17,27 +17,27 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     orderDetailsEntity: OrderDetail[],
 ): Promise<Order> {
     return await this.prisma.$transaction(async (tx) => {
-        // Actualizar raciones disponibles
-        for (const detailDto of updateOrder.orderDetails ?? []) {
-            const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === detailDto.orderDetailId);
-            if (!existingDetail) continue; // No es necesario lanzar error aquí, ya lo validamos en el UseCase
+        // // Actualizar raciones disponibles
+        // for (const orderDetailDto of updateOrder.orderDetails ?? []) {
+        //     const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === orderDetailDto.orderDetailId);
+        //     if (!existingDetail) continue; // No es necesario lanzar error aquí, ya lo validamos en el UpdateOrder UseCase
 
-            const requestedServings = 
-            detailDto.fullPortion !== undefined || detailDto.halfPortion !== undefined
-                ? (detailDto.fullPortion ?? 0) + (detailDto.halfPortion ?? 0) * 0.5
-                : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-            const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-            const servingsDifference = requestedServings - previousServings;
-
-            await tx.platillo.update({
-                where: { id: existingDetail.dishId },
-                data: { 
-                  racionesDisponibles: { 
-                    decrement: servingsDifference,
-                  }
-                }
-            });
-        }
+        //     const requestedServings = 
+        //     orderDetailDto.fullPortion !== undefined || orderDetailDto.halfPortion !== undefined
+        //         ? (orderDetailDto.fullPortion ?? 0) + (orderDetailDto.halfPortion ?? 0) * 0.5
+        //         : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+        //     const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+        //     const servingsDifference = requestedServings - previousServings;
+        //     //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Disminuir limiteRaciones de PlatilloProgramado
+        //     await tx.platillo.update({
+        //         where: { id: existingDetail.dishId },
+        //         data: { 
+        //           racionesDisponibles: { 
+        //             decrement: servingsDifference,
+        //           }
+        //         }
+        //     });
+        // }
 
         // Actualizar detalles del pedido
         const detailsToUpdate = updateOrder.orderDetails?.filter(detail => detail.orderDetailId);
@@ -73,16 +73,16 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   async createOder(createOrderDto: CreateOrderDto): Promise<Order> {
     return this.prisma.$transaction(async (tx) => {
       // Actualizar raciones disponibles
-      for( const detail of createOrderDto.orderDetails ) { //comenzamos a iterar los orderDetails.
-        await tx.platillo.update({
-          where: { id: detail.dishId },
-          data: { 
-            racionesDisponibles: {//decrementamos las raciones disponibles
-              decrement: detail.fullPortion + detail.halfPortion * 0.5,
-            }
-          }
-        });
-      }
+      // for( const detail of createOrderDto.orderDetails ) { //comenzamos a iterar los orderDetails.
+      //   await tx.platillo.update({
+      //     where: { id: detail.dishId },
+      //     data: { 
+      //       racionesDisponibles: {//decrementamos las raciones disponibles
+      //         decrement: detail.fullPortion + detail.halfPortion * 0.5,
+      //       }
+      //     }
+      //   });
+      // }
       //Por ultimo creamos el pedido.
       const order = await tx.pedido.create({
         data: {
@@ -150,18 +150,22 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
   async deleteOrder(orderId: number, orderDetails: OrderDetail[]): Promise<Order> {
     return await this.prisma.$transaction(async (tx) => {
-      for (const detail of orderDetails) {
-        const existingDetail = orderDetails.find(orderDetail => orderDetail.orderDetailId === detail.orderDetailId);
-        if (!existingDetail) continue;
+      // //? Primero es necesario restaurar las raciones de los platillos asociados a los detalles del pedido. Devolver las raciones disponibles a los platillos.
+      // for (const detail of orderDetails) {
+      //   // Verificar si el detalle existe en la base de datos
+      //   const existingDetail = orderDetails.find(orderDetail => orderDetail.orderDetailId === detail.orderDetailId);
+      //   // Si no existe, continuar con el siguiente detalle
+      //   if (!existingDetail) continue;
 
-        const savingsToRestore = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+      //   const savingsToRestore = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
 
-        await tx.platillo.update({
-          where: { id: existingDetail.dishId},
-          data: { racionesDisponibles: { increment: savingsToRestore } }
-        })
-      }
+      //   await tx.platillo.update({
+      //     where: { id: existingDetail.dishId},
+      //     data: { racionesDisponibles: { increment: savingsToRestore } }
+      //   })
+      // }
 
+      //? Eliminamos los detalles del pedido asociados al pedido que se va
       await tx.detallePedido.deleteMany({
         where: { pedidoId: orderId }
       });
@@ -180,12 +184,12 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
     return this.prisma.$transaction(async (tx) => {
       // Actualizar raciones disponibles
-      await tx.platillo.update({
-        where: { id: createOrderDetail.dishId}, 
-        data: {
-          racionesDisponibles: { decrement: createOrderDetail.fullPortion + createOrderDetail.halfPortion * 0.5 }
-        }
-      });
+      // await tx.platillo.update({
+      //   where: { id: createOrderDetail.dishId}, 
+      //   data: {
+      //     racionesDisponibles: { decrement: createOrderDetail.fullPortion + createOrderDetail.halfPortion * 0.5 }
+      //   }
+      // });
 
       // Crear el detalle del pedido
       const orderDetail = await tx.detallePedido.create({
@@ -201,6 +205,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   }
 
   async deleteOrderDetail(orderDetailId: number): Promise<OrderDetail> {
+    this.getOrderDetailById(orderDetailId); // Verificar si el detalle existe
     const deleteOrderDetail = await this.prismaOrderDetail.delete({
       where: {
         id: orderDetailId
@@ -249,4 +254,10 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       }
     });
   }
+
+  // //como le llamarías a un endpoint que devuelva los detalles de ordenes realizados de ese platillo de este día?
+  // getOrderDetailsByDishIdAndDate( dishId: number ): Promise<OrderDetail[]> {
+    
+  // }
+
 }

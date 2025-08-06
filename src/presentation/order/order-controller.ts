@@ -83,7 +83,7 @@ export class OrderController {
     .catch( error => this.handleError(error, res));
   }
 
-  public createOrderDetail = (req: Request, res: Response) => {
+  public createOrderDetail = (req: Request, res: Response) => { //FIXME: PEDIR EL ORDER ID COMO PARAMETRO
     const [error, orderDetailDto] = CreateOrderDetailsDto.create(req.body);
 
     if (error) {
@@ -91,7 +91,7 @@ export class OrderController {
         return;
     }
 
-    new CreateOrderDetail(this.orderRepository, this.dishRepository)
+    new CreateOrderDetail(this.orderRepository/* , this.dishRepository */)
     .execute(orderDetailDto!)
     .then( orderDetail => res.status(201).json(orderDetail))
     .catch( error => this.handleError(error, res));

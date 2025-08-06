@@ -1,4 +1,5 @@
 import { OrderDetail, User } from "../../entities";
+import { CustomError } from "../../errors";
 import { DishRepository, OrderRepository } from "../../repositories";
 
 interface DeleteOrderUseCase {
@@ -15,12 +16,11 @@ export class DeleteOrder implements DeleteOrderUseCase {
         const orderFound = await this.orderRepository.getOrderById(orderId);
 
         if (orderFound.kitchenId !== user.kitchenId && user.rol !== 'SUPER_ADMIN') {
-            throw new Error('User does not have access to this kitchen');
+            throw CustomError.unAuthorized('User does not have access to this kitchen');
         }
 
+        // Obtener los detalles del pedido para restaurar las raciones
         const orderDetailsByOrderId: OrderDetail[] = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
-
-
 
         const orderDeleted = await this.orderRepository.deleteOrder(orderId, orderDetailsByOrderId);
         return {

@@ -14,30 +14,27 @@ export class DeleteOrderDetail implements DeleteOrderDetailUseCase {
     ) {}
 
     async execute(orderDetailId: number): Promise<object> {
-        const existingOrderDetail = await this.orderRepository.getOrderDetailById(orderDetailId);
 
-        
-
-        // TODO: Check if the dish is available to restore the servings
-        if (existingOrderDetail) {
-            const servingToRestore = (existingOrderDetail.portion ?? 0) + (existingOrderDetail.halfPortion ?? 0) * 0.5;
-            const dish = await this.dishRepository.getDishById(existingOrderDetail.dishId);
+        // TODO: restaurar limiteRaciones de Platillo programado si controlRaciones es true
+        // if (existingOrderDetail) {
+        //     const servingToRestore = (existingOrderDetail.portion ?? 0) + (existingOrderDetail.halfPortion ?? 0) * 0.5;
+        //     const dish = await this.dishRepository.getDishById(existingOrderDetail.dishId);
             
-            const newAvailableServings = dish.availableServings + servingToRestore;
-            const [error, updateDishDto] = UpdateDishDto.create({
-                availableServings: newAvailableServings, 
-                dishId: dish.dishId
-            })
+        //     const newAvailableServings = dish.availableServings + servingToRestore;
+        //     const [error, updateDishDto] = UpdateDishDto.create({
+        //         availableServings: newAvailableServings, 
+        //         dishId: dish.dishId
+        //     })
 
-            if (error) {
-                throw new Error(error);
-            }
+        //     if (error) {
+        //         throw new Error(error);
+        //     }
 
-            const updateDish = await this.dishRepository.updateDish(updateDishDto!);
-            if (!updateDish) {
-                throw CustomError.badRequest(`Dish with id ${dish.dishId} could not be updated`);
-            }
-        }
+        //     const updateDish = await this.dishRepository.updateDish(updateDishDto!);
+        //     if (!updateDish) {
+        //         throw CustomError.badRequest(`Dish with id ${dish.dishId} could not be updated`);
+        //     }
+        // }
 
         const orderDeleted = await this.orderRepository.deleteOrderDetail(orderDetailId);
         return {

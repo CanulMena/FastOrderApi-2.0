@@ -6,7 +6,7 @@ export class Dish {
     public name: string,
     public pricePerServing: number,
     public pricePerHalfServing: number,
-    public availableServings: number,
+    // public availableServings: number,
     public kitchenId: number,
     public sidesId?: number[],
     public imagePath?: string,
@@ -14,7 +14,7 @@ export class Dish {
   ) {} 
   
   static fromJson = ( object: {[key: string] : any} ): Dish => {
-    const { id, nombre, precioEntera, precioMedia, racionesDisponibles, rutaImagen, complementos, cocinaId, platillosProgramados} = object;
+    const { id, nombre, precioEntera, precioMedia, /* racionesDisponibles, */ rutaImagen, complementos, cocinaId, platillosProgramados} = object;
     if ( !id ) throw CustomError.badRequest('id is required');
     if ( !nombre ) throw CustomError.badRequest('nombre is required');
     if ( !precioEntera ) throw CustomError.badRequest('precioEntera is required');
@@ -27,6 +27,6 @@ export class Dish {
     const scheduledDays = platillosProgramados?.map((p: { diaSemana: string}) => p.diaSemana) || [];
     if (rutaImagen !== null && typeof rutaImagen !== 'string') throw CustomError.badRequest('Image Path must be a string or null');
 
-    return new Dish(id, nombre, precioEntera, precioMedia, racionesDisponibles,  cocinaId, sidesId, rutaImagen, scheduledDays);
+    return new Dish(id, nombre, precioEntera, precioMedia, /* racionesDisponibles, */  cocinaId, sidesId, rutaImagen, scheduledDays);
   }
 }

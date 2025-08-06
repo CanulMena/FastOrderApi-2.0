@@ -28,7 +28,7 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
         rutaImagen: dish?.imagePath,
         precioMedia: dish!.pricePerHalfServing,
         precioEntera: dish!.pricePerServing,
-        racionesDisponibles: dish!.availableServings,
+        /* racionesDisponibles: dish!.availableServings, */
       }));
       return {dia: today, platillos: result};
     }
@@ -41,7 +41,7 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
       rutaImagen: dish?.imagePath,
       precioMedia: dish!.pricePerHalfServing,
       precioEntera: dish!.pricePerServing,
-      racionesDisponibles: dish!.availableServings,
+      // racionesDisponibles: dish!.availableServings,
     }));
 
     return {dia: today, platillos: result};

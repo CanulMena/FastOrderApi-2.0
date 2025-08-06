@@ -16,7 +16,8 @@ export class PostgresSchedDishDataSourceImpl implements SchedDishDatasource {
         platilloId: schedDish.dishId,
         cocinaId: schedDish.kitchenId,
         diaSemana: schedDish.weekDay,
-        racionesProgramadas: schedDish.scheduledRations,
+        limiteRaciones: schedDish.SchedDishPortionLimit,
+        controlRaciones: schedDish.controlRations,
       }
     });
 

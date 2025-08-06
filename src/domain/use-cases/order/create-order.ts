@@ -43,11 +43,12 @@ export class RegisterOrder implements RegisterOrderUseCase {
         }
         // validar que ese platillo tenga suficientes raciones disponibles
         const orderPortion = detail.fullPortion + detail.halfPortion * 0.5;
-        if (dish.availableServings < orderPortion) {
-          throw CustomError.unAuthorized(
-            `Dish ${dish.name} with id ${dish.dishId} from the kitchen ${dish.kitchenId} does not have enough available servings - enable: ${dish.availableServings}`
-          );
-        }
+        //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Validar que orderPortion no sea mayor al limiteRaciones de PlatilloProgramado
+        // if (dish.availableServings < orderPortion) {
+        //   throw CustomError.unAuthorized(
+        //     `Dish ${dish.name} with id ${dish.dishId} from the kitchen ${dish.kitchenId} does not have enough available servings - enable: ${dish.availableServings}`
+        //   );
+        // }
       })
     }
 

@@ -5,11 +5,12 @@ export class CreateSchedDishDto {
       public dishId: number,
       public kitchenId: number,
       public weekDay: WeekDays,
-      public scheduledRations: number,
+      public SchedDishPortionLimit?: number,
+      public controlRations: boolean = false,
   ){}
 
   static create(object: { [key: string]: any }): [string?, CreateSchedDishDto?] {
-    const { dishId, kitchenId, weekDay, scheduledRations } = object;
+    const { dishId, kitchenId, weekDay, schedDishPortionLimit, controlRations } = object;
 
     if( !dishId ) return ['dishId is required'];
     if( isNaN(dishId) ) return ['dishId must be a number'];
@@ -17,10 +18,11 @@ export class CreateSchedDishDto {
     if( isNaN(kitchenId) ) return ['kitchenId must be a number'];
     if( !weekDay ) return ['weekDay is required'];
     if( !SchedDish.isValidWeekDay(weekDay) ) return [`Invalid week day: ${weekDay} - valid values: ${SchedDish.validWeekDays}`];
-    if( !scheduledRations ) return ['scheduledRations is required'];
-    if( isNaN(scheduledRations) ) return ['scheduledRations must be a number'];
-    if( scheduledRations < 0 ) return ['scheduledRations must be greater than 0'];
+    if( schedDishPortionLimit ) { // solo aceptaremos valores thurty
+      if( isNaN(schedDishPortionLimit) ) return ['SchedDishPortionLimit must be a number'];
+    }
+    if( controlRations !== undefined && typeof controlRations !== 'boolean' ) return ['controlRations must be a boolean'];
 
-    return [undefined, new CreateSchedDishDto( dishId, kitchenId, weekDay, scheduledRations )];
+    return [undefined, new CreateSchedDishDto( dishId, kitchenId, weekDay, schedDishPortionLimit, controlRations )];
   }
 }

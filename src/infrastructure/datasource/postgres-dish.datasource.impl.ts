@@ -14,7 +14,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         nombre: registerDishDto.name,
         precioMedia: registerDishDto.pricePerHalfServing,
         precioEntera: registerDishDto.pricePerServing,
-        racionesDisponibles: registerDishDto.availableServings,
+        /* racionesDisponibles: registerDishDto.availableServings, */
         rutaImagen: registerDishDto.imagePath ? registerDishDto.imagePath : null,
         cocinaId: registerDishDto.kitchenId,
         complementos: registerDishDto.sidesId 
@@ -155,7 +155,7 @@ export class PostgresDishDatasourceImpl implements DishDatasource {
         nombre: updateDishDto.name,
         precioMedia: updateDishDto.pricePerHalfServing,
         precioEntera: updateDishDto.pricePerServing,
-        racionesDisponibles: updateDishDto.availableServings,
+        /* racionesDisponibles: updateDishDto.availableServings, */
         rutaImagen: updateDishDto.imagePath,
       },
       include: {

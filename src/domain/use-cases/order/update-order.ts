@@ -48,33 +48,34 @@ export class UpdateOrder implements UpdateOrderUseCase {
             orderDetailsByOrderId = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
     
             // 2. Obtenemos todos los dishId de los detalles de pedido que tenemos.
-            const dishIds: number[] = orderDetailsByOrderId.map(detail => detail.dishId);
+            const dishesId: number[] = orderDetailsByOrderId.map(detail => detail.dishId);
     
             // 3. Obtenemos todos los platillos de los detalles de pedido que tenemos.
-            const dishes = await this.dishRepository.getDishesById(dishIds);
+            const dishes = await this.dishRepository.getDishesById(dishesId);
     
             // 4. Validar raciones disponibles antes de hacer cualquier actualización
-            updateOrderDto.orderDetails.forEach(detail => {
-            const existingDetail = orderDetailsByOrderId.find(d => d.orderDetailId === detail.orderDetailId);
+            updateOrderDto.orderDetails.forEach(detailDto => {
+            // verificar que el detalle del pedido exista
+            const existingDetail:  OrderDetail | undefined = orderDetailsByOrderId.find(d => d.orderDetailId === detailDto.orderDetailId);
             if (!existingDetail) {
-                throw CustomError.badRequest(`Order detail ${detail.orderDetailId} not found`);
+                throw CustomError.badRequest(`Order detail ${detailDto.orderDetailId} not found`);
             }
+            //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Validar que orderPortion no sea mayor al limiteRaciones de PlatilloProgramado
+            // const requestedServings =
+            //     detailDto.fullPortion !== undefined || detailDto.halfPortion !== undefined
+            //     ? (detailDto.fullPortion ?? 0) + (detailDto.halfPortion ?? 0) * 0.5
+            //     : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
     
-            const requestedServings =
-                detail.fullPortion !== undefined || detail.halfPortion !== undefined
-                ? (detail.fullPortion ?? 0) + (detail.halfPortion ?? 0) * 0.5
-                : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+            // const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
+            // const dish = dishes.find(d => d.dishId === existingDetail.dishId);
+            // if (!dish) {
+            //     throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
+            // }
     
-            const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-            const dish = dishes.find(d => d.dishId === existingDetail.dishId);
-            if (!dish) {
-                throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
-            }
-    
-            const servingsDifference = requestedServings - previousServings;
-            if (servingsDifference > 0 && servingsDifference > dish.availableServings) {
-                throw CustomError.badRequest(`Not enough servings available for dish ${dish.name}`);
-            }
+            // const servingsDifference = requestedServings - previousServings;
+            // if (servingsDifference > 0 && servingsDifference > dish.availableServings) {
+            //     throw CustomError.badRequest(`Not enough servings available for dish ${dish.name}`);
+            // }
             });
         }
 

@@ -39,7 +39,6 @@ model Platillo {
   precioMedia  Float                 @db.Real
   precioEntera Float                 @db.Real
   rutaImagen   String?
-  racionesDisponibles Float            @default(0.0)
   cocinaId     Int
   detalles     DetallePedido[]
   cocina       Cocina                @relation(fields: [cocinaId], references: [id])
@@ -132,8 +131,8 @@ model PlatilloProgramado {
   platilloId          Int
   cocinaId            Int
   diaSemana           DiaSemana
-  racionesProgramadas Float     @db.Real
-
+  limiteRaciones      Int?     // Opcional: si es null => sin control
+  controlRaciones     Boolean  @default(false) // <-- ¡clave para activarlo!
   platillo            Platillo  @relation(fields: [platilloId], references: [id])
   cocina              Cocina    @relation(fields: [cocinaId], references: [id])
 
