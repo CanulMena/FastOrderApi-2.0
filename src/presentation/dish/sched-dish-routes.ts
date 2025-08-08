@@ -44,6 +44,19 @@ export class SchedDishRoutes {
       schedDishController.getAvailableDishes
     );
 
+    router.get(
+      '/available-dishes-for-week',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      schedDishController.getAvailableDishesForWeek
+    );
+
+    router.get(
+      '/get-by-dish-id/:dishId',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      schedDishController.getSchedDishesByDishId
+    );
     return router;
 
   }

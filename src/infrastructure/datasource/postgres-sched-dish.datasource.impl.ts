@@ -70,4 +70,29 @@ export class PostgresSchedDishDataSourceImpl implements SchedDishDatasource {
     return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish));
   }
 
+  async findAllSchedDishByKitchenForWeek(kitchenId: number): Promise<SchedDish[]> {
+    const scheduledDishes = await this.prismaSchedDish.findMany({
+      where: {
+        cocinaId: kitchenId,
+      },
+      include: {
+        platillo: true,
+      }
+    });
+
+    return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish));
+  }
+
+  async findAllSchedDishByDishId(dishId: number): Promise<SchedDish[]> {
+    const scheduledDishes = await this.prismaSchedDish.findMany({
+      where: {
+        platilloId: dishId, 
+      }, 
+      include: {
+        platillo: true,
+      }
+    });
+
+    return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish)); 
+  }
 }

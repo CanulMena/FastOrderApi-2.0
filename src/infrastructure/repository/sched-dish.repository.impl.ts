@@ -23,4 +23,11 @@ export class SchedDishRepositoryImpl implements SchedDishRepository {
     return this.datasource.findAllSchedDishByKitchen(kitchenId, weekDay);
   }
 
+  findAllSchedDishByKitchenForWeek(kitchenId: number): Promise<SchedDish[]> {
+    return this.datasource.findAllSchedDishByKitchenForWeek(kitchenId);
+  }
+
+  findAllSchedDishByDishId(dishId: number): Promise<SchedDish[]> {
+    return this.datasource.findAllSchedDishByDishId(dishId);
+  }
 }

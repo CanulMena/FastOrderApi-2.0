@@ -6,4 +6,6 @@ export abstract class SchedDishRepository {
   abstract findSchedDish( schedDish: CreateSchedDishDto ): Promise<null>;
   abstract findScheduledDishesByDay( weekDay: WeekDays ): Promise<SchedDish[]>;
   abstract findAllSchedDishByKitchen( kitchenId: number, weekDay: WeekDays ): Promise<SchedDish[]>;
+  abstract findAllSchedDishByKitchenForWeek( kitchenId: number ): Promise<SchedDish[]>;
+  abstract findAllSchedDishByDishId( dishId: number ): Promise<SchedDish[]>;
 }

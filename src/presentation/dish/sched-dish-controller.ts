@@ -5,6 +5,8 @@ import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository, OrderRepository } from "../../domain/repositories";
 import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
 import { User } from "../../domain/entities";
+import { GetAvailableDishesForWeek } from "../../domain/use-cases/dish/get-availables-dishes-for-week";
+import { GetAvailableDishesByDishId } from "../../domain/use-cases/dish/get-availables-dishes-by-dish-id";
 
 export class SchedDishController {
 
@@ -52,6 +54,30 @@ export class SchedDishController {
     .then( availableDishes => res.status(200).json(availableDishes))
     .catch( error => this.handleError(error, res));
 
+  }
+
+  public getAvailableDishesForWeek = async (req: Request, res: Response) => {
+    const user = req.body.user as User;
+
+    new GetAvailableDishesForWeek(this.schedDishRepository)
+    .execute(user)
+    .then(availableDishes => res.status(200).json(availableDishes))
+    .catch( error => this.handleError(error, res) );
+  }
+
+  public getSchedDishesByDishId = async (req: Request, res: Response) => {
+    const dishId = +req.params.dishId;
+    const user = req.body.user as User;
+
+    if ( isNaN(dishId) ) {
+      res.status(400).json({error: 'ID argument is not a number'});
+      return;
+    }
+
+    new GetAvailableDishesByDishId(this.schedDishRepository)
+    .execute(dishId, user)
+    .then( schedDishes => res.status(200).json(schedDishes))
+    .catch( error => this.handleError(error, res) );
   }
 
   //TODO: Actualizar los platillos programados
