@@ -5,6 +5,7 @@ import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { CreateOrderDetailsDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
 import { Dish, OrderDetail } from "../../domain/entities";
+import { response } from "express";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -255,9 +256,47 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     });
   }
 
-  // //como le llamarías a un endpoint que devuelva los detalles de ordenes realizados de ese platillo de este día?
-  // getOrderDetailsByDishIdAndDate( dishId: number ): Promise<OrderDetail[]> {
-    
-  // }
+  
+  async getOrderedServingsByDishAndDateRange(
+    dishId: number,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{
+    dishId: number,
+    dishTotalServings: number
+  }> {
+
+    const orderDetails = await this.prismaOrderDetail.findMany({
+      where: {
+        platilloId: dishId,
+        pedido: {
+          fecha: {
+            gte: startDate,
+            lte: endDate
+          }
+        }
+      },
+    });
+
+    //quiero mandar el full portion y half portion de cada order detail, para que se pueda calcular el total de raciones vendidas.
+    const orderedServingsByDishAndDateRange = orderDetails.map( orderDetail => ({
+      orderDetailId: orderDetail.id,
+      dishId: orderDetail.platilloId,
+      pedidoId: orderDetail.pedidoId,
+      fullPortion: orderDetail.cantidadEntera,
+      halfPortion: orderDetail.cantidadMedia,
+      orderDetailTotalServing: orderDetail.cantidadEntera + (orderDetail.cantidadMedia * 0.5),
+    }));
+
+    // Calcular el total de todas las raciones vendidas del platillo
+    const totalServingsFromDish = orderedServingsByDishAndDateRange.reduce((acc, curr) => acc + curr.orderDetailTotalServing, 0);
+
+    const result = {
+      dishId: dishId,
+      dishTotalServings: totalServingsFromDish,
+    }
+
+    return result;
+  }
 
 }

@@ -10,6 +10,10 @@ export const luxonAdapter = {
     return dt.startOf('day');
   },
 
+  getEndOfDay: (dt: DateTime): DateTime => {
+    return dt.endOf('day');
+  },
+
   getDayName: (dt: DateTime): 'DOMINGO' | 'LUNES' | 'MARTES' | 'MIERCOLES' | 'JUEVES' | 'VIERNES' | 'SABADO' => {
     const diasEnum = [
       'DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'

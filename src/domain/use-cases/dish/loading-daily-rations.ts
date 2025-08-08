@@ -29,7 +29,6 @@ export class LoadingDailyRations implements LoadingDailyRationsUseCase {
         undefined,
         undefined, 
         undefined,
-        p.scheduledRations,
         undefined,
         undefined,
       );
