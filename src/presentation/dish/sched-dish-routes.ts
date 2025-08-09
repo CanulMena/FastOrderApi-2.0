@@ -57,6 +57,14 @@ export class SchedDishRoutes {
       authMiddleware.validateRole(roles.Admin),
       schedDishController.getSchedDishesByDishId
     );
+
+    router.put(
+      '/update/:id',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(roles.Admin),
+      schedDishController.updateSchedDish
+    );
+
     return router;
 
   }

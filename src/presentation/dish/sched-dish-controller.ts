@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { CreateSchedDishDto } from "../../domain/dtos";
+import { CreateSchedDishDto, UpdateSchedDishDto } from "../../domain/dtos";
 import { CreateSchedDish,  } from "../../domain/use-cases/dish/create-sched-dish";
 import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository, OrderRepository } from "../../domain/repositories";
 import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
 import { User } from "../../domain/entities";
-import { GetAvailableDishesByDishId, GetAvailableDishesForWeek } from "../../domain/use-cases";
+import { GetAvailableDishesByDishId, GetAvailableDishesForWeek, UpdateSchedDish } from "../../domain/use-cases";
 
 export class SchedDishController {
 
@@ -76,6 +76,22 @@ export class SchedDishController {
     new GetAvailableDishesByDishId(this.schedDishRepository)
     .execute(dishId, user)
     .then( schedDishes => res.status(200).json(schedDishes))
+    .catch( error => this.handleError(error, res) );
+  }
+
+  public updateSchedDish = async (req: Request, res: Response) => {
+    const id = +req.params.id;
+    const user = req.body.user as User;
+    const [error, updateSchedDish] = UpdateSchedDishDto.create({...req.body, id});
+
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    new UpdateSchedDish(this.schedDishRepository)
+    .execute(user, updateSchedDish!)
+    .then(updatedSchedDish => res.status(200).json(updatedSchedDish))
     .catch( error => this.handleError(error, res) );
   }
 

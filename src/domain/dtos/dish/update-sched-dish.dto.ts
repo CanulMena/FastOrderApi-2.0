@@ -12,7 +12,7 @@ export class UpdateSchedDishDto {
         const { id, weekDay } = object;
 
         if (!id || isNaN(Number(id))) return ['ID argument must be a valid number'];
-        if (SchedDish.isValidWeekDay(weekDay)) return [`Invalid week day: ${weekDay} - valid values: ${SchedDish.validWeekDays}`]; 
+        if (!SchedDish.isValidWeekDay(weekDay)) return [`Invalid week day: ${weekDay} - valid values: ${SchedDish.validWeekDays}`]; 
 
         return [ undefined, new UpdateSchedDishDto(id, weekDay) ];
     }
