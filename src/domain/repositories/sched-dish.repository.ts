@@ -9,4 +9,5 @@ export abstract class SchedDishRepository {
   abstract findAllSchedDishByKitchenForWeek( kitchenId: number ): Promise<SchedDish[]>;
   abstract findAllSchedDishByDishId( dishId: number ): Promise<SchedDish[]>;
   abstract updateSchedDish( schedDish: UpdateSchedDishDto ): Promise<SchedDish>;
+  abstract deleteSchedDish( id: number ): Promise<void>;
 }
