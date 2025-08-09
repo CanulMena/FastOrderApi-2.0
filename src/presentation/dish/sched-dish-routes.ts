@@ -63,8 +63,15 @@ export class SchedDishRoutes {
       authMiddleware.validateJWT,
       authMiddleware.validateRole(roles.Admin),
       schedDishController.updateSchedDish
-    );
+    );  
 
+    router.delete(
+      '/delete/:schedDishId', 
+      authMiddleware.validateJWT, 
+      authMiddleware.validateRole(roles.Admin),
+      schedDishController.deleteSchedDish,
+    );
+    
     return router;
 
   }

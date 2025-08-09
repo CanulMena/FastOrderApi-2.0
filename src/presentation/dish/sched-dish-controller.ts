@@ -5,7 +5,7 @@ import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository, OrderRepository } from "../../domain/repositories";
 import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
 import { User } from "../../domain/entities";
-import { GetAvailableDishesByDishId, GetAvailableDishesForWeek, UpdateSchedDish } from "../../domain/use-cases";
+import { DeleteSchedDish, GetAvailableDishesByDishId, GetAvailableDishesForWeek, UpdateSchedDish } from "../../domain/use-cases";
 
 export class SchedDishController {
 
@@ -93,6 +93,20 @@ export class SchedDishController {
     .execute(user, updateSchedDish!)
     .then(updatedSchedDish => res.status(200).json(updatedSchedDish))
     .catch( error => this.handleError(error, res) );
+  }
+
+  public deleteSchedDish = async (req: Request, res: Response) => {
+    const schedDishId = +req.params.id;
+
+    if (isNaN(schedDishId)) {
+      res.status(400).json({ error: 'ID argument is not a number' });
+      return;
+    }
+
+    new DeleteSchedDish(this.schedDishRepository)
+    .execute(schedDishId)
+    .then(() => res.status(200).json())
+    .catch(error => this.handleError(error, res));
   }
 
   //TODO: Actualizar los platillos programados
