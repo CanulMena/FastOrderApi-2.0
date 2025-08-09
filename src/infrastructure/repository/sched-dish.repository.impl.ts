@@ -34,4 +34,8 @@ export class SchedDishRepositoryImpl implements SchedDishRepository {
   updateSchedDish( updateSchedDishDto: UpdateSchedDishDto ): Promise<SchedDish> {
     return this.datasource.updateSchedDish( updateSchedDishDto );
   }
+
+  deleteSchedDish( schedDishId: number ): Promise<SchedDish> {
+    return this.datasource.deleteSchedDish( schedDishId );
+  }
 }

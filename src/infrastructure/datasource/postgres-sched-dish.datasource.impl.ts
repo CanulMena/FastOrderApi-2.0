@@ -127,4 +127,16 @@ export class PostgresSchedDishDataSourceImpl implements SchedDishDatasource {
 
     return SchedDish.fromJson(updatedSchedDish);
   }
+
+  async deleteSchedDish( schedDishId: number ): Promise<SchedDish> {
+    await this.getSchedDishById( schedDishId );
+
+    const deletedSchedDish = await this.prismaSchedDish.delete({
+      where: {
+        id: schedDishId
+      },
+    });
+
+    return SchedDish.fromJson(deletedSchedDish);
+  }
 }
