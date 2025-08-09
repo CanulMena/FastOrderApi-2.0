@@ -10,6 +10,7 @@ export class DeleteSchedDish implements DeleteSchedDishUseCase {
     async execute(schedDishId: number): Promise<object> {
         const schedDishDeleted = await this.schedDishRepository.deleteSchedDish(schedDishId);
         return {
+            message: "Scheduled dish deleted successfully.",
             schedDish: schedDishDeleted
         }
     }
