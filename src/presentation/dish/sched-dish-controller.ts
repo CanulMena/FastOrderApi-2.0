@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { CreateSchedDishDto } from "../../domain/dtos";
-import { CreateSchedDish } from "../../domain/use-cases/dish/create-sched-dish";
+import { CreateSchedDish,  } from "../../domain/use-cases/dish/create-sched-dish";
 import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository, OrderRepository } from "../../domain/repositories";
 import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
 import { User } from "../../domain/entities";
-import { GetAvailableDishesForWeek } from "../../domain/use-cases/dish/get-availables-dishes-for-week";
-import { GetAvailableDishesByDishId } from "../../domain/use-cases/dish/get-availables-dishes-by-dish-id";
+import { GetAvailableDishesByDishId, GetAvailableDishesForWeek } from "../../domain/use-cases";
 
 export class SchedDishController {
 
