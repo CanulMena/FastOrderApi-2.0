@@ -1,4 +1,4 @@
-import { CreateSchedDishDto } from '../../domain/dtos';
+import { CreateSchedDishDto, UpdateSchedDishDto } from '../../domain/dtos';
 import { SchedDish, WeekDays } from '../../domain/entities';
 import { SchedDishDatasource } from '../../domain/datasource';
 import { SchedDishRepository } from '../../domain/repositories';
@@ -29,5 +29,9 @@ export class SchedDishRepositoryImpl implements SchedDishRepository {
 
   findAllSchedDishByDishId(dishId: number): Promise<SchedDish[]> {
     return this.datasource.findAllSchedDishByDishId(dishId);
+  }
+
+  updateSchedDish( updateSchedDishDto: UpdateSchedDishDto ): Promise<SchedDish> {
+    return this.datasource.updateSchedDish( updateSchedDishDto );
   }
 }

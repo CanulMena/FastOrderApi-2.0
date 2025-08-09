@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { SchedDishDatasource } from "../../domain/datasource/sched-dish.datasource";
-import { CreateSchedDishDto } from "../../domain/dtos";
+import { CreateSchedDishDto, UpdateSchedDishDto } from "../../domain/dtos";
 import { SchedDish, WeekDays } from "../../domain/entities";
 import { CustomError } from "../../domain/errors";
 
@@ -94,5 +94,37 @@ export class PostgresSchedDishDataSourceImpl implements SchedDishDatasource {
     });
 
     return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish)); 
+  }
+
+    async getSchedDishById(schedDishId: number): Promise<SchedDish> {
+    const scheduledDish = await this.prismaSchedDish.findUnique({
+      where: {
+        id: schedDishId,
+      },
+      include: {
+        platillo: true,
+      }
+    });
+
+    if (!scheduledDish) throw CustomError.notFound(`Scheduled dish with ID ${schedDishId} not found.`);
+
+    return SchedDish.fromJson(scheduledDish);
+  }
+  
+  async updateSchedDish( updateSchedDish: UpdateSchedDishDto ): Promise<SchedDish> {
+    await this.getSchedDishById(updateSchedDish.id);
+    const updatedSchedDish = await this.prismaSchedDish.update({
+      where: {
+        id: updateSchedDish.id
+      },
+      data: {
+        diaSemana: updateSchedDish.weekDay,
+      }, 
+      include: {
+        platillo: true,
+      }
+    });
+
+    return SchedDish.fromJson(updatedSchedDish);
   }
 }
