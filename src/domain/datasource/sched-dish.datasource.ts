@@ -9,5 +9,5 @@ export abstract class SchedDishDatasource {
   abstract findAllSchedDishByKitchenForWeek( kitchenId: number ): Promise<SchedDish[]>;
   abstract findAllSchedDishByDishId( dishId: number ): Promise<SchedDish[]>;
   abstract updateSchedDish( schedDish: UpdateSchedDishDto ): Promise<SchedDish>;
-  abstract deletSchedDish( id: number ): Promise<void>;
+  abstract deleteSchedDish( schedDishId: number ): Promise<void>;
 }
