@@ -1,4 +1,4 @@
-import { CreateSchedDishDto } from "../dtos";
+import { CreateSchedDishDto, UpdateSchedDishDto,  } from "../dtos";
 import { SchedDish, WeekDays } from "../entities";
 
 export abstract class SchedDishRepository {
@@ -8,4 +8,5 @@ export abstract class SchedDishRepository {
   abstract findAllSchedDishByKitchen( kitchenId: number, weekDay: WeekDays ): Promise<SchedDish[]>;
   abstract findAllSchedDishByKitchenForWeek( kitchenId: number ): Promise<SchedDish[]>;
   abstract findAllSchedDishByDishId( dishId: number ): Promise<SchedDish[]>;
+  abstract updateSchedDish( schedDish: UpdateSchedDishDto ): Promise<SchedDish>;
 }
