@@ -96,7 +96,7 @@ export class SchedDishController {
   }
 
   public deleteSchedDish = async (req: Request, res: Response) => {
-    const schedDishId = +req.params.id;
+    const schedDishId = +req.params.schedDishId;
 
     if (isNaN(schedDishId)) {
       res.status(400).json({ error: 'ID argument is not a number' });
@@ -105,7 +105,7 @@ export class SchedDishController {
 
     new DeleteSchedDish(this.schedDishRepository)
     .execute(schedDishId)
-    .then(() => res.status(200).json())
+    .then(() => res.status(200).json('Scheduled dish deleted successfully.'))
     .catch(error => this.handleError(error, res));
   }
 
