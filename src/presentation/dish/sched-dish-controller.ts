@@ -108,8 +108,4 @@ export class SchedDishController {
     .then(() => res.status(200).json('Scheduled dish deleted successfully.'))
     .catch(error => this.handleError(error, res));
   }
-
-  //TODO: Actualizar los platillos programados
-
-  //TODO: Eliminar platillos programados
 }
