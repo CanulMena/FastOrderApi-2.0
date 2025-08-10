@@ -74,8 +74,8 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
       );
 
       return {
-        dia: today, 
-        platillos: usersResult
+        day: today, 
+        dishes: usersResult
       };
   }
 
