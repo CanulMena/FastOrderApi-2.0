@@ -16,4 +16,9 @@ export abstract class OrderDatasource {
   // orderDetail
   abstract createOrderDetail(orderDetail: CreateOrderDetailsDto): Promise<OrderDetail>;
   abstract deleteOrderDetail(orderDetailId: number): Promise<OrderDetail>;
+  abstract getOrderedServingsByDishAndDateRange(dishId: number, startDate: Date, endDate: Date): 
+  Promise<{
+    dishId: number,
+    dishTotalServings: number
+  }>;
 }

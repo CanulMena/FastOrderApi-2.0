@@ -1,30 +1,35 @@
 import { DateTime } from 'luxon';
+import { CustomError } from '../../domain/errors';
+import { WeekDays } from '../../domain/entities';
 
 export const luxonAdapter = {
+  getCurrentDateTimeInZone: (zone: string = 'America/Merida'): DateTime => 
+    DateTime.now().setZone(zone),
 
-  getCurrentDateTimeInYucatan: (zone: string = 'America/Merida'): DateTime => {
-    return DateTime.now().setZone(zone);
-  },
+  getStartOfDayUtc: (zone: string): DateTime => 
+    DateTime.now().setZone(zone).startOf('day').toUTC(),
 
-  getStartOfDay: (dt: DateTime): DateTime => {
-    return dt.startOf('day');
-  },
+  getEndOfDayUtc: (zone: string): DateTime => 
+    DateTime.now().setZone(zone).endOf('day').toUTC(),
 
-  getDayName: (dt: DateTime): 'DOMINGO' | 'LUNES' | 'MARTES' | 'MIERCOLES' | 'JUEVES' | 'VIERNES' | 'SABADO' => {
-    const diasEnum = [
+  getDayName: (dt: DateTime): WeekDays => {
+    const diasEnum: WeekDays[] = [
       'DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'
-    ] as const;
-
-    // Luxon: weekday 1 = Monday, 7 = Sunday, así que ajustamos con módulo
+    ];
     return diasEnum[dt.weekday % 7];
   },
 
-  toJSDate: (dt: DateTime): Date => {
-    return dt.toJSDate();
-  },
+  toJSDate: (dt: DateTime): Date => dt.toJSDate(),
 
-  formatDateTime: (dt: DateTime, format = 'ff'): string => {
-    return dt.toFormat(format); // ejemplo de formato: 'yyyy-MM-dd HH:mm:ss'
+  /** Nuevo método limpio y único propósito */
+  getDayRangeUtcByZone: (zone: string): { startUTC: Date; endUTC: Date; dayName: WeekDays } => {
+    const startDT = luxonAdapter.getStartOfDayUtc(zone);
+    const endDT = luxonAdapter.getEndOfDayUtc(zone);
+
+    return {
+      startUTC: luxonAdapter.toJSDate(startDT),
+      endUTC: luxonAdapter.toJSDate(endDT),
+      dayName: luxonAdapter.getDayName(startDT)
+    };
   }
-
-}
+};

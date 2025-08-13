@@ -56,4 +56,12 @@ export class OrderRepositoryImpl implements OrderRepository{
   getOrdersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Order[]> {
     return this.datasource.getOrdersByKitchenId(kitchenId, pagination);
   }
+
+  getOrderedServingsByDishAndDateRange(dishId: number, startDate: Date, endDate: Date): 
+  Promise<{
+    dishId: number,
+    dishTotalServings: number
+  }> {
+    return this.datasource.getOrderedServingsByDishAndDateRange(dishId, startDate, endDate);
+  }
 }

@@ -1,3 +1,4 @@
+import { regularExps } from "../../../configuration/regular-exp";
 import { Order, OrderDeliveryType, OrderPaymentType, OrderStatus } from "../../entities";
 import { CreateOrderDetailsDto } from "./create-order-details.dto";
 
@@ -18,8 +19,11 @@ export class CreateOrderDto {
 
     // Validar fecha
     if (!date) return ['date is required'];
+
+    if (!regularExps.iso8601.test(date)) return ['date must be in ISO 8601 format - example: 2023-10-01T12:00:00Z'];
+
     const newDate = new Date(date);
-    if (isNaN(newDate.getTime())) return ['date is not a valid date - format: yyyy-mm-dd hh:mm:ss'];
+    if (isNaN(newDate.getTime())) return ['date is not a valid date - example: 2023-10-01T12:00:00Z'];
 
     // Validar estado del pedido
     if (!status) return ['status is required'];

@@ -5,6 +5,7 @@ import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { CreateOrderDetailsDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
 import { Dish, OrderDetail } from "../../domain/entities";
+import { response } from "express";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -255,9 +256,58 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     });
   }
 
-  // //como le llamarías a un endpoint que devuelva los detalles de ordenes realizados de ese platillo de este día?
-  // getOrderDetailsByDishIdAndDate( dishId: number ): Promise<OrderDetail[]> {
+  async getOrderedServingsByDishAndDateRange(
+    dishId: number,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ dishId: number; dishTotalServings: number }> {
     
-  // }
+    const orderDetails: OrderDetail[] = await this.findOrderDetailsByDishAndDate(dishId, startDate, endDate);
 
+    const servingsList = this.mapOrderDetailsToServings(orderDetails);
+
+    const totalServings = this.calculateTotalServings(servingsList);
+
+    return {
+      dishId,
+      dishTotalServings: totalServings,
+    };
+  }
+
+    private async findOrderDetailsByDishAndDate(dishId: number, startDate: Date, endDate: Date): Promise<OrderDetail[]> {
+    const orderDetailsData: {
+      id: number;
+      cantidadEntera: number;
+      cantidadMedia: number;
+      pedidoId: number;
+      platilloId: number;
+    }[] = await this.prismaOrderDetail.findMany({
+      where: {
+        platilloId: dishId,
+        pedido: {
+          fecha: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      },
+    });
+
+    const orderDetailsEntity = orderDetailsData.map(orderDetail => OrderDetail.fromJson(orderDetail));
+
+    return orderDetailsEntity;
+  }
+
+  private mapOrderDetailsToServings(orderDetails: OrderDetail[]) {
+    return orderDetails.map(orderDetail => ({
+      orderDetailId: orderDetail.orderDetailId,
+      dishId: orderDetail.dishId,
+      pedidoId: orderDetail.orderId,
+      totalServings: orderDetail.portion + ((orderDetail.halfPortion ?? 0) * 0.5),
+    }));
+  }
+
+  private calculateTotalServings(servingsList: { totalServings: number }[]) {
+    return servingsList.reduce((acc, curr) => acc + curr.totalServings, 0);
+  }
 }
