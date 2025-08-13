@@ -79,7 +79,7 @@ model Cliente {
 
 model Pedido {
   id              Int              @id @default(autoincrement())
-  fecha           DateTime         @db.Timestamp(6)
+  fecha           DateTime         @db.Timestamptz(6)
   estado          EstadoPedido     @default(PENDIENTE)
   tipoEntrega     TipoEntrega      @default(PRESENCIAL)
   tipoPago        TipoPago         @default(EFECTIVO)

@@ -256,47 +256,58 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     });
   }
 
-  
   async getOrderedServingsByDishAndDateRange(
     dishId: number,
     startDate: Date,
     endDate: Date
-  ): Promise<{
-    dishId: number,
-    dishTotalServings: number
-  }> {
+  ): Promise<{ dishId: number; dishTotalServings: number }> {
+    
+    const orderDetails: OrderDetail[] = await this.findOrderDetailsByDishAndDate(dishId, startDate, endDate);
 
-    const orderDetails = await this.prismaOrderDetail.findMany({
+    const servingsList = this.mapOrderDetailsToServings(orderDetails);
+
+    const totalServings = this.calculateTotalServings(servingsList);
+
+    return {
+      dishId,
+      dishTotalServings: totalServings,
+    };
+  }
+
+    private async findOrderDetailsByDishAndDate(dishId: number, startDate: Date, endDate: Date): Promise<OrderDetail[]> {
+    const orderDetailsData: {
+      id: number;
+      cantidadEntera: number;
+      cantidadMedia: number;
+      pedidoId: number;
+      platilloId: number;
+    }[] = await this.prismaOrderDetail.findMany({
       where: {
         platilloId: dishId,
         pedido: {
           fecha: {
             gte: startDate,
-            lte: endDate
-          }
-        }
+            lte: endDate,
+          },
+        },
       },
     });
 
-    //quiero mandar el full portion y half portion de cada order detail, para que se pueda calcular el total de raciones vendidas.
-    const orderedServingsByDishAndDateRange = orderDetails.map( orderDetail => ({
-      orderDetailId: orderDetail.id,
-      dishId: orderDetail.platilloId,
-      pedidoId: orderDetail.pedidoId,
-      fullPortion: orderDetail.cantidadEntera,
-      halfPortion: orderDetail.cantidadMedia,
-      orderDetailTotalServing: orderDetail.cantidadEntera + (orderDetail.cantidadMedia * 0.5),
-    }));
+    const orderDetailsEntity = orderDetailsData.map(orderDetail => OrderDetail.fromJson(orderDetail));
 
-    // Calcular el total de todas las raciones vendidas del platillo
-    const totalServingsFromDish = orderedServingsByDishAndDateRange.reduce((acc, curr) => acc + curr.orderDetailTotalServing, 0);
-
-    const result = {
-      dishId: dishId,
-      dishTotalServings: totalServingsFromDish,
-    }
-
-    return result;
+    return orderDetailsEntity;
   }
 
+  private mapOrderDetailsToServings(orderDetails: OrderDetail[]) {
+    return orderDetails.map(orderDetail => ({
+      orderDetailId: orderDetail.orderDetailId,
+      dishId: orderDetail.dishId,
+      pedidoId: orderDetail.orderId,
+      totalServings: orderDetail.portion + ((orderDetail.halfPortion ?? 0) * 0.5),
+    }));
+  }
+
+  private calculateTotalServings(servingsList: { totalServings: number }[]) {
+    return servingsList.reduce((acc, curr) => acc + curr.totalServings, 0);
+  }
 }
