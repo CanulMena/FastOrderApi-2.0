@@ -18,7 +18,7 @@ function main(){
     );
 
     // Inicializar tareas programadas
-    CronJobs.executeRationsLoad();
+    // CronJobs.executeRationsLoad();
 
     // Configurar y iniciar el servidor.
     const server = new AppServer({

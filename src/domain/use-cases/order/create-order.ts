@@ -42,7 +42,7 @@ export class RegisterOrder implements RegisterOrderUseCase {
           );
         }
         // validar que ese platillo tenga suficientes raciones disponibles
-        const orderPortion = detail.fullPortion + detail.halfPortion * 0.5;
+        // const orderPortion = detail.fullPortion + detail.halfPortion * 0.5;
         //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Validar que orderPortion no sea mayor al limiteRaciones de PlatilloProgramado
         // if (dish.availableServings < orderPortion) {
         //   throw CustomError.unAuthorized(
