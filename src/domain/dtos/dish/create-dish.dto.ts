@@ -4,19 +4,19 @@ export class CreateDishDto {
     public name: string,
     public pricePerHalfServing: number,
     public pricePerServing: number,
-    public availableServings: number,
+    // public availableServings: number,
     public kitchenId: number,
     public sidesId?: number[],
     public imagePath?: string,
   ){}
 
   static create( props: {[key: string]: any} ): [ string?, CreateDishDto? ] {
-    let { name, pricePerHalfServing, pricePerServing, availableServings, kitchenId, sidesId, imagePath } = props;
+    let { name, pricePerHalfServing, pricePerServing, kitchenId, sidesId, imagePath } = props;
 
     // Convertir valores numéricos que llegan como string
     pricePerHalfServing = Number(pricePerHalfServing);
     pricePerServing = Number(pricePerServing);
-    availableServings = availableServings !== undefined ? Number(availableServings) : undefined;
+    // availableServings = availableServings !== undefined ? Number(availableServings) : undefined;
     kitchenId = Number(kitchenId);
 
 
@@ -36,12 +36,12 @@ export class CreateDishDto {
     if (!name) return ['Missing name'];
     if (!pricePerHalfServing) return ['Missing pricePerHalfServing'];
     if (!pricePerServing) return ['Missing pricePerServing'];
-    if (!availableServings) return ['Missing availableServings'];
+    // if (!availableServings) return ['Missing availableServings'];
     if (!kitchenId) return ['Missing kitchenId'];
     if ( typeof kitchenId !== 'number' || kitchenId <= 0 ) return ['kitchenId must be a positive number'];
     if (imagePath && typeof imagePath !== 'string') return ['imagePath must be a string or null'];
     
-    return [undefined, new CreateDishDto( name, pricePerHalfServing, pricePerServing, availableServings,kitchenId, sidesId, imagePath )];
+    return [undefined, new CreateDishDto( name, pricePerHalfServing, pricePerServing,kitchenId, sidesId, imagePath )];
   }
 
 }
