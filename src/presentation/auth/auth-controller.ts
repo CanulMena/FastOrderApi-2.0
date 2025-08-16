@@ -55,12 +55,21 @@ export class AuthController {
     }
 
     const clientType = req.headers['x-client-type'];
+
+    // Nuevos datos
+    const deviceName = req.headers['x-device-name'] as string || 'Unknown Device';
+    const deviceOS = req.headers['x-device-os'] as string || 'Unknown OS';
+    const ipAddress = req.ip; // Express obtiene la IP del cliente
     
     new LoginUniversalUser( 
       this.userRepositoryImpl,
       this.jwtRepository
     )
-    .execute(loginUserDto!, clientType as string)
+    .execute(
+      loginUserDto!, 
+      clientType as string,
+      { deviceName, deviceOS, ipAddress }
+    )
     .then( response => {
 
       if (response.setCookies) {
