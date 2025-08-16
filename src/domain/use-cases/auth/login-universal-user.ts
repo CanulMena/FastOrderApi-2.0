@@ -9,7 +9,11 @@ export class LoginUniversalUser {
         private readonly jwtRepository: JwtRepository
     ) {}
 
-    async execute(loginUserDto: LoginUserDto, clientType: string) {
+    async execute(
+        loginUserDto: LoginUserDto, 
+        clientType: string,
+        deviceInfo?: { deviceName?: string; deviceOS?: string; ipAddress?: string }
+    ) {
         if (clientType !== 'web' && clientType !== 'mobile') {
         throw CustomError.badRequest('Invalid client type. Must be "web" or "mobile".');
         }
@@ -17,7 +21,10 @@ export class LoginUniversalUser {
         const { user, accessToken, refreshToken } = await new LoginUser(
             this.userRepository,
             this.jwtRepository
-        ).execute(loginUserDto);
+        ).execute(
+            loginUserDto,
+            deviceInfo
+        );
 
         // Decide el formato de respuesta según el tipo de cliente
         if (clientType === 'web') {

@@ -1,6 +1,7 @@
 import { JwtRepository } from '../../domain/repositories/jwt.repository';
 import { JwtDataSource } from '../../domain/datasource/jwt.datasource';
 import { Jwt } from '../../domain/entities';
+import { SaveRefreshTokenDto } from '../../domain/dtos';
 
 export class JwtRepositoryImpl implements JwtRepository {
 
@@ -8,8 +9,8 @@ export class JwtRepositoryImpl implements JwtRepository {
     private readonly jwtDataSource: JwtDataSource
   ){}
 
-  saveRefreshToken(userId: number, refreshtoken: string, expiresIn: Date): Promise<Jwt> {
-    return this.jwtDataSource.saveRefreshToken(userId, refreshtoken, expiresIn);
+  saveRefreshToken(data: SaveRefreshTokenDto): Promise<Jwt> {
+    return this.jwtDataSource.saveRefreshToken(data);
   }
   
   findRefreshToken(token: string): Promise<Jwt> {

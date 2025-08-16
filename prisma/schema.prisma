@@ -114,16 +114,19 @@ model DetallePedido {
 }
 
 model RefreshToken {
-  id          Int   @id @default(autoincrement()) // Identificador único del registro
-  userId      Int                          // Relaciona el token con un usuario
-  token       String   @unique             // El refresh token
-  createdAt   DateTime @default(now())     // Fecha de creación
-  expiresAt   DateTime                     // Fecha de expiración
+  id          Int       @id @default(autoincrement())       // Identificador único del registro
+  userId      Int                                           // Relaciona el token con un usuario
+  token       String    @unique                             // El refresh token en texto plano (puedes migrar a hash más adelante)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)  // Fecha de creación (UTC)
+  lastUsedAt  DateTime? @default(now()) @db.Timestamptz(6)  // Última vez que se usó para renovar tokens
+  deviceName  String?                                       // Ej. "Chrome en Windows 10"
+  deviceOS    String?                                       // Ej. "Windows 10", "Android 13"
+  ipAddress   String?                                       // IP desde donde se generó (opcional, útil para auditoría)
 
-  usuario     Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usuario     Usuario   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])                        // Indexar por userId para búsquedas rápidas
-  @@index([token])                         // Indexar por token para búsquedas rápidas
+  @@index([userId])
+  @@index([token])
 }
 
 model PlatilloProgramado {

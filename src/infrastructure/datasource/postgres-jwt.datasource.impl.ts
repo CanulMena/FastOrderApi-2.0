@@ -2,18 +2,21 @@ import { PrismaClient } from "@prisma/client";
 import { JwtDataSource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { Jwt } from "../../domain/entities";
+import { SaveRefreshTokenDto } from "../../domain/dtos";
 
 export class PostgresJwtDatsourceImpl implements JwtDataSource {
 
   private readonly prisma = new PrismaClient().refreshToken;
 
   // Guardar un refresh token
-  async saveRefreshToken(userId: number, refreshtoken: string, expiresIn: Date): Promise<Jwt> {
+  async saveRefreshToken(data: SaveRefreshTokenDto): Promise<Jwt> {
     const tokenSaved = await this.prisma.create({
       data: {
-        userId: userId,
-        token: refreshtoken,
-        expiresAt: expiresIn
+        userId: data.userId,
+        token: data.refreshtoken,
+        deviceName: data.deviceName,
+        deviceOS: data.deviceOS,
+        ipAddress: data.ipAddress
       }
     });
 
@@ -46,7 +49,8 @@ export class PostgresJwtDatsourceImpl implements JwtDataSource {
       where: { token: oldToken },
       data: {
         token: newToken,
-        expiresAt: expiresIn
+        lastUsedAt: new Date(),
+        // expiresAt: expiresIn
       }
     });
 
