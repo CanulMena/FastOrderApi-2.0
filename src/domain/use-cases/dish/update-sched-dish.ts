@@ -22,6 +22,13 @@ export class UpdateSchedDish implements UpdateSchedDishUseCase {
         }
 
         const updatedDish = await this.schedDishRepository.updateSchedDish(schedDishDto);
-        return { message: 'Dish updated successfully', dish: updatedDish };
+        return {
+            schedDish: {
+                id: updatedDish.id,
+                weekDay: updatedDish.weekDay, 
+                dishId: updatedDish.dishId,
+                name: updatedDish.dish?.name
+            }
+        };
     }
 }
