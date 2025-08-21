@@ -51,14 +51,14 @@ export class SideRoutes {
         ); 
 
         router.delete(
-            '/delete-by-id/:sideId',
+            '/delete/:sideId',
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
             sideController.deleteSide
         );
 
         router.put(
-            '/put-by-id/:sideId',
+            '/update/:sideId',
             authMiddleware.validateJWT,
             authMiddleware.validateRole(roles.Admin),
             sideController.updateSide
