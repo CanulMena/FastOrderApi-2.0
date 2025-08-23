@@ -84,11 +84,11 @@ model Pedido {
   tipoEntrega     TipoEntrega      @default(PRESENCIAL)
   tipoPago        TipoPago         @default(EFECTIVO)
   esPagado        Boolean          @default(false)
-  clienteId       Int
+  clienteId       Int?
   cocinaId        Int
   detalles        DetallePedido[]
   pagosPendientes PagosPendientes?
-  cliente         Cliente          @relation(fields: [clienteId], references: [id])
+  cliente         Cliente?          @relation(fields: [clienteId], references: [id])
   cocina          Cocina           @relation(fields: [cocinaId], references: [id])
 }
 
