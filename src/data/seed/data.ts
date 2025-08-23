@@ -188,7 +188,7 @@ export const seedData = {
     {
       nombre: 'Admin Central',
       email: 'gussycaul124@gmail.com',
-      contrasena: bcryptAdapter.hash('123456'),
+      contrasena: bcryptAdapter.hash('Relax98705'),
       rol: 'ADMIN',
       cocinaIndex: 0, // Relacionar con cocinas[0] - Cocina Central
     },
