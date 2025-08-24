@@ -1,4 +1,5 @@
 import { CreateOrderDetailsDto, CreateOrderDto, PaginationDto, UpdateOrderDto } from "../dtos";
+import { OrderRange } from "../dvo";
 import { Order, OrderDetail } from "../entities";
 
 export abstract class OrderRepository {
@@ -21,4 +22,9 @@ export abstract class OrderRepository {
     dishId: number,
     dishTotalServings: number
   }>;
+  abstract getKitchenOrdersInRange(
+      kitchenId: number,
+      orderRange: OrderRange,
+      paginationDto: PaginationDto
+    ): Promise<Order[]> 
 }

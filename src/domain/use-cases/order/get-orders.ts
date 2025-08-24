@@ -2,6 +2,7 @@ import { Order, User } from '../../entities';
 import { PaginationDto } from '../../dtos';
 import { OrderRepository } from '../../repositories';
 import { CustomError } from '../../errors';
+import { envs } from '../../../configuration'
 
 
 interface GetOrdersUseCase {
@@ -16,7 +17,7 @@ export class GetOrders implements GetOrdersUseCase {
     async execute(user: User, paginationDto: PaginationDto): Promise<object> {
         const { page, limit } = paginationDto;
 
-        if (user.rol === 'SUPER_ADMIN' || user.rol === 'OPERATOR') {
+        if (user.rol === 'SUPER_ADMIN') {
             const ordersCount = await this.orderRepositoy.getOrdersCount();
             const orders = await this.orderRepositoy.getOrders(paginationDto);
             return this.buildResponse(orders, page, limit, ordersCount);
@@ -38,9 +39,9 @@ export class GetOrders implements GetOrdersUseCase {
             limit,
             total: count,
             next: (page * limit) < count ? `/api/dish/get-all?page=${ (page + 1) }&limit=${ limit }` : null,
-            prev: ( page - 1 > 0 ) ? `http://localhost:3000/dish/get-all?page=${ (page - 1) }&limit=${ limit }` : null,
-            dishes: orders,
-            message: orders.length === 0 ? 'No more dishes available for this query.' : null,
+            prev: ( page - 1 > 0 ) ? `${envs.WEB_SERVICE_URL}/dish/get-all?page=${ (page - 1) }&limit=${ limit }` : null,
+            orders: orders,
+            message: orders.length === 0 ? 'No more orders available for this query.' : null,
         };
     }
 }
