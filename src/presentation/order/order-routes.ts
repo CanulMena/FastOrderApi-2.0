@@ -39,7 +39,14 @@ export class OrderRoutes {
       authMiddleware.validateJWT,
       authMiddleware.validateRole(rolesConfig.AllRoles),
       orderController.getOrders
-    )
+    );
+
+    router.get(
+      '/get-orders-day',
+      authMiddleware.validateJWT,
+      authMiddleware.validateRole(rolesConfig.AllRoles),
+      orderController.getOrdersDay
+    );
 
     router.get(
       'get-by-id/:orderId',

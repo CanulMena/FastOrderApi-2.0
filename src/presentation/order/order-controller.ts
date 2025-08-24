@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CustomError } from "../../domain/errors";
 import { User } from "../../domain/entities";
 import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto, PaginationDto } from "../../domain/dtos";
-import { RegisterOrder, UpdateOrder, DeleteOrder, GetOrders, DeleteOrderDetail, CreateOrderDetail } from "../../domain/use-cases/index";
+import { RegisterOrder, UpdateOrder, DeleteOrder, GetOrders, DeleteOrderDetail, CreateOrderDetail, GetOrdersDay } from "../../domain/use-cases/index";
 import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
 
 export class OrderController {
@@ -121,6 +121,21 @@ export class OrderController {
     }
 
     new GetOrders(this.orderRepository)
+    .execute(user, paginationDto!)
+    .then( orders => res.status(200).json(orders))
+    .catch( error => this.handleError(error, res));
+  }
+
+  public getOrdersDay = (req: Request, res: Response) => {
+    const user = req.body.user as User;
+    const { page = 1, limit = 10 } = req.query;
+    const [error, paginationDto] = PaginationDto.create(+page, +limit);
+    if (error) {
+      res.status(400).json({error});
+      return;
+    }
+
+    new GetOrdersDay(this.orderRepository)
     .execute(user, paginationDto!)
     .then( orders => res.status(200).json(orders))
     .catch( error => this.handleError(error, res));
