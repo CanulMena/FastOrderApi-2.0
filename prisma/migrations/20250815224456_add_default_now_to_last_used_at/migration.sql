@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "RefreshToken" ALTER COLUMN "lastUsedAt" SET DEFAULT CURRENT_TIMESTAMP;
