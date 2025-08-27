@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { SchedDishDatasource } from "../../domain/datasource/sched-dish.datasource";
-import { CreateSchedDishDto } from "../../domain/dtos";
+import { CreateSchedDishDto, UpdateSchedDishDto } from "../../domain/dtos";
 import { SchedDish, WeekDays } from "../../domain/entities";
 import { CustomError } from "../../domain/errors";
 
@@ -70,4 +70,73 @@ export class PostgresSchedDishDataSourceImpl implements SchedDishDatasource {
     return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish));
   }
 
+  async findAllSchedDishByKitchenForWeek(kitchenId: number): Promise<SchedDish[]> {
+    const scheduledDishes = await this.prismaSchedDish.findMany({
+      where: {
+        cocinaId: kitchenId,
+      },
+      include: {
+        platillo: true,
+      }
+    });
+
+    return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish));
+  }
+
+  async findAllSchedDishByDishId(dishId: number): Promise<SchedDish[]> {
+    const scheduledDishes = await this.prismaSchedDish.findMany({
+      where: {
+        platilloId: dishId, 
+      }, 
+      include: {
+        platillo: true,
+      }
+    });
+
+    return scheduledDishes.map((schedDish) => SchedDish.fromJson(schedDish)); 
+  }
+
+    async getSchedDishById(schedDishId: number): Promise<SchedDish> {
+    const scheduledDish = await this.prismaSchedDish.findUnique({
+      where: {
+        id: schedDishId,
+      },
+      include: {
+        platillo: true,
+      }
+    });
+
+    if (!scheduledDish) throw CustomError.notFound(`Scheduled dish with ID ${schedDishId} not found.`);
+
+    return SchedDish.fromJson(scheduledDish);
+  }
+  
+  async updateSchedDish( updateSchedDish: UpdateSchedDishDto ): Promise<SchedDish> {
+    await this.getSchedDishById(updateSchedDish.id);
+    const updatedSchedDish = await this.prismaSchedDish.update({
+      where: {
+        id: updateSchedDish.id
+      },
+      data: {
+        diaSemana: updateSchedDish.weekDay,
+      }, 
+      include: {
+        platillo: true,
+      }
+    });
+
+    return SchedDish.fromJson(updatedSchedDish);
+  }
+
+  async deleteSchedDish( schedDishId: number ): Promise<SchedDish> {
+    await this.getSchedDishById( schedDishId );
+
+    const deletedSchedDish = await this.prismaSchedDish.delete({
+      where: {
+        id: schedDishId
+      },
+    });
+
+    return SchedDish.fromJson(deletedSchedDish);
+  }
 }

@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { CreateSchedDishDto } from "../../domain/dtos";
-import { CreateSchedDish } from "../../domain/use-cases/dish/create-sched-dish";
+import { CreateSchedDishDto, UpdateSchedDishDto } from "../../domain/dtos";
+import { CreateSchedDish,  } from "../../domain/use-cases/dish/create-sched-dish";
 import { CustomError } from "../../domain/errors";
 import { DishRepository, SchedDishRepository, OrderRepository } from "../../domain/repositories";
 import { GetAvailableDishes } from '../../domain/use-cases/dish/get-available-dishes';
 import { User } from "../../domain/entities";
+import { DeleteSchedDish, GetAvailableDishesByDishId, GetAvailableDishesForWeek, UpdateSchedDish } from "../../domain/use-cases";
 
 export class SchedDishController {
 
@@ -54,7 +55,57 @@ export class SchedDishController {
 
   }
 
-  //TODO: Actualizar los platillos programados
+  public getAvailableDishesForWeek = async (req: Request, res: Response) => {
+    const user = req.body.user as User;
 
-  //TODO: Eliminar platillos programados
+    new GetAvailableDishesForWeek(this.schedDishRepository)
+    .execute(user)
+    .then(availableDishes => res.status(200).json(availableDishes))
+    .catch( error => this.handleError(error, res) );
+  }
+
+  public getSchedDishesByDishId = async (req: Request, res: Response) => {
+    const dishId = +req.params.dishId;
+    const user = req.body.user as User;
+
+    if ( isNaN(dishId) ) {
+      res.status(400).json({error: 'ID argument is not a number'});
+      return;
+    }
+
+    new GetAvailableDishesByDishId(this.schedDishRepository)
+    .execute(dishId, user)
+    .then( schedDishes => res.status(200).json(schedDishes))
+    .catch( error => this.handleError(error, res) );
+  }
+
+  public updateSchedDish = async (req: Request, res: Response) => {
+    const id = +req.params.id;
+    const user = req.body.user as User;
+    const [error, updateSchedDish] = UpdateSchedDishDto.create({...req.body, id});
+
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    new UpdateSchedDish(this.schedDishRepository)
+    .execute(user, updateSchedDish!)
+    .then(updatedSchedDish => res.status(200).json(updatedSchedDish))
+    .catch( error => this.handleError(error, res) );
+  }
+
+  public deleteSchedDish = async (req: Request, res: Response) => {
+    const schedDishId = +req.params.schedDishId;
+
+    if (isNaN(schedDishId)) {
+      res.status(400).json({ error: 'ID argument is not a number' });
+      return;
+    }
+
+    new DeleteSchedDish(this.schedDishRepository)
+    .execute(schedDishId)
+    .then(() => res.status(200).json('Scheduled dish deleted successfully.'))
+    .catch(error => this.handleError(error, res));
+  }
 }

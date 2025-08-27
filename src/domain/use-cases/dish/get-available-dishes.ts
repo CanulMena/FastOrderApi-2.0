@@ -55,7 +55,7 @@ export class GetAvailableDishes implements GetAvailableDishesUseCase {
       range.endUTC
     );
 
-    return {
+      return {
       id: dish.dishId,
       nombre: dish.name,
       rutaImagen: dish.imagePath,
