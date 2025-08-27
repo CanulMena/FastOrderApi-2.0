@@ -15,11 +15,14 @@ export class RegisterOrder implements RegisterOrderUseCase {
   ) {}
 
   async execute(createOrderDto: CreateOrderDto): Promise<object> {
-    const customer = await this.customerRepository.getCustomerById(createOrderDto.clientId);
-    if (customer !== null && customer.kitchenId !== createOrderDto.kitchenId) {
-      throw CustomError.unAuthorized(
-        `El cliente con id ${customer.customerId} no pertenece a la cocina del pedido`
-      );
+
+    if(createOrderDto.clientId) {
+      const customer = await this.customerRepository.getCustomerById(createOrderDto.clientId);
+      if (customer !== null && customer.kitchenId !== createOrderDto.kitchenId) {
+        throw CustomError.unAuthorized(
+          `El cliente con id ${customer.customerId} no pertenece a la cocina del pedido`
+        );
+      }
     }
 
     // Si orderDetails no es nulo y tiene al menos un detalle

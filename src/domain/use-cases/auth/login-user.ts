@@ -1,5 +1,5 @@
 import { bcryptAdapter, envs, GenerateTokenConfig, jwtAdapter } from "../../../configuration/plugins";
-import { LoginUserDto } from "../../dtos/auth";
+import { LoginUserDto, SaveRefreshTokenDto } from "../../dtos/auth";
 import { User } from "../../entities";
 import { CustomError } from "../../errors";
 import { UserRepository, JwtRepository } from "../../repositories";
@@ -15,7 +15,10 @@ export class LoginUser implements LoginUserUseCase {
     private readonly jwtRepository: JwtRepository
   ) {}
 
-  async execute(loginUserDto: LoginUserDto): Promise<{ user: object, accessToken: string, refreshToken: string }> {
+  async execute(
+    loginUserDto: LoginUserDto,
+    deviceInfo?: { deviceName?: string; deviceOS?: string; ipAddress?: string }
+  ): Promise<{ user: object, accessToken: string, refreshToken: string }> {
     const userFound = await this.userRepository.getUserByEmail(loginUserDto.email);
     const isMatchingPassword = await bcryptAdapter.compare(loginUserDto.password, userFound.passwordHash);
     if (!isMatchingPassword) throw CustomError.badRequest('Invalid password');
@@ -30,8 +33,15 @@ export class LoginUser implements LoginUserUseCase {
       secret: envs.REFRESH_JWT_SEED,
     });
     // Guardamos el refresh token en la base de datos
-    const expireIn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    const jwtSaved = await this.jwtRepository.saveRefreshToken(userEntity.userId, refreshToken, expireIn);
+    // const expireIn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const saveRefreshTokenDto = new SaveRefreshTokenDto(
+      userEntity.userId,
+      refreshToken,
+      deviceInfo?.deviceName,
+      deviceInfo?.deviceOS,
+      deviceInfo?.ipAddress
+    );
+    const jwtSaved = await this.jwtRepository.saveRefreshToken(saveRefreshTokenDto);
     if( !jwtSaved ) throw CustomError.internalServer('Error saving refresh token');
         
     return {

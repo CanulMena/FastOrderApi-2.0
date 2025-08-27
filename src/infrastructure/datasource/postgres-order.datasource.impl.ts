@@ -5,7 +5,7 @@ import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
 import { CreateOrderDetailsDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
 import { Dish, OrderDetail } from "../../domain/entities";
-import { response } from "express";
+import { OrderRange } from "../../domain/dvo";
 
 export class PostgresOrderDatasourceImpl implements OrderDatasource {
 
@@ -310,4 +310,33 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   private calculateTotalServings(servingsList: { totalServings: number }[]) {
     return servingsList.reduce((acc, curr) => acc + curr.totalServings, 0);
   }
+
+  public async getKitchenOrdersInRange(
+    kitchenId: number,
+    orderRange: OrderRange,
+    paginationDto: PaginationDto
+  ): Promise<Order[]> {
+    const { page, limit } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    // 1. Ejecutar query a Prisma
+    const orders = await this.prismaPedido.findMany({
+      skip,
+      take: limit,
+      where: {
+        cocinaId: kitchenId,
+        fecha: {
+          gte: orderRange.startDate,
+          lte: orderRange.endDate,
+        },
+      },
+      include: {
+        detalles: true,
+      },
+    });
+
+    // 2. Transformar a entidades de dominio
+    return orders.map(Order.fromJson);
+  }
+
 }

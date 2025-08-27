@@ -2,7 +2,7 @@
 CREATE TYPE "EstadoPago" AS ENUM ('PENDIENTE', 'PAGADO');
 
 -- CreateEnum
-CREATE TYPE "Rol" AS ENUM ('ADMIN', 'DELIVERY', 'OPERATOR');
+CREATE TYPE "Rol" AS ENUM ('ADMIN', 'DELIVERY', 'OPERATOR', 'SUPER_ADMIN');
 
 -- CreateEnum
 CREATE TYPE "EstadoPedido" AS ENUM ('PENDIENTE', 'ENTREGADO', 'CANCELADO');
@@ -12,6 +12,9 @@ CREATE TYPE "TipoEntrega" AS ENUM ('ENVIO', 'PRESENCIAL');
 
 -- CreateEnum
 CREATE TYPE "TipoPago" AS ENUM ('EFECTIVO', 'TARJETA', 'FIADO');
+
+-- CreateEnum
+CREATE TYPE "DiaSemana" AS ENUM ('LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO');
 
 -- CreateTable
 CREATE TABLE "Cocina" (
@@ -26,8 +29,10 @@ CREATE TABLE "Cocina" (
 -- CreateTable
 CREATE TABLE "Usuario" (
     "id" SERIAL NOT NULL,
-    "cocinaId" INTEGER NOT NULL,
+    "cocinaId" INTEGER,
+    "nombre" VARCHAR(100) NOT NULL DEFAULT 'Nombre por defecto',
     "email" VARCHAR(150) NOT NULL,
+    "emailValid" BOOLEAN NOT NULL DEFAULT false,
     "contrasena" VARCHAR(255) NOT NULL,
     "rol" "Rol" NOT NULL DEFAULT 'ADMIN',
 
@@ -79,11 +84,12 @@ CREATE TABLE "Cliente" (
 -- CreateTable
 CREATE TABLE "Pedido" (
     "id" SERIAL NOT NULL,
-    "fecha" TIMESTAMP(6) NOT NULL,
+    "fecha" TIMESTAMPTZ(6) NOT NULL,
     "estado" "EstadoPedido" NOT NULL DEFAULT 'PENDIENTE',
     "tipoEntrega" "TipoEntrega" NOT NULL DEFAULT 'PRESENCIAL',
     "tipoPago" "TipoPago" NOT NULL DEFAULT 'EFECTIVO',
-    "clienteId" INTEGER NOT NULL,
+    "esPagado" BOOLEAN NOT NULL DEFAULT false,
+    "clienteId" INTEGER,
     "cocinaId" INTEGER NOT NULL,
 
     CONSTRAINT "Pedido_pkey" PRIMARY KEY ("id")
@@ -106,11 +112,36 @@ CREATE TABLE "DetallePedido" (
     "id" SERIAL NOT NULL,
     "cantidadEntera" INTEGER NOT NULL,
     "cantidadMedia" INTEGER NOT NULL,
-    "subtotal" REAL NOT NULL,
     "pedidoId" INTEGER NOT NULL,
     "platilloId" INTEGER NOT NULL,
 
     CONSTRAINT "DetallePedido_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RefreshToken" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastUsedAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "deviceName" TEXT,
+    "deviceOS" TEXT,
+    "ipAddress" TEXT,
+
+    CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PlatilloProgramado" (
+    "id" SERIAL NOT NULL,
+    "platilloId" INTEGER NOT NULL,
+    "cocinaId" INTEGER NOT NULL,
+    "diaSemana" "DiaSemana" NOT NULL,
+    "limiteRaciones" INTEGER,
+    "controlRaciones" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "PlatilloProgramado_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -122,8 +153,20 @@ CREATE UNIQUE INDEX "Complemento_nombre_cocinaId_key" ON "Complemento"("nombre",
 -- CreateIndex
 CREATE UNIQUE INDEX "PagosPendientes_pedidoId_key" ON "PagosPendientes"("pedidoId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
+
+-- CreateIndex
+CREATE INDEX "RefreshToken_userId_idx" ON "RefreshToken"("userId");
+
+-- CreateIndex
+CREATE INDEX "RefreshToken_token_idx" ON "RefreshToken"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PlatilloProgramado_platilloId_cocinaId_diaSemana_key" ON "PlatilloProgramado"("platilloId", "cocinaId", "diaSemana");
+
 -- AddForeignKey
-ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Platillo" ADD CONSTRAINT "Platillo_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -141,7 +184,7 @@ ALTER TABLE "PlatilloComplemento" ADD CONSTRAINT "PlatilloComplemento_platilloId
 ALTER TABLE "Cliente" ADD CONSTRAINT "Cliente_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Pedido" ADD CONSTRAINT "Pedido_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -157,3 +200,12 @@ ALTER TABLE "DetallePedido" ADD CONSTRAINT "DetallePedido_pedidoId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "DetallePedido" ADD CONSTRAINT "DetallePedido_platilloId_fkey" FOREIGN KEY ("platilloId") REFERENCES "Platillo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlatilloProgramado" ADD CONSTRAINT "PlatilloProgramado_platilloId_fkey" FOREIGN KEY ("platilloId") REFERENCES "Platillo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlatilloProgramado" ADD CONSTRAINT "PlatilloProgramado_cocinaId_fkey" FOREIGN KEY ("cocinaId") REFERENCES "Cocina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

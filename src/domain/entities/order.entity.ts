@@ -68,7 +68,7 @@ export class Order {
       }
     }
 
-    if(!clienteId) throw CustomError.badRequest('Missing clienteId');
+    // if(!clienteId) throw CustomError.badRequest('Missing clienteId');
     if(!cocinaId) throw CustomError.badRequest('Missing cocinaId');
     return new Order(
       id,

@@ -1,5 +1,5 @@
 import { CronService } from './cron/cron-service';
-import { LoadingDailyRations } from '../domain/use-cases/dish/loading-daily-rations';
+// import { LoadingDailyRations } from '../domain/use-cases/dish/loading-daily-rations';
 import { PostgresSchedDishDataSourceImpl, PostgresDishDatasourceImpl } from '../infrastructure/datasource';
 import { SchedDishRepositoryImpl, DishRepositoryImpl } from '../infrastructure/repository';
 

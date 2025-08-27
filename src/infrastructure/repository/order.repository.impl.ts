@@ -1,5 +1,6 @@
 import { OrderDatasource } from "../../domain/datasource";
 import { CreateOrderDetailsDto, CreateOrderDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
+import { OrderRange } from "../../domain/dvo";
 import { Order, OrderDetail } from "../../domain/entities";
 import { OrderRepository } from "../../domain/repositories";
 
@@ -8,6 +9,9 @@ export class OrderRepositoryImpl implements OrderRepository{
   constructor(
     private datasource: OrderDatasource
   ) {}
+  getKitchenOrdersInRange(kitchenId: number, orderRange: OrderRange, paginationDto: PaginationDto): Promise<Order[]> {
+    return this.datasource.getKitchenOrdersInRange(kitchenId, orderRange, paginationDto);
+  }
 
   createOder(order: CreateOrderDto): Promise<Order> {
     return this.datasource.createOder(order);
