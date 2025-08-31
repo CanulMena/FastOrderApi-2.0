@@ -45,4 +45,7 @@ export class DishRepositoryImpl implements DishRepository {
     return this.dishDatasource.findDishByNameAndKitchenId(name, kitchenId);
   }
   
+  async getDishesBySideId(sideId: number): Promise<Dish[]> {
+    return this.dishDatasource.getDishesBySideId(sideId);
+  }
 }
