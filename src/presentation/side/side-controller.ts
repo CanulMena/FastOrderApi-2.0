@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FileUploadRepository, SideRepository } from "../../domain/repositories/index";
+import { DishRepository, FileUploadRepository, SideRepository } from "../../domain/repositories/index";
 import { CreateSideDto, UpdateSideDto, PaginationDto } from '../../domain/dtos/index';
 import { CreateSide, DeleteSide, GetSide, GetSides, UpdateSide, DeleteUploadedFile, FileUploadSingle } from '../../domain/use-cases/index';
 import { CustomError } from '../../domain/errors';
@@ -10,6 +10,7 @@ export class SideController {
 
     constructor(
         public sideRepository: SideRepository,
+        public dishRepository: DishRepository,
         public fileUploadRepository: FileUploadRepository
     ) {}
 
@@ -45,7 +46,7 @@ export class SideController {
             res.status(400).json({error: 'ID argument is not a number'});
         }
 
-        new GetSide(this.sideRepository)
+        new GetSide(this.sideRepository, this.dishRepository)
         .execute(sideId, user)
         .then(side => res.status(200).json(side))
         .catch( error => this.handleError(error, res));
