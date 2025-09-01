@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CloudinaryFileUploadDataSourceImpl, PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
-import { FileUploadRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
+import { CloudinaryFileUploadDataSourceImpl, PostgresDishDatasourceImpl, PostgresSideDatasourceImpl, PostgresUserDataSourceImpl } from "../../infrastructure/datasource/index";
+import { DishRepositoryImpl, FileUploadRepositoryImpl, SideRepositoryImpl, UserRepositoryImpl } from "../../infrastructure/repository/index";
 import { SideController } from "./side-controller";
 import { rolesConfig } from "../../configuration";
 import { AuthMiddleware, FileUploadMiddleware, TypeMiddleware } from "../middlewares/index";
@@ -15,6 +15,9 @@ export class SideRoutes {
         const sideDatasourceImpl = new PostgresSideDatasourceImpl();
         const sideRepositoryImpl = new SideRepositoryImpl( sideDatasourceImpl );
 
+        const dishDatasourceImpl = new PostgresDishDatasourceImpl();
+        const dishRepositoryImpl = new DishRepositoryImpl( dishDatasourceImpl );
+
         const userDatasourceImpl = new PostgresUserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasourceImpl);
 
@@ -22,7 +25,7 @@ export class SideRoutes {
         const cloudinaryFileUploadDatasource = new CloudinaryFileUploadDataSourceImpl();
         const fileSystemFileUploadDataSource = new FileSystemFileUploadDataSourceImpl();
         const fileUploadRepository = new FileUploadRepositoryImpl(cloudinaryFileUploadDatasource)
-        const sideController = new SideController( sideRepositoryImpl, fileUploadRepository );
+        const sideController = new SideController( sideRepositoryImpl, dishRepositoryImpl, fileUploadRepository );
         
         const roles = rolesConfig;
 
