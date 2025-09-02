@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import { UserRepository, KitchenRepository, JwtRepository } from '../../domain/repositories';
-import { LoginUserDto, RefreshTokenDto, RegisterUserDto } from '../../domain/dtos/auth';
+import { LoginUserDto, RefreshTokenDto, RegisterUserDto, PaginationDto } from '../../domain/dtos';
+import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken, 
+  GetUsersByIdKitchen, LoginUniversalUser, LogoutUser } from '../../domain/use-cases/index';
 import { CustomError } from '../../domain/errors';
-import { CreateUser, LoginUser, SendEmailValidationLink, ValidateEmail, RefreshToken, GetUsersByIdKitchen } from '../../domain/use-cases/auth/index';
 import { User } from '../../domain/entities';
-import { PaginationDto } from '../../domain/dtos';
-import { LoginUniversalUser } from '../../domain/use-cases/auth/login-universal-user';
-import { LogoutUser } from '../../domain/use-cases/auth/logout-user';
+import { envs } from '../../configuration';
 
 
 export class AuthController {
@@ -17,6 +16,8 @@ export class AuthController {
     public sendEmailValidationLink: SendEmailValidationLink,
     public validateUserEmail: ValidateEmail
   ){}
+
+  private webUrl = envs.WEB_URL;
 
   private handleError(error: unknown, res: Response) {
     if (error instanceof CustomError) {
@@ -78,7 +79,7 @@ export class AuthController {
           // secure: true,
           // sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 2, // 2 hours
-          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         })
         res.cookie('refreshToken', response.refreshToken,  {
@@ -86,7 +87,7 @@ export class AuthController {
           // secure: true, 
           // sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 24 * 7,
-          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         });
         res.status(200).json({ user: response.user })
@@ -136,7 +137,7 @@ export class AuthController {
           // secure: true,
           // sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 2, // 2 hours
-          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         })
         res.cookie('refreshToken', response.refreshToken,  {
@@ -144,7 +145,7 @@ export class AuthController {
           // secure: true, 
           // sameSite: 'strict',
           maxAge: 1000 * 60 * 60 * 24 * 7,
-          domain: 'localhost', // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         });
         res.status(200).json({ message: 'Tokens refreshed successfully' });

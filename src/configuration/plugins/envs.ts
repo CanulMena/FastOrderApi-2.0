@@ -21,4 +21,6 @@ export const envs = {
         .asString()
         .split(',') //los divide por cada coma
         .map(origin => origin.trim()), //quita espacios en cada elemetno del array
+
+    WEB_URL: get('WEB_URL').required().asString(),
 }
