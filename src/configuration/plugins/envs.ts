@@ -23,4 +23,5 @@ export const envs = {
         .map(origin => origin.trim()), //quita espacios en cada elemetno del array
 
     WEB_URL: get('WEB_URL').required().asString(),
+    PRODUCTION: get('PRODUCTION').default('false').asBool(),
 }

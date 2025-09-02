@@ -17,7 +17,7 @@ export class AuthController {
     public validateUserEmail: ValidateEmail
   ){}
 
-  private webUrl = envs.WEB_URL;
+  private domain = envs.PRODUCTION ? envs.WEB_SERVICE_URL : 'localhost';
 
   private handleError(error: unknown, res: Response) {
     if (error instanceof CustomError) {
@@ -76,18 +76,18 @@ export class AuthController {
       if (response.setCookies) {
         res.cookie('accessToken', response.accessToken, {
           httpOnly: true,
-          // secure: true,
-          // sameSite: 'strict',
+          secure: true,
+          sameSite: 'none',
           maxAge: 1000 * 60 * 60 * 2, // 2 hours
-          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.domain, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         })
         res.cookie('refreshToken', response.refreshToken,  {
           httpOnly: true, 
-          // secure: true, 
-          // sameSite: 'strict',
+          secure: true,
+          sameSite: 'none',
           maxAge: 1000 * 60 * 60 * 24 * 7,
-          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.domain, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         });
         res.status(200).json({ user: response.user })
@@ -134,18 +134,18 @@ export class AuthController {
       if (req.headers['x-client-type'] === 'web') {
         res.cookie('accessToken', response.accessToken, {
           httpOnly: true,
-          // secure: true,
-          // sameSite: 'strict',
+          secure: true,
+          sameSite: 'none',
           maxAge: 1000 * 60 * 60 * 2, // 2 hours
-          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.domain, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         })
         res.cookie('refreshToken', response.refreshToken,  {
           httpOnly: true, 
-          // secure: true, 
-          // sameSite: 'strict',
+          secure: true,
+          sameSite: 'none',
           maxAge: 1000 * 60 * 60 * 24 * 7,
-          domain: this.webUrl, // Asegúrate de que el dominio sea correcto para tu entorno
+          domain: this.domain, // Asegúrate de que el dominio sea correcto para tu entorno
           path: '/', // Asegúrate de que el path sea correcto para tu aplicación
         });
         res.status(200).json({ message: 'Tokens refreshed successfully' });
