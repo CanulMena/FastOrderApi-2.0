@@ -16,4 +16,9 @@ export const envs = {
     CLOUDINARY_CLOUD_NAME: get('CLOUDINARY_CLOUD_NAME').required().asString(),
     CLOUDINARY_API_KEY: get('CLOUDINARY_API_KEY').required().asString(),
     CLOUDINARY_API_SECRET: get('CLOUDINARY_API_SECRET').required().asString(),
+    CORS_ORIGINS: get('CORS_ORIGINS')
+        .required()
+        .asString()
+        .split(',') //los divide por cada coma
+        .map(origin => origin.trim()), //quita espacios en cada elemetno del array
 }

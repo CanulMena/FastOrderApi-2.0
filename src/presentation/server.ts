@@ -3,6 +3,7 @@ import express, { Router } from 'express';
 import fileUpload from 'express-fileupload'; //*TODO: Crearle su plugin.
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { envs } from '../configuration';
 
 export interface ServerAppOptions {
     port: number;
@@ -20,29 +21,26 @@ export class AppServer {
     }
 
     async start(){
-        // this.app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
-        const allowedOrigins = [
-            'http://localhost:4200', // Web Angular
-          // Agrega aquí los orígenes de producción cuando los tengas
-        ];
+        const allowedOrigins = envs.CORS_ORIGINS;
 
-        this.app.use(cors({
-          origin: (origin, callback) => {
-            // Permite requests sin origen (por ejemplo, desde Postman o curl)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) {
-              return callback(null, true);
-            }
-            return callback(new Error('Not allowed by CORS'));
-          },
-          credentials: true
-        }));
-        // this.app.use(cors({ origin: '*', credentials: true }));
+        this.app.use(
+          cors({
+            origin: (origin, callback) => {
+              // Permite requests sin origen (por ejemplo, desde Postman o curl)
+              if (!origin) return callback(null, true);
+              if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+              }
+              return callback(new Error('Not allowed by CORS'));
+            },
+            credentials: true
+          }),
+        );
         this.app.use(cookieParser());
-        this.app.use(express.json()); //* raw json
+        this.app.use(express.json()); //raw json
         this.app.use(express.urlencoded({ extended: true })); //* form data
         this.app.use(fileUpload({
-            // useTempFiles : true, //*activar para archivos grandes
+            // useTempFiles : true, //activar para archivos grandes
             limits: { fileSize: 50 * 1024 * 1024 },
         }));
 
