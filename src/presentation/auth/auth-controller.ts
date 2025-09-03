@@ -163,8 +163,8 @@ export class AuthController {
     .execute(refreshToken)
     .then(response => {
       if (clientType === 'web') {
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('accessToken', this.getCookieOptions(0));
+        res.clearCookie('refreshToken', this.getCookieOptions(0));
         res.status(200).json({ message: 'Logged out successfully' });
       } else {
         res.status(200).json(response);
