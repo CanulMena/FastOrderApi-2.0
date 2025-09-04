@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { CustomError } from "../../domain/errors";
 import { User } from "../../domain/entities";
-import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto, PaginationDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto, PaginationDto, OrderFiltersDto } from "../../domain/dtos";
 import { RegisterOrder, UpdateOrder, DeleteOrder, GetOrders, DeleteOrderDetail, CreateOrderDetail, GetOrdersDay } from "../../domain/use-cases/index";
 import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
 
@@ -128,15 +128,22 @@ export class OrderController {
 
   public getOrdersDay = (req: Request, res: Response) => {
     const user = req.body.user as User;
-    const { page = 1, limit = 10 } = req.query;
-    const [error, paginationDto] = PaginationDto.create(+page, +limit);
-    if (error) {
-      res.status(400).json({error});
+    const { page = 1, limit = 10, orderStatus, paymentType, orderType } = req.query;
+    const [paginationError, paginationDto] = PaginationDto.create(+page, +limit);
+
+    if (paginationError) {
+      res.status(400).json({error: paginationError});
+      return;
+    }
+
+    const [filterError, filterDto] = OrderFiltersDto.create({ orderStatus, paymentType, orderType });
+    if (filterError) {
+      res.status(400).json({error: filterError});
       return;
     }
 
     new GetOrdersDay(this.orderRepository)
-    .execute(user, paginationDto!)
+    .execute(user, paginationDto!, filterDto!)
     .then( orders => res.status(200).json(orders))
     .catch( error => this.handleError(error, res));
   }
