@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { Order } from '../../domain/entities/order.entity';
-import { CreateOrderDto } from '../../domain/dtos/order/create-order.dto';
+import { Order, OrderStatus } from '../../domain/entities/order.entity';
 import { OrderDatasource } from "../../domain/datasource";
 import { CustomError } from "../../domain/errors";
-import { CreateOrderDetailsDto, PaginationDto, UpdateOrderDto } from "../../domain/dtos";
+import { CreateOrderDetailsDto, OrderFiltersDto, PaginationDto, UpdateOrderDto, CreateOrderDto } from "../../domain/dtos";
 import { Dish, OrderDetail } from "../../domain/entities";
 import { OrderRange } from "../../domain/dvo";
 
@@ -314,7 +313,8 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   public async getKitchenOrdersInRange(
     kitchenId: number,
     orderRange: OrderRange,
-    paginationDto: PaginationDto
+    paginationDto: PaginationDto,
+    filtersDto?: OrderFiltersDto
   ): Promise<Order[]> {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
@@ -329,6 +329,9 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
           gte: orderRange.startDate,
           lte: orderRange.endDate,
         },
+      ...(filtersDto?.orderStatus ? { estado: filtersDto.orderStatus } : {}),
+      ...(filtersDto?.paymentType ? { tipoPago: filtersDto.paymentType } : {}),
+      ...(filtersDto?.orderType ? { tipoEntrega: filtersDto.orderType } : {}),
       },
       include: {
         detalles: true,

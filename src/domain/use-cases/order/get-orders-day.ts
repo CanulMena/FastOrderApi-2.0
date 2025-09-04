@@ -1,5 +1,5 @@
 import { Order, User } from "../../entities";
-import { PaginationDto } from '../../dtos/shared/pagination.dto';
+import { PaginationDto, OrderFiltersDto } from '../../dtos/index';
 import { luxonAdapter } from "../../../configuration/plugins/luxon.adapter";
 import { OrderRepository } from "../../repositories";
 import { OrderRange } from "../../dvo";
@@ -7,7 +7,11 @@ import { envs } from "../../../configuration";
 import { CustomError } from "../../errors";
 
 interface GetOrdersDayUseCase {
-    execute(user: User, paginationDto: PaginationDto): Promise<object>;
+    execute(
+      user: User, 
+      paginationDto: PaginationDto,
+      filtersDto?: OrderFiltersDto
+    ): Promise<object>;
 }
 
 export class GetOrdersDay implements GetOrdersDayUseCase {
@@ -16,9 +20,9 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
     private readonly orderRepository: OrderRepository
   ) {}
 
-  async execute(user: User, paginationDto: PaginationDto): Promise<object> {
+  async execute(user: User, paginationDto: PaginationDto, filtersDto?: OrderFiltersDto): Promise<object> {
 
-    const orders = await this.getOrders(user, paginationDto);
+    const orders = await this.getOrders(user, paginationDto, filtersDto);
 
     if (!user.kitchenId) {
         throw CustomError.unAuthorized('User does not have access to any kitchen');
@@ -27,10 +31,10 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
     return this.buildResponse(orders, paginationDto.page, paginationDto.limit, orders.length);
   }
 
-  private async getOrders(user: User, paginationDto: PaginationDto): Promise<Order[]> {
+  private async getOrders(user: User, paginationDto: PaginationDto, filtersDto?: OrderFiltersDto): Promise<Order[]> {
 
     if (user.rol === "SUPER_ADMIN") {
-      return await this.orderRepository.getOrders(paginationDto);
+      return await this.orderRepository.getOrders(paginationDto); //TODO: CAMBIAR EL RETRUN DE LOS SUPER_ADMIN
     }
 
     const userDayRangeUTC = luxonAdapter.getDayRangeUtcByZone("America/Merida");
@@ -39,7 +43,8 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
     return await this.orderRepository.getKitchenOrdersInRange(
       user.kitchenId!,
       orderRange,
-      paginationDto
+      paginationDto,
+      filtersDto
     );
   }
 
