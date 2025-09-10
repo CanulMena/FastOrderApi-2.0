@@ -142,7 +142,11 @@ export class OrderController {
       return;
     }
 
-    new GetOrdersDay(this.orderRepository)
+    new GetOrdersDay(
+      this.orderRepository,
+      this.customerRepository,
+      this.dishRepository
+    )
     .execute(user, paginationDto!, filterDto!)
     .then( orders => res.status(200).json(orders))
     .catch( error => this.handleError(error, res));
