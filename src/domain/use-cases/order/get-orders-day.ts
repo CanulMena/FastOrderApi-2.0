@@ -40,7 +40,7 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
 
     const orders = await this.getOrders(user, paginationDto, filtersDto);
 
-    const ordersDto = await Promise.all(
+    const ordersDto: OrderResponseDto[] = await Promise.all(
       orders.map((order) => this.mapOrderToDto(order))
     );
 
@@ -92,6 +92,7 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
           halfPortion: detail.halfPortion,
           imagePath: dish.imagePath,
           subtotal,
+          dishName: dish.name,
         };
       })
     );

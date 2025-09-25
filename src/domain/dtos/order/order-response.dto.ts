@@ -16,6 +16,7 @@ export interface OrderResponseDto {
     orderId: number;
     halfPortion: number | undefined;
     subtotal: number;
+    dishName: string;
     imagePath?: string;
   }[];
 }
