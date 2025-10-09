@@ -1,10 +1,11 @@
-import { Dish, Order, User } from "../../entities";
+import { Order, User } from "../../entities";
 import { PaginationDto, OrderFiltersDto, OrderResponseDto, PaginatedResponse } from "../../dtos";
 import { luxonAdapter } from "../../../configuration/plugins/luxon.adapter";
-import { CustomerRepository, DishRepository, OrderRepository } from "../../repositories";
+import { OrderRepository } from "../../repositories";
 import { OrderRange } from "../../dvo";
 import { envs } from "../../../configuration";
 import { CustomError } from "../../errors";
+import { OrderMapper } from "../../mappers";
 
 enum UserRoles {
   SUPER_ADMIN = "SUPER_ADMIN",
@@ -25,9 +26,8 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
 
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly customerRepository: CustomerRepository,
-    private readonly dishRepository: DishRepository
-  ) {}
+    private readonly orderMapper: OrderMapper,
+  ){}
 
   async execute(
     user: User,
@@ -38,17 +38,17 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
       throw CustomError.unAuthorized("User does not have access to any kitchen");
     }
 
-    const orders = await this.getOrders(user, paginationDto, filtersDto);
+    const ordersRange = await this.getOrders(user, paginationDto, filtersDto);
 
     const ordersDto: OrderResponseDto[] = await Promise.all(
-      orders.map((order) => this.mapOrderToDto(order))
+      ordersRange.map((order) => this.mapOrderToDto(order))
     );
 
     return this.buildResponse(
       ordersDto,
       paginationDto.page,
       paginationDto.limit,
-      orders.length
+      ordersRange.length
     );
   }
 
@@ -73,45 +73,9 @@ export class GetOrdersDay implements GetOrdersDayUseCase {
   }
 
   private async mapOrderToDto(order: Order): Promise<OrderResponseDto> {
-    const customer = order.clientId
-      ? await this.customerRepository.getCustomerById(order.clientId)
-      : null;
-
-    const orderDetails = await Promise.all(
-      order.orderDetails.map(async (detail) => {
-        const dish: Dish = await this.dishRepository.getDishById(detail.dishId);
-        const subtotal =
-          detail.portion * dish.pricePerServing +
-          (detail.halfPortion ?? 0) * dish.pricePerHalfServing;
-
-        return {
-          orderDetailId: detail.orderDetailId,
-          portion: detail.portion,
-          dishId: detail.dishId,
-          orderId: detail.orderId,
-          halfPortion: detail.halfPortion,
-          imagePath: dish.imagePath,
-          subtotal,
-          dishName: dish.name,
-        };
-      })
-    );
-
-    const total = orderDetails.reduce((acc, d) => acc + d.subtotal, 0);
-
-    return {
-      orderId: order.orderId,
-      date: order.date,
-      status: order.status,
-      deliveryType: order.deliveryType,
-      paymentType: order.paymentType,
-      isPaid: order.isPaid,
-      clientName: customer?.name ?? "Anonimo",
-      kitchenId: order.kitchenId,
-      clientId: order.clientId,
-      total,
-      orderDetails,
-    };
+    const orderMapper = this.orderMapper;
+    const orderResponseDto = await orderMapper.mapOrderToDto(order);
+    return orderResponseDto;
   }
 
   private buildResponse(

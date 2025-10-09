@@ -7,21 +7,33 @@ import { envs } from '../configuration';
 
 export interface ServerAppOptions {
     port: number;
-    routes: Router;
+    // routes: Router;
 }
 
 export class AppServer {
-    private app = express();
+    public app = express();
     private readonly port: number;
-    private readonly routes: Router;
+    // private readonly routes: Router;
 
     constructor( serverAppOptions : ServerAppOptions ){
         this.port = serverAppOptions.port;
-        this.routes = serverAppOptions.routes;
+        // this.routes = serverAppOptions.routes;
+
+        this.configure();
     }
 
     async start(){
-        const allowedOrigins = envs.CORS_ORIGINS;
+      this.app.listen( this.port, () => {
+          console.log( `Server is running on port ${this.port}` );
+      });
+    }
+
+    public setRoutes( router: Router ){
+      this.app.use(router);
+    }
+
+    async configure(){
+      const allowedOrigins = envs.CORS_ORIGINS;
 
         this.app.use(
           cors({
@@ -43,13 +55,6 @@ export class AppServer {
             // useTempFiles : true, //activar para archivos grandes
             limits: { fileSize: 50 * 1024 * 1024 },
         }));
-
-        this.app.use( this.routes );
-
-        this.app.listen( this.port, () => {
-            console.log( `Server is running on port ${this.port}` );
-        });
-
     }
 
 }

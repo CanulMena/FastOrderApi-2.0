@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { CustomError } from "../../domain/errors";
-import { User } from "../../domain/entities";
+import { Order, User } from "../../domain/entities";
 import { CreateOrderDetailsDto, CreateOrderDto, UpdateOrderDto, PaginationDto, OrderFiltersDto } from "../../domain/dtos";
 import { RegisterOrder, UpdateOrder, DeleteOrder, GetOrders, DeleteOrderDetail, CreateOrderDetail, GetOrdersDay } from "../../domain/use-cases/index";
 import { CustomerRepository, DishRepository, OrderRepository } from "../../domain/repositories";
+import { OrderMapper } from '../../domain/mappers';
 
 export class OrderController {
 
@@ -144,8 +145,7 @@ export class OrderController {
 
     new GetOrdersDay(
       this.orderRepository,
-      this.customerRepository,
-      this.dishRepository
+      new OrderMapper(this.customerRepository, this.dishRepository),
     )
     .execute(user, paginationDto!, filterDto!)
     .then( orders => res.status(200).json(orders))
