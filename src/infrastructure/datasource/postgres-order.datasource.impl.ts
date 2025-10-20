@@ -49,9 +49,10 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
                 tipoEntrega: updateOrder.orderType,
                 tipoPago: updateOrder.paymentType,
                 esPagado: updateOrder.isPaid,
+                notas: updateOrder.notes,
                 clienteId: updateOrder.clientId,
                 detalles: {
-                    update: detailsToUpdate!.map(detalle => ({
+                    update: detailsToUpdate?.map(detalle => ({
                         where: { id: detalle.orderDetailId },
                         data: {
                             platilloId: detalle.dishId,
@@ -66,7 +67,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
             }
         });
         return Order.fromJson(updatedOrder);
-    });
+    },/* { timeout: 15000 } */);
 }
 
 
@@ -92,6 +93,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
           tipoPago: createOrderDto.paymentType,
           esPagado: createOrderDto.isPaid,
           clienteId: createOrderDto.clientId,
+          notas: createOrderDto.notes,
           cocinaId: createOrderDto.kitchenId,
           detalles: {
             create: createOrderDto.orderDetails.map(detail => ({

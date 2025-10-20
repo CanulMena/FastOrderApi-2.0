@@ -26,8 +26,8 @@ export class UpdateOrder implements UpdateOrderUseCase {
         }
 
         // Validar que el status de la orden que se quiere actualizar no sea entregado
-        if (orderFound.status === 'ENTREGADO') {
-            throw CustomError.badRequest('The order has already been delivered');
+        if (orderFound.status === 'COMPLETADO') {
+            throw CustomError.badRequest('The order has already been completed');
         }
 
         // Verificar que se quiere actualizar al cliente de la orden

@@ -5,6 +5,7 @@ export interface OrderResponseDto {
   deliveryType: string;
   paymentType: string;
   isPaid: boolean;
+  notes?: string;
   clientName?: string;
   kitchenId: number;
   clientId?: number

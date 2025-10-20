@@ -43,6 +43,7 @@ export class OrderMapper {
       deliveryType: order.deliveryType,
       paymentType: order.paymentType,
       isPaid: order.isPaid,
+      notes: order.notes,
       clientName: customer?.name ?? 'Anónimo',
       kitchenId: order.kitchenId,
       clientId: order.clientId,

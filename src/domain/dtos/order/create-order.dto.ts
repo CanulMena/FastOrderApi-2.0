@@ -12,10 +12,11 @@ export class CreateOrderDto {
     public orderDetails: CreateOrderDetailsDto[], // Detalles del pedido
     public kitchenId: number, // Relación a la cocina para identificar de dónde es el pedido
     public clientId?: number, // Relación al cliente que hizo el pedido
+    public notes?: string,
   ) {}
 
   static create(object: { [key: string]: any }): [string?, CreateOrderDto?] {
-    const { date, status, orderType, paymentType, isPaid, orderDetails, clientId, kitchenId } = object;
+  const { date, status, orderType, paymentType, isPaid, orderDetails, clientId, kitchenId, notes } = object;
 
     // Validar fecha
     if (!date) return ['date is required'];
@@ -59,7 +60,9 @@ export class CreateOrderDto {
     if (!kitchenId) return ['kitchenId is required'];
     if (isNaN(kitchenId)) return ['kitchenId must be a number'];
 
+    if (notes && typeof notes !== 'string') return ['notes must be a string'];
+
     // Crear instancia válida
-    return [undefined, new CreateOrderDto(newDate, status, orderType, paymentType, isPaid, validatedDetails, kitchenId, clientId)];
+    return [undefined, new CreateOrderDto(newDate, status, orderType, paymentType, isPaid, validatedDetails, kitchenId, clientId, notes)];
   }
 }

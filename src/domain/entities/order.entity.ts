@@ -1,7 +1,7 @@
 import { CustomError } from "../errors";
 import { OrderDetail } from "./order-detail.entity";
 
-const validOrderStatus = ['PENDIENTE', 'CANCELADO', 'ENTREGADO'] as const;
+const validOrderStatus = ['PENDIENTE', 'CANCELADO', 'ENTREGADO', 'EMPAQUETADO', 'COMPLETADO'] as const;
 export type OrderStatus = typeof validOrderStatus[number]; //type
 
 const TypeDelivery = ['ENVIO', 'PRESENCIAL'] as const;
@@ -24,6 +24,7 @@ export class Order {
     public orderDetails: OrderDetail[],
     public clientId: number, // Relación al cliente que hizo el pedido
     public kitchenId: number, // Relación a la cocina para identificar de dónde es el pedido
+    public notes?: string
     //TODO: agregar los pagos pendientes
   ) {}
 
@@ -41,7 +42,7 @@ export class Order {
 
   static fromJson( object: {[key: string] : any} ): Order {
     const { id, fecha, estado, tipoEntrega, tipoPago, esPagado, detalles,
-      clienteId, cocinaId } = object;
+      clienteId, cocinaId, notas } = object;
     let newDate;
     if(!id) throw CustomError.badRequest('Missing id');
     if(!fecha) throw CustomError.badRequest('Missing fecha');
@@ -54,6 +55,7 @@ export class Order {
     if(!tipoPago) throw CustomError.badRequest('Missing tipoPago');
     if(!Order.isValidOrderPaymentType(tipoPago)) throw CustomError.badRequest(`Invalid payment type - valid values: ${Order.OrderPaymentType}`);
     if(esPagado === undefined) throw CustomError.badRequest('Missing esPagado');
+    if(notas && typeof notas !== 'string') throw CustomError.badRequest('notes must be a string');
 
     // if(!detalles) throw CustomError.badRequest('Missing detalles');
     // if(!Array.isArray(detalles)) throw CustomError.badRequest('detalles must be an array');
@@ -79,7 +81,8 @@ export class Order {
       esPagado,
       validatedDetails,
       clienteId,
-      cocinaId
+      cocinaId,
+      notas
     );
   }
   

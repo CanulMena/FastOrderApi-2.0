@@ -11,10 +11,11 @@ export class UpdateOrderDto {
         public readonly isPaid?: boolean,
         public readonly clientId?: number,
         public readonly orderDetails?: UpdateOrderDetailsDto[],
+        public readonly notes?: string,
     ) {}
 
     static create( object: {[key: string]: any} ): [string?, UpdateOrderDto?] {
-        const { orderId, date, status, orderType, paymentType, isPaid, clientId, orderDetails} = object;
+    const { orderId, date, status, orderType, paymentType, isPaid, clientId, orderDetails, notes } = object;
 
         if (!orderId || isNaN(Number(orderId)) ) return ['ID argument must be a valid number'];
 
@@ -38,7 +39,8 @@ export class UpdateOrderDto {
                 if (validDetail) validatedDetails.push(validDetail);
             }
         }
+        if (notes && typeof notes !== 'string') return ['notes must be a string'];
 
-        return [ undefined, new UpdateOrderDto(orderId, date, status, orderType, paymentType, isPaid, clientId, orderDetails) ];
+        return [ undefined, new UpdateOrderDto(orderId, date, status, orderType, paymentType, isPaid, clientId, orderDetails, notes) ];
     }
 }

@@ -2,7 +2,7 @@
 import { bcryptAdapter } from './../../configuration';
 
 
-const cocinaCentral = { // cocinaIndex [0]
+const cocinaElBaby = { // cocinaIndex [0]
 
   complementos: [
     {
@@ -92,6 +92,7 @@ const cocinaCentral = { // cocinaIndex [0]
       esPagado: false,
       clienteIndex: 0,   // Juan Pérez
       cocinaIndex: 0,    // Cocina Central
+      notas: "TestingNotas",
       detalles: [
         {
           platilloIndex: 0, // Empanizado
@@ -180,21 +181,21 @@ const cocinaCentral = { // cocinaIndex [0]
 
 export const seedData = {
   cocinas: [
-    { nombre: 'Cocina Central', direccion: 'Calle 123', telefono: '111-222-333' },
-    { nombre: 'Cocina Norte', direccion: 'Avenida 456', telefono: '222-333-444' },
+    { nombre: 'Cocina el baby', direccion: 'Calle 111b * 52a y 54 N° 494', telefono: '9991402885' },
+    { nombre: 'Cocina testing', direccion: 'Calle 111 * 46 y 48 N° 315', telefono: '9991402885' },
   ],
 
   usuarios: [
     {
-      nombre: 'Admin Central',
+      nombre: 'Gustavo Mena',
       email: 'gussycaul124@gmail.com',
       contrasena: bcryptAdapter.hash('Relax98705'),
       rol: 'ADMIN',
       cocinaIndex: 0, // Relacionar con cocinas[0] - Cocina Central
     },
     {
-      nombre: 'Admin Norte',
-      email: 'gusssy12@gmail.com',
+      nombre: 'Admin testing',
+      email: 'adminTesting@gmail.com',
       contrasena: bcryptAdapter.hash('123456'),
       rol: 'ADMIN',
       cocinaIndex: 1, // Relacionar con cocinas[1] - Cocina Norte
@@ -202,28 +203,25 @@ export const seedData = {
   ],
 
   platillos: [
-    ...cocinaCentral.platillos,
+    ...cocinaElBaby.platillos,
+
+    //agregar complementos de la otra cocina.
+  ],
+
+  complementos: [
+    ...cocinaElBaby.complementos,
+
     // {
-    //   nombre: 'Frijol con puerco',
-    //   precioMedia: 70,
-    //   precioEntera: 100,
+    //   nombre: 'Papas fritas',
+    //   descripcion: 'Papas crocantes',
     //   rutaImagen: null,
     //   cocinaIndex: 1, // Relacionar con cocinas[1] - Cocina Norte
     // },
   ],
 
-  complementos: [
-    ...cocinaCentral.complementos,
-    {
-      nombre: 'Papas fritas',
-      descripcion: 'Papas crocantes',
-      rutaImagen: null,
-      cocinaIndex: 1, // Relacionar con cocinas[1] - Cocina Norte
-    },
-  ],
-
   clientes: [
-    ...cocinaCentral.clientes,
+    ...cocinaElBaby.clientes,
+
     {
       nombre: 'María López',
       email: 'marialopez@gmail.com',
@@ -234,7 +232,8 @@ export const seedData = {
   ],
 
   platillosProgramados: [
-    ...cocinaCentral.platillosProgramados,
+    ...cocinaElBaby.platillosProgramados,
+
     {
       platilloIndex: 1,
       diaSemana: 'VIERNES',
@@ -245,7 +244,7 @@ export const seedData = {
   ],
 
   ordenes: [
-    ...cocinaCentral.ordenes,
+    ...cocinaElBaby.ordenes,
   ],
 
 
