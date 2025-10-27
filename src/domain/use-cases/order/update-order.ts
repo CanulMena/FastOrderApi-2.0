@@ -1,86 +1,202 @@
-import { UpdateOrderDto } from "../../dtos";
-import { OrderDetail, User } from "../../entities";
+import { OrderResponseDto, UpdateOrderDto } from "../../dtos";
+import { Order, OrderDetail, User } from "../../entities";
 import { CustomError } from "../../errors";
 import { CustomerRepository, DishRepository, OrderRepository } from "../../repositories";
-
+import { WssService } from "../../../presentation/services/ws-service";
+// import { luxonAdapter } from "../../../configuration/plugins/luxon.adapter";
+import { OrderMapper } from "../../mappers";
 
 interface UpdateOrderUseCase {
-    execute(updateOrderDto: UpdateOrderDto, user: User): Promise<Object>;
+  execute(updateOrderDto: UpdateOrderDto, user: User): Promise<object>;
 }
 
 export class UpdateOrder implements UpdateOrderUseCase {
-    constructor (
-        private readonly orderRepository: OrderRepository,
-        private readonly customerRepository: CustomerRepository,
-        private readonly dishRepository: DishRepository
-        
-    ) {}
 
-    async execute(updateOrderDto: UpdateOrderDto, user: User): Promise<Object> {
-        //* Parte principal de la orden
-        // Verifica si la orden existe
-        const orderFound = await this.orderRepository.getOrderById(updateOrderDto.orderId);
-        // Verifica si el usuario tiene acceso a la cocina de la orden
-        if (orderFound.kitchenId !== user.kitchenId && user.rol !== 'SUPER_ADMIN') {
-            throw CustomError.unAuthorized('User does not have access to this kitchen');
+  private _orderMapper: OrderMapper;
+
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly customerRepository: CustomerRepository,
+    private readonly dishRepository: DishRepository,
+    private readonly wssService = WssService.instance,
+    private orderMapper?: OrderMapper,
+  ) {
+    this._orderMapper = orderMapper ?? new OrderMapper(this.customerRepository, this.dishRepository);
+  }
+
+  async execute(updateOrderDto: UpdateOrderDto, user: User): Promise<object> {
+    // Validar acceso y existencia
+    const orderFound = await this.validateAccess(updateOrderDto, user);
+
+    // Validar cliente (si se actualiza)
+    await this.validateCustomer(updateOrderDto, orderFound.kitchenId);
+
+    // Validar detalles (si los hay)
+    const orderDetailsByOrderId: OrderDetail[] =
+      await this.validateOrderDetails(updateOrderDto, orderFound.orderId);
+
+    // Actualizar en repositorio
+    const updatedOrder = await this.orderRepository.updateOrder(
+      updateOrderDto,
+      orderDetailsByOrderId
+    );
+
+    // Notificar por WebSocket
+    await this.notifyInstanceOrderUpdated(updatedOrder);
+    // await this.notifyDishPortionsUpdated(updatedOrder, updateOrderDto);
+
+    return { orderUpdated: updatedOrder };
+  }
+
+  // =============================
+  // Métodos privados auxiliares
+  // =============================
+
+  /** Validar existencia y acceso del usuario a la orden */
+  private async validateAccess(updateOrderDto: UpdateOrderDto, user: User) {
+    const orderFound = await this.orderRepository.getOrderById(updateOrderDto.orderId);
+
+    if (orderFound.kitchenId !== user.kitchenId && user.rol !== "SUPER_ADMIN") {
+      throw CustomError.unAuthorized("User does not have access to this kitchen");
+    }
+
+    if( updateOrderDto.status === 'COMPLETADO' && updateOrderDto.isPaid === false ) {
+        throw CustomError.badRequest("Para completar una orden, ocupa ser pagada");
+    }
+
+    if (orderFound.status === "COMPLETADO" && orderFound.isPaid === true) {
+      throw CustomError.badRequest("The order has already been completed");
+    }
+
+    return orderFound;
+  }
+
+  /** Validar cliente (si se cambia el cliente de la orden) */
+  private async validateCustomer(updateOrderDto: UpdateOrderDto, kitchenId: number) {
+    if (!updateOrderDto.clientId) return;
+
+    const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId);
+    if (customer.kitchenId !== kitchenId) {
+      throw CustomError.badRequest("The customer does not belong to this kitchen");
+    }
+  }
+
+  /** Validar que los detalles existan antes de actualizar */
+  private async validateOrderDetails(updateOrderDto: UpdateOrderDto, orderId: number) {
+    let orderDetailsByOrderId: OrderDetail[] = [];
+
+    if (updateOrderDto.orderDetails && updateOrderDto.orderDetails.length > 0) {
+      orderDetailsByOrderId = await this.orderRepository.getOrderDetailsByOrderId(orderId);
+
+      const dishesId = orderDetailsByOrderId.map((d) => d.dishId);
+      const dishes = await this.dishRepository.getDishesById(dishesId);
+
+      for (const detailDto of updateOrderDto.orderDetails) {
+        const existingDetail = orderDetailsByOrderId.find(
+          (d) => d.orderDetailId === detailDto.orderDetailId
+        );
+        if (!existingDetail) {
+          throw CustomError.badRequest(`Order detail ${detailDto.orderDetailId} not found`);
         }
 
-        // Validar que el status de la orden que se quiere actualizar no sea entregado
-        if (orderFound.status === 'COMPLETADO') {
-            throw CustomError.badRequest('The order has already been completed');
+        const dish = dishes.find((d) => d.dishId === existingDetail.dishId);
+        if (!dish) {
+          throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
         }
 
-        // Verificar que se quiere actualizar al cliente de la orden
-        if (updateOrderDto.clientId) { 
-            // Verifica si el cliente existe
-            const customer = await this.customerRepository.getCustomerById(updateOrderDto.clientId!); //*le paso el id del cilente que quiero actualizar en el updateOrderDto
-            
-            // Verifica si el cliente pertenece a la cocina de la orden
-            if ( customer.kitchenId !== orderFound.kitchenId) {
-                throw CustomError.badRequest('The customer does not belong to the kitchen of the order');
-            }
-        } 
-
-        //* Parte anidada de la orden (detalles de la orden)
-        let orderDetailsByOrderId: OrderDetail[] = [];
-        if (updateOrderDto.orderDetails && updateOrderDto.orderDetails.length > 0) {
-            // 1. Obtenemos todos los detalles de orden de la orden existente.
-            orderDetailsByOrderId = await this.orderRepository.getOrderDetailsByOrderId(orderFound.orderId);
-    
-            // 2. Obtenemos todos los dishId de los detalles de pedido que tenemos.
-            const dishesId: number[] = orderDetailsByOrderId.map(detail => detail.dishId);
-    
-            // 3. Obtenemos todos los platillos de los detalles de pedido que tenemos.
-            const dishes = await this.dishRepository.getDishesById(dishesId);
-    
-            // 4. Validar raciones disponibles antes de hacer cualquier actualización
-            updateOrderDto.orderDetails.forEach(detailDto => {
-            // verificar que el detalle del pedido exista
-            const existingDetail:  OrderDetail | undefined = orderDetailsByOrderId.find(d => d.orderDetailId === detailDto.orderDetailId);
-            if (!existingDetail) {
-                throw CustomError.badRequest(`Order detail ${detailDto.orderDetailId} not found`);
-            }
-            //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Validar que orderPortion no sea mayor al limiteRaciones de PlatilloProgramado
+        //FIXME: Cuando el control de raciones de PlatilloProgramado este activo. Validar que orderPortion no sea mayor al limiteRaciones de PlatilloProgramado
             // const requestedServings =
             //     detailDto.fullPortion !== undefined || detailDto.halfPortion !== undefined
             //     ? (detailDto.fullPortion ?? 0) + (detailDto.halfPortion ?? 0) * 0.5
             //     : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
-    
+
             // const previousServings = (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
             // const dish = dishes.find(d => d.dishId === existingDetail.dishId);
             // if (!dish) {
             //     throw CustomError.notFound(`Dish with id ${existingDetail.dishId} not found`);
             // }
-    
+
             // const servingsDifference = requestedServings - previousServings;
             // if (servingsDifference > 0 && servingsDifference > dish.availableServings) {
             //     throw CustomError.badRequest(`Not enough servings available for dish ${dish.name}`);
             // }
-            });
-        }
+      }
+    }
 
-        const orderUpdated = await this.orderRepository.updateOrder(updateOrderDto, orderDetailsByOrderId);
+    return orderDetailsByOrderId;
+  }
 
-        return { orderUpdated };
+  /** Notificar a la cocina que la orden fue actualizada */
+  private async notifyOrderUpdated(updatedOrder: any, originalOrder?: any) {
+    if (!originalOrder) return;
+
+  // Campos que nos interesan monitorear
+  const keysToWatch = [
+    "status",
+    "isPaid",
+    "orderType",
+    "paymentType",
+    "clientId",
+    "notes",
+  ];
+
+  const changes: Record<string, any> = { orderId: updatedOrder.orderId };
+
+  for (const key of keysToWatch) {
+    // Algunos nombres cambian entre tu dominio y la BD (ajústalo si es necesario)
+    const oldValue = originalOrder[key];
+    const newValue = updatedOrder[key];
+
+    if (newValue !== undefined && newValue !== oldValue) {
+      changes[key] = newValue;
+    }
+  }
+
+  // Solo notificamos si hubo cambios relevantes
+  if (Object.keys(changes).length > 1) {
+    this.wssService.sendMessageToKitchen(
+      updatedOrder.kitchenId,
+      "ORDER_UPDATED",
+      changes
+    );
+  }
+  }
+
+  private async notifyInstanceOrderUpdated(updatedOrder: Order) {
+    const orderDto = await this.mapOrderToDto(updatedOrder);
+    this.wssService.sendMessageToKitchen(
+      updatedOrder.kitchenId,
+      "ORDER_UPDATED",
+      orderDto
+    );
+  }
+
+//   /** Notificar el recuento actualizado de porciones de los platillos */
+//   private async notifyDishPortionsUpdated(updatedOrder: any, updateOrderDto: UpdateOrderDto) {
+//     if (!updateOrderDto.orderDetails?.length) return;
+
+//     const { startUTC, endUTC } = luxonAdapter.getDayRangeUtcByZone("America/Merida");
+
+//     for (const detail of updateOrderDto.orderDetails) {
+//       const portions = await this.orderRepository.getOrderedServingsByDishAndDateRange(
+//         detail.dishId,
+//         startUTC,
+//         endUTC
+//       );
+
+//       this.wssService.sendMessageToKitchen(
+//         updatedOrder.kitchenId,
+//         "DISH_PORTIONS_UPDATED",
+//         {
+//           dishId: detail.dishId,
+//           recuentoPorciones: portions.dishTotalServings,
+//         }
+//       );
+//     }
+//   }
+
+    private async mapOrderToDto(order: Order): Promise<OrderResponseDto> {
+      const orderResponseDto = await this._orderMapper.mapOrderToDto(order);
+      return orderResponseDto;
     }
 }

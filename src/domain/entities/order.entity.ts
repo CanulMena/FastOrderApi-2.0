@@ -18,7 +18,7 @@ export class Order {
     public orderId: number, // Identificador único del pedido
     public date: Date, // Fecha del pedido
     public status: OrderStatus, // Estado del pedido
-    public deliveryType: OrderDeliveryType                , // Tipo de pedido
+    public deliveryType: OrderDeliveryType, // Tipo de pedido
     public paymentType: OrderPaymentType, // Tipo de pago
     public isPaid: boolean, // Si el pedido está pagado
     public orderDetails: OrderDetail[],
@@ -85,5 +85,5 @@ export class Order {
       notas
     );
   }
-  
+
 }
