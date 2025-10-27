@@ -32,7 +32,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         //     await tx.platillo.update({
         //         where: { id: existingDetail.dishId },
         //         data: {
-        //           racionesDisponibles: { 
+        //           racionesDisponibles: {
         //             decrement: servingsDifference,
         //           }
         //         }
@@ -45,9 +45,9 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         const updatedOrder = await tx.pedido.update({
             where: { id: updateOrder.orderId },
             data: {
-                estado: updateOrder.status,
-                tipoEntrega: updateOrder.orderType,
-                tipoPago: updateOrder.paymentType,
+                estado: updateOrder.status as any,
+                tipoEntrega: updateOrder.orderType as any,
+                tipoPago: updateOrder.paymentType as any,
                 esPagado: updateOrder.isPaid,
                 notas: updateOrder.notes,
                 clienteId: updateOrder.clientId,
