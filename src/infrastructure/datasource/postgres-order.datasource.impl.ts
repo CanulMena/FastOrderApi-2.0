@@ -13,7 +13,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
   private readonly prismaOrderDetail = this.prisma.detallePedido;
 
   async updateOrder(
-    updateOrder: UpdateOrderDto, 
+    updateOrder: UpdateOrderDto,
     orderDetailsEntity: OrderDetail[],
 ): Promise<Order> {
     return await this.prisma.$transaction(async (tx) => {
@@ -22,7 +22,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         //     const existingDetail = orderDetailsEntity.find(orderDetailEntity => orderDetailEntity.orderDetailId === orderDetailDto.orderDetailId);
         //     if (!existingDetail) continue; // No es necesario lanzar error aquí, ya lo validamos en el UpdateOrder UseCase
 
-        //     const requestedServings = 
+        //     const requestedServings =
         //     orderDetailDto.fullPortion !== undefined || orderDetailDto.halfPortion !== undefined
         //         ? (orderDetailDto.fullPortion ?? 0) + (orderDetailDto.halfPortion ?? 0) * 0.5
         //         : (existingDetail.portion ?? 0) + (existingDetail.halfPortion ?? 0) * 0.5;
@@ -31,7 +31,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
         //     //TODO: Cuando el control de raciones de PlatilloProgramado este activo. Disminuir limiteRaciones de PlatilloProgramado
         //     await tx.platillo.update({
         //         where: { id: existingDetail.dishId },
-        //         data: { 
+        //         data: {
         //           racionesDisponibles: { 
         //             decrement: servingsDifference,
         //           }
@@ -77,7 +77,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       // for( const detail of createOrderDto.orderDetails ) { //comenzamos a iterar los orderDetails.
       //   await tx.platillo.update({
       //     where: { id: detail.dishId },
-      //     data: { 
+      //     data: {
       //       racionesDisponibles: {//decrementamos las raciones disponibles
       //         decrement: detail.fullPortion + detail.halfPortion * 0.5,
       //       }
@@ -107,7 +107,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
           detalles: true, // Incluir detalles en la respuesta
         },
       });
-  
+
       return Order.fromJson(order);
     });
 
@@ -173,7 +173,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       });
 
       const deleteOrder = await tx. pedido.delete({
-        where: { id: orderId }, 
+        where: { id: orderId },
         include: { detalles: true },
       });
 
@@ -187,7 +187,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     return this.prisma.$transaction(async (tx) => {
       // Actualizar raciones disponibles
       // await tx.platillo.update({
-      //   where: { id: createOrderDetail.dishId}, 
+      //   where: { id: createOrderDetail.dishId},
       //   data: {
       //     racionesDisponibles: { decrement: createOrderDetail.fullPortion + createOrderDetail.halfPortion * 0.5 }
       //   }
@@ -196,8 +196,8 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       // Crear el detalle del pedido
       const orderDetail = await tx.detallePedido.create({
         data: {
-          cantidadEntera: createOrderDetail.fullPortion, 
-          cantidadMedia: createOrderDetail.halfPortion, 
+          cantidadEntera: createOrderDetail.fullPortion,
+          cantidadMedia: createOrderDetail.halfPortion,
           platilloId: createOrderDetail.dishId,
           pedidoId: createOrderDetail.orderId!,
         }
@@ -222,7 +222,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     const {page, limit} = pagination;
     return await this.prismaPedido.findMany({
       skip: (page - 1) * limit,
-      take: limit, 
+      take: limit,
       include: {
         detalles: true
       }
@@ -262,7 +262,7 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
     startDate: Date,
     endDate: Date
   ): Promise<{ dishId: number; dishTotalServings: number }> {
-    
+
     const orderDetails: OrderDetail[] = await this.findOrderDetailsByDishAndDate(dishId, startDate, endDate);
 
     const servingsList = this.mapOrderDetailsToServings(orderDetails);
@@ -334,6 +334,9 @@ export class PostgresOrderDatasourceImpl implements OrderDatasource {
       ...(filtersDto?.orderStatus ? { estado: filtersDto.orderStatus } : {}),
       ...(filtersDto?.paymentType ? { tipoPago: filtersDto.paymentType } : {}),
       ...(filtersDto?.orderType ? { tipoEntrega: filtersDto.orderType } : {}),
+      },
+      orderBy: {
+        fecha: filtersDto?.orderByDate || 'desc',
       },
       include: {
         detalles: true,
