@@ -7,6 +7,6 @@ export abstract class CustomerRepository {
   abstract registerCustomer(registerCustomerDto: RegisterCustomerDto): Promise<Customer>;
   abstract getCustomerById(CustomerId: number): Promise<Customer>;
   abstract getCustomersByKitchenIdCount(kitchenId: number): Promise<number>;
-  abstract getCustomersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Customer[]>;
-  
+  abstract getCustomersByKitchenId(kitchenId: number, pagination: PaginationDto, search: string): Promise<Customer[]>;
+
 }

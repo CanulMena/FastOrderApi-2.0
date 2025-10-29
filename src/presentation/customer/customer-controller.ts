@@ -41,6 +41,7 @@ export class CustomerController{
   public getCustomersByIdKitchen = (req: Request, res: Response) => {
     const user = req.body.user as User;
     const kitchenId = +req.params.kitchenId;
+    const search = req.query.search;
     const {page = 1, limit = 10} = req.query;
     const [error, paginationDto] = PaginationDto.create(+page, +limit);
     if (error) {
@@ -49,7 +50,7 @@ export class CustomerController{
     }
 
     new GetCustomersByIdKitchen(this.customerRepository)
-    .execute(user, kitchenId, paginationDto!)
+    .execute(user, kitchenId, paginationDto!, search ? String(search) : undefined)
     .then((customers) => res.status(200).json(customers))
     .catch((err) => this.handleError(err, res));
   }

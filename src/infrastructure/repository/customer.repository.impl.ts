@@ -23,8 +23,8 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     return this.customerDatasource.getCustomersByKitchenIdCount(kitchenId);
   }
 
-  getCustomersByKitchenId(kitchenId: number, pagination: PaginationDto): Promise<Customer[]> {
-    return this.customerDatasource.getCustomersByKitchenId(kitchenId, pagination);
+  getCustomersByKitchenId(kitchenId: number, pagination: PaginationDto, search: string): Promise<Customer[]> {
+    return this.customerDatasource.getCustomersByKitchenId(kitchenId, pagination, search);
   }
 
 }

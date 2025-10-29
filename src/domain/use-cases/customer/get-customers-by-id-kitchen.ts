@@ -1,9 +1,10 @@
 import { CustomerRepository, UserRepository } from "../../repositories";
 import { PaginationDto } from '../../dtos/shared/pagination.dto';
 import { Customer, User } from "../../entities";
+import { CustomError } from "../../errors";
 
 interface GetCustomersByIdKitchenUseCase {
-    execute(user: User ,kitchenId: number, pagination: PaginationDto): Promise<object>;
+    execute(user: User ,kitchenId: number, pagination: PaginationDto, search?: string): Promise<object>;
 }
 
 export class GetCustomersByIdKitchen implements GetCustomersByIdKitchenUseCase {
@@ -11,24 +12,24 @@ export class GetCustomersByIdKitchen implements GetCustomersByIdKitchenUseCase {
         private readonly customerRepository: CustomerRepository,
     ) {}
 
-    async execute(user: User, kitchenId: number, pagination: PaginationDto): Promise<object> {
+    async execute(user: User, kitchenId: number, pagination: PaginationDto, search?: string): Promise<object> {
         const { page, limit } = pagination;
 
         if (user.rol === 'SUPER_ADMIN') {
             const customersCount = await this.customerRepository.getCustomersByKitchenIdCount(kitchenId);
-            const customers = await this.customerRepository.getCustomersByKitchenId(kitchenId, pagination);
+            const customers = await this.customerRepository.getCustomersByKitchenId(kitchenId, pagination, search ?? '');
             return this.buildResponse(customers, page, limit, customersCount);
         }
 
         if (!user.kitchenId) {
-            throw new Error('User does not have access to any kitchen');
+            throw CustomError.unAuthorized('User does not have access to any kitchen');
         }
 
         const customersByKitchenIdCount = await this.customerRepository.getCustomersByKitchenIdCount(user.kitchenId);
-        const customersByKitchenId = await this.customerRepository.getCustomersByKitchenId(user.kitchenId, pagination);
+        const customersByKitchenId = await this.customerRepository.getCustomersByKitchenId(user.kitchenId, pagination, search ?? '');
 
         return this.buildResponse(customersByKitchenId, page, limit, customersByKitchenIdCount);
-    
+
     }
 
     private buildResponse(customers: Customer[], page: number, limit: number, count: number): object {
